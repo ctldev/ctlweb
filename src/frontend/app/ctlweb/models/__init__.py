@@ -1,1 +1,1 @@
-from models.py import *
+from ctlweb.models.default import *
