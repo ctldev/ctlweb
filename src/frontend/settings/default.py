@@ -3,7 +3,12 @@
 import sys
 from os.path import abspath, basename, dirname, join, normpath
 
-from django.utils.crypto import get_random_string
+try:
+    from django.utils.crypto import get_random_string
+    USE_CHOICE = False
+except ImportError:
+    from random import choice
+    USE_CHOICE = True
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -169,6 +174,9 @@ except IOError:
     try:
         with open(SECRET_FILE, 'w') as f:
             chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-            f.write(get_random_string(50, chars))
+            if USE_CHOICE:
+                f.write(''.join([choice(chars) for i in range(50)]))
+            else:
+                f.write(get_random_string(50, chars))
     except IOError:
         raise Exception('cannot open file `%s` for writing.' % SECRET_FILE)
