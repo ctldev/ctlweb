@@ -1,7 +1,24 @@
 # Django settings for frontend project.
 
-DEBUG = True
+import sys
+from os.path import abspath, basename, dirname, join, normpath
+
+from helpers import gen_secret_key
+
+DEBUG = FALSE
 TEMPLATE_DEBUG = DEBUG
+
+DJANGO_ROOT = dirname(dirname(abspath(__file__)))
+
+SITE_NAME = basename(DJANGO_ROOT)
+
+SITE_ROOT = dirname(DJANGO_ROOT)
+
+SECRET_FILE = normpath(join(SITE_ROOT, 'deploy', 'SECRET'))
+
+sys.path.append(SITE_ROOT)
+sys.path.append(normpath(join(DJANGO_ROOT, 'app')))
+
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -56,7 +73,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = normpath(join(DJANGO_ROOT, 'static'))
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -83,7 +100,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '+32v8r#app+@acf%3hd0nlp%^mm81v5&2hg+72ur%i6un)8oy-'
+#SECRET_KEY = '+32v8r#app+@acf%3hd0nlp%^mm81v5&2hg+72ur%i6un)8oy-'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -103,6 +120,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'frontend.urls'
 
 TEMPLATE_DIRS = (
+    normpath(join(DJANGO_ROOT, 'templates')),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -143,3 +161,12 @@ LOGGING = {
         },
     }
 }
+
+try:
+    SECRET_KEY = open(SECRET_FILE).read().strip()
+except IOError:
+    try:
+        with open(SECRET_FILE, 'w') as f:
+            f.write(gen_secret_key(50))
+    except IOError:
+        raise Exception('cannot open file `%s` for writing.' % SECRET_FILE)
