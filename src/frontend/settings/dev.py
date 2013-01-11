@@ -9,7 +9,7 @@ TEMPLATE_DEBUG = DEBUG
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': normpath(join(SITE_ROOT, 'db', 'ctlweb.db')),
+            'NAME': normpath(join(SITE_ROOT, 'app', 'ctlweb', 'ctlweb.db')),
             'USER': '',
             'PASSWORD': '',
             'HOST': '',

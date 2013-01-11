@@ -3,22 +3,22 @@
 import sys
 from os.path import abspath, basename, dirname, join, normpath
 
-from helpers import gen_secret_key
+from django.utils.crypto import get_random_string
 
-DEBUG = FALSE
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 
 SITE_NAME = basename(DJANGO_ROOT)
 
-SITE_ROOT = dirname(DJANGO_ROOT)
+#SITE_ROOT = dirname(DJANGO_ROOT)
+SITE_ROOT = DJANGO_ROOT
 
-SECRET_FILE = normpath(join(SITE_ROOT, 'deploy', 'SECRET'))
+SECRET_FILE = normpath(join(SITE_ROOT, 'settings', 'SECRET'))
 
 sys.path.append(SITE_ROOT)
 sys.path.append(normpath(join(DJANGO_ROOT, 'app')))
-
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -167,6 +167,7 @@ try:
 except IOError:
     try:
         with open(SECRET_FILE, 'w') as f:
-            f.write(gen_secret_key(50))
+            chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+            f.write(get_random_string(50, chars))
     except IOError:
         raise Exception('cannot open file `%s` for writing.' % SECRET_FILE)
