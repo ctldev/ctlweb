@@ -1,8 +1,8 @@
 from django.conf.urls.defaults import patterns, url
 from django.views.generic.simple import direct_to_template
-from ctlweb.views.views import *
+from app.ctlweb.views import *
 
-urlpatterns = patterns('ctlweb.views.views',
+urlpatterns = patterns('app.ctlweb.views',
         url(r'^$', 'index', name='index'), 
         
 )
