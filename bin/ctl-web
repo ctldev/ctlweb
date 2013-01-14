@@ -1,0 +1,16 @@
+#!/bin/bash
+TEMP=`getopt -o a:k:r:o --long a-long:,k-long:,r-long:,o-long: \
+     -n 'example.bash' -- "$@"`
+
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+while true ; do
+    case "$1" in 
+        -a) echo "hier kommt eine add-funktion ($2)"; shift;;
+        -k) echo "hier kommt eine key-funktion ($2) " ; shift 2;;
+        -r) echo "hier kommt eine löschfunktion ($2)" ; shift 2;;
+        -o) echo " hier kommt eine overview-funktion " ; shift 2;;
+        --) shift ; break ;;
+        
+    esac
+done       
