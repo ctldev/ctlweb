@@ -4,7 +4,7 @@ from app.ctlweb.views import *
 
 urlpatterns = patterns('app.ctlweb.views',
         url(r'^$', 'index'), 
-        
+        url(r'^search/$', 'search') 
 )
 
 
