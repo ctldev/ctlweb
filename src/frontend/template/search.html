@@ -1,18 +1,68 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Erweiterte Suche</h1>
-<form class="form-horizontal">
-  <div class="control-group">
-	<label class="control-label" for="searchtext">Alle Kategorien</label>
-	<div class="controls">
-	  <input type="text" class="search-query" placeholder="Suchtext">
-	  
-	</div>
-  </div>
-  <div class="control-group">
-	<div class="controls">
-	  <button class="btn btn-inverse">Suche starten</button>
-	</div>
-  </div>
-</form>
+<div class='transbox'>
+  <h1>Erweiterte Suche</h1>
+  <form class="form-horizontal">
+
+
+  	{{baseform.management_form}}
+	<table id="formset" class="form">
+	  {% for form in baseform %}
+	    {% if forloop.first %}
+		  <thead><tr>
+			{% for field in form.visible_fields %}
+			  <th>{{ field.label|capfirst }}</th>
+			{% endfor %}
+		  </tr></thead>
+		{% endif %}
+		<tr class="{% cycle row1,row2 %}">
+		  {% for field in form.visible_fields %}
+			<td>
+			  {# Include the hidden fields in the form #}
+			  {% if forloop.first %}
+				{% for hidden in form.hidden_fields %}
+				  {{ hidden }}
+				{% endfor%}
+			  {% endif %}
+			  {{ field.errors.as_ul }}
+			  {{ field }}
+			</td>
+		  {% endfor %}
+		</tr>
+	  {% endfor %}
+	</table>
+
+  	{{addform.management_form}}
+	<table id="formset" class="form">
+	  {% for form in addform %}
+	    {% if forloop.first %}
+		  <thead><tr>
+			{% for field in form.visible_fields %}
+			  <th>{{ field.label|capfirst }}</th>
+			{% endfor %}
+		  </tr></thead>
+		{% endif %}
+		<tr class="{% cycle row1,row2 %}">
+		  {% for field in form.visible_fields %}
+			<td>
+			  {# Include the hidden fields in the form #}
+			  {% if forloop.first %}
+				{% for hidden in form.hidden_fields %}
+				  {{ hidden }}
+				{% endfor%}
+			  {% endif %}
+			  {{ field.errors.as_ul }}
+			  {{ field }}
+			</td>
+		  {% endfor %}
+		</tr>
+	  {% endfor %}
+	</table>
+
+
+
+
+	<button class="btn btn-inverse">Suche starten</button>
+  </form>
+</div>
 {% endblock %}
