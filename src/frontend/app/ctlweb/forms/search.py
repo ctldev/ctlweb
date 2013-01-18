@@ -5,7 +5,9 @@ class SearchForm(forms.Form):
             ('all', 'Alle Kategorien'),
             ('name', 'Name'),
             ('author', 'Autor'),
-            ('keywords', 'Schusselwort'),)
+            ('keywords', 'Schusselwort'),
+            ('homeserver', 'Server'),
+            ('date', 'Datum'),)
     Suchtext = forms.CharField()
     Kategorie = forms.ChoiceField(choices = CATEGORY_CHOICES)
 
@@ -14,7 +16,10 @@ class AddSearchForm(forms.Form):
             ('all', 'Alle Kategorien'),
             ('name', 'Name'),
             ('author', 'Autor'),
-            ('keywords', 'Schusselwort'),)
+            ('keywords', 'Schusselwort'),
+            ('homeserver', 'Server'),
+            ('date','Datum'),)
+    
     LOGIC_CHOICES = (
             ('and', 'und'),
             ('and not', 'und nicht'),
