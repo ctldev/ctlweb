@@ -30,27 +30,36 @@
             <span class="icon-bar"></span>
           </a>
           <a class="brand" href="/">CTLWEB</a>
+
           <div class="nav-collapse collapse">
+
             <ul class="nav">
               <li class="home"><a href="/">Home</a></li>
-			  <li><a href="{% url components %}">Verzeichnis</a></li>
-              <li class="dropdown">
-			  <a href="{% url administration %}" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
+              <li><a href="{% url components %}">Verzeichnis</a></li>
+              <li class="dropdown"><a href="{% url administration %}" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-					<li> <a href="{% url administration_easy %}">Benutzerkonfiguration</a></li>
-					<li> <a href="{% url administration_advanced %}">Serverkonfiguration</a></li>
-                    <li> <a href="{% url administration_advanced %}">Komponentnenkonfiguration</a></li>
+            					<li> <a href="{% url administration_easy %}">Benutzerkonfiguration</a></li>
+            					<li> <a href="{% url administration_advanced %}">Serverkonfiguration</a></li>
+                      <li> <a href="{% url administration_advanced %}">Komponentnenkonfiguration</a></li>
                   </ul>
 
-				  <li><a href="{% url impressum %}">Impressum</a></li>
+				      <li><a href="{% url impressum %}">Impressum</a></li>
             </ul>
-			<ul class="nav pull-right">
-			  <li><form class="navbar-search pull-right">
-				<input type="text" class="search-query" placeholder="Suche">
-			  </form></li>
-			  <li><a href="{% url search %}">Erweiterte Suche</a></li>
-          </div><!--/.nav-collapse -->
-        </div>
+      			
+            <ul class="nav pull-right">  
+      			  <li><form class="navbar-search pull-right">
+      				<input type="text" class="search-query" placeholder="Suche">
+      			  </li>
+      			  <li><a href="{% url search %}">Erweiterte Suche</a></li>
+              <li><a href="">Login</a></li>
+              <li><a href="">Registrieren</a></li>
+
+              </form>
+
+          
+              
+            </ul>
+          </div>
       </div>
     </div>
 
