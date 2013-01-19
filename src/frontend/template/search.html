@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block headextra %}
+{{ addform.media }}
+{% endblock headextra %}
 {% block content %}
 <div class='transbox'>
   <h1>Erweiterte Suche</h1>
@@ -9,11 +12,15 @@
 	<table id="formset" class="form">
 	  {% for form in baseform %}
 	    {% if forloop.first %}
-		  <thead><tr>
+		<thead>
+		  <tr>
 			{% for field in form.visible_fields %}
-			  <th>{{ field.label|capfirst }}</th>
+			  <th>
+			    {{ field.label|capfirst }}
+			  </th>
 			{% endfor %}
-		  </tr></thead>
+		  </tr>
+	    </thead>
 		{% endif %}
 		<tr class="{% cycle row1,row2 %}">
 		  {% for field in form.visible_fields %}
@@ -32,17 +39,36 @@
 	  {% endfor %}
 	</table>
 
+	<script type="text/javascript">
+	  <!--
+	  $(function() {
+		$('.add-row').click(function() {
+		  return addForm(this, 'addform');
+		});
+		$('.delete-row').click(function() {
+		  return deleteForm(this, 'addform');
+		});
+	  })
+	  //-->
+	</script>
   	{{addform.management_form}}
 	<table id="formset" class="form">
 	  {% for form in addform %}
 	    {% if forloop.first %}
-		  <thead><tr>
-			{% for field in form.visible_fields %}
-			  <th>{{ field.label|capfirst }}</th>
-			{% endfor %}
-		  </tr></thead>
+		  <thead>
+		    <tr>
+			  {% for field in form.visible_fields %}
+			    <th>
+				  {{ field.label|capfirst }}
+				</th>
+			  {% endfor %}
+		    </tr>
+		  </thead>
 		{% endif %}
-		<tr class="{% cycle row1,row2 %}">
+		<tr 
+		  class="{% cycle row1,row2 %} dynamic-form" 
+		  id="{{ form.prefix }}-row"
+		>
 		  {% for field in form.visible_fields %}
 			<td>
 			  {# Include the hidden fields in the form #}
@@ -58,11 +84,13 @@
 		</tr>
 	  {% endfor %}
 	</table>
+	<a href="javascript:void(0)"  class="btn btn-inverse add-row">
+	  Weiteres Suchfeld
+	</a>
 
-
-
-
-	<button class="btn btn-inverse">Suche starten</button>
+	<button class="btn btn-inverse">
+	  Suche starten
+	</button>
   </form>
 </div>
 {% endblock %}
