@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+import sys
+import getopt
+
+# registriert benutzer mit id und rsa-pub-key.
+# Fügt den Benutzer dabei der DB hinzu und schreibt die .authorized_keys neu
+
+opt = "a:k:r:ov"
+long_opt = [ "add=", "key=", "remove=", "overview" ]
+max_output_level = 2
+
+def usage():
+    print("Usage:", sys.argv[0], """[-a <id>|--add=<id> -k <key>|--key=<key>]
+    \t [-r <id>|--remove=<id>] 
+    \t [-o|--overview]""")
+
+def main():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
+
+    except getopt.GetoptError as err:
+        # Print help and exit
+        print(err)
+        usage()
+        sys.exit(2)
+    output = None
+    verbose = 0
+
+    for o, a in opts:
+        if o in ("-a", "--add"):
+            print("add",o,a)
+
+        elif o in ("-k", "--key"):
+            print("key",o,a)
+
+        elif o in ("-r", "--remove"):
+            print("removing",o,a)
+
+        elif o in ("-o", "--overview"):
+            print("overview",o,a)
+
+        elif o == "-v":
+            if verbose < max_output_level: 
+                verbose = verbose + 1
+        
+if __name__ == "__main__":
+    main()

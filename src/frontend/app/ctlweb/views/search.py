@@ -10,8 +10,8 @@ from ctlweb.forms import SearchForm, AddSearchForm
 def search(request):
     SearchFormset = formset_factory(SearchForm)
     AddSearchFormset = formset_factory(AddSearchForm)
-    baseform = SearchFormset()
-    addform = AddSearchFormset()
+    baseform = SearchFormset(prefix="baseform")
+    addform = AddSearchFormset(prefix="addform")
     dict_response = {
             'baseform' : baseform,
             'addform' : addform,
