@@ -1,3 +1,4 @@
+#vim: set fileencoding=utf-8
 """Development settings and globals."""
 
 from default import *

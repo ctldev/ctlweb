@@ -1,3 +1,4 @@
+#vim: set fileencoding=utf-8
 from django.conf.urls.defaults import patterns, include, url
 from django.conf import settings
 

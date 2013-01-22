@@ -1,3 +1,4 @@
+#vim: set fileencoding=utf-8
 # Django settings for frontend project.
 
 import sys

@@ -1,3 +1,4 @@
+#vim: set fileencoding=utf-8
 from views import *
 from search import *
 from login import *

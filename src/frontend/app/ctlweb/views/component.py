@@ -1,3 +1,4 @@
+#vim: set fileencoding=utf-8
 # vim: set fileencoding=utf-8
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import RequestContext, Template
