@@ -1,4 +1,3 @@
-#vim: set fileencoding=utf-8
 # vim: set fileencoding=utf-8
 from django.contrib.auth.models import User
 from django.db import models
@@ -35,9 +34,9 @@ class Userkeys(models.Model):
         verbose_name = _(u"Benutzerschlüssel")
         verbose_name_plural = _(u"Benutzerschlüssel")
 	permissions = (
-		("can_request_key", _(u"Darf sich einen Schlüssel anfordern")),
-		("can_activate_user", _("Darf User freischalten")),
-		("can_ban_user", _("Darf User bannen")))        
+		("can_request_key", u"Darf sich einen Schlüssel anfordern"),
+		("can_activate_user", "Darf User freischalten"),
+		("can_ban_user", "Darf User bannen"))        
 
 class Components(models.Model):
     name = models.CharField(_("Name"), max_length=100, unique="True")
@@ -56,9 +55,9 @@ class Components(models.Model):
         verbose_name = _("Component")
         verbose_name_plural = _("Components")        
     permissions = (
-		    ("can_see_description", _("Darf Beschreibungen lesen")),
-		    ("can_see_homecluster", _("Darf die Ursprungscluster sehen")),
-     		("can_see_homeserver", _("Darf die Ursprungsserver sehen")))
+		    ("can_see_description", "Darf Beschreibungen lesen"),
+		    ("can_see_homecluster", "Darf die Ursprungscluster sehen"),
+     		("can_see_homeserver", "Darf die Ursprungsserver sehen"))
 
 class Components_Cluster(models.Model):
     component = models.ForeignKey(Components)
@@ -68,6 +67,5 @@ class Components_Cluster(models.Model):
     class Meta:
         app_label = 'ctlweb'
     permissons = (
-            ("can_see_path", _("Darf den Pfad sehen")),
-            ("can_see_code", _("Darf den Implementierungscode sehen"))),
-
+            ("can_see_path", "Darf den Pfad sehen"),
+            ("can_see_code", "Darf den Implementierungscode sehen"))
