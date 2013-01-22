@@ -34,9 +34,9 @@ class Userkeys(models.Model):
         verbose_name = _(u"Benutzerschlüssel")
         verbose_name_plural = _(u"Benutzerschlüssel")
 	permissions = (
-		("can_request_key", u"Darf sich einen Schlüssel anfordern"),
-		("can_activate_user", "Darf User freischalten"),
-		("can_ban_user", "Darf User bannen"))        
+		("can_request_key", u"Can request a userkey"),
+		("can_activate_user", "Can activate a User"),
+		("can_ban_user", "Can deactivate a User"))        
 
 class Components(models.Model):
     name = models.CharField(_("Name"), max_length=100, unique="True")
@@ -55,9 +55,9 @@ class Components(models.Model):
         verbose_name = _("Component")
         verbose_name_plural = _("Components")        
     permissions = (
-		    ("can_see_description", "Darf Beschreibungen lesen"),
-		    ("can_see_homecluster", "Darf die Ursprungscluster sehen"),
-     		("can_see_homeserver", "Darf die Ursprungsserver sehen"))
+		    ("can_see_description", "Can read Descriptions"),
+		    ("can_see_homecluster", "Can see corresponding cluster"),
+     		("can_see_homeserver", "Can see corresponding server"))
 
 class Components_Cluster(models.Model):
     component = models.ForeignKey(Components)
@@ -67,5 +67,5 @@ class Components_Cluster(models.Model):
     class Meta:
         app_label = 'ctlweb'
     permissons = (
-            ("can_see_path", "Darf den Pfad sehen"),
-            ("can_see_code", "Darf den Implementierungscode sehen"))
+            ("can_see_path", "Can see filepath"),
+            ("can_see_code", "Can see Code to implement"))
