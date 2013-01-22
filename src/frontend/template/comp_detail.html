@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h1>{{ component.name }} 
+	{% if can_change %}
+	<small>
+	  <!--Link einfügen -->
+	  <a href="" class="nolink">
+		<input type="button" name="edit" value="Editieren" />
+	  </a>
+	</small>
+	{% endif %}
+  </h1>
+</div>
+<table class="table table-condensed">
+  <tr>
+	<td>{{ component.brief_description  }} </td>
+  </tr>
+  <tr>
+	<td> Ersteller </td>
+	<td> {{ component.programmer }} </td>
+  </tr>
+  <tr>
+	<td> Datum </td>
+	<td> {{ component.datum }} </td>
+  </tr>
+  {% if see_homeserver %}
+  <tr>
+	<td> Homeserver </td>
+	<td> 
+	  <table class="table table-condensed">  
+		{% for hs in homeserver %}
+		  <tr>
+			<td> {{ hs.name }} </td>
+			<td> {{ hs.domain }} </td>
+		  </tr>
+		{% endfor %}
+	  </table>
+	</td>
+  </tr>
+  {% endif %}
+</table>
+<div class="accordion" id="accordion2">
+  <div class="accordion-group">
+	<div class="accordion-heading">
+	  <a class="accordion-toggle" data-toggle="collapse"
+		data-parent="#accordion2" href="#collapseOne">
+		Beschreibung
+	  </a>
+	</div>
+  <div id="collapseOne" class="accordion-body collapse in">
+	<div class="accordion-inner">
+	  {{ component.description }}
+	</div>
+  </div>
+</div>
+</div>
+
+{% if see_homecluster %}
+<div class="accordion" id="accordion1">
+  <div class="accordion-group">
+	{% for hc in homecluster %}
+	  <div class="accordion-heading">
+		<a class="accordion-toggle" data-toggle="collapse"
+		  data-parent="#accordion1" href="#{{ hc.id }}">
+		  {{ hc.name }} {{ hc.domain }}
+		</a>
+	  </div>
+	  <div id="{{ hc.id }}" class="accordion-body collapse in">
+		<div class="accordion-inner">
+		  {% for h in hc.components_cluster_set.all %}
+		  <table>
+			{% if see_path %}
+			  <tr>
+				<td> Pfad: </td>
+		        <td> {{ h.path }} </td>
+			  </tr>
+			{% endif %}
+			{% if see_code %}
+			  <tr>
+				<td> Code: </td>
+				<td> {{ h.code }} </td>
+			  </tr>
+			{% endif %}
+		  </table>
+		  {% endfor %}
+		</div>
+	  </div>
+	{% endfor %}
+  </div>
+</div>
+{% endblock content %}				
