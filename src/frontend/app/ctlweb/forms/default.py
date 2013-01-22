@@ -9,5 +9,5 @@ class ComponentAddForm(ModelForm):
     cluster = forms.ModelMultileChoiceField(
             queryset=Cluster.objects.all()), label=_("Cluster"))
     class Meta:
-        model = components
+        model = Components
 	    exclude = ('date', 'is_active')

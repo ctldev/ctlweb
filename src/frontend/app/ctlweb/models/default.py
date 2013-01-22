@@ -40,9 +40,9 @@ class Userkeys(models.Model):
 
 class Components(models.Model):
     name = models.CharField(_("Name"), max_length=100, unique="True")
-    homeserver = models.ManyToManyField(webserver, 
+    homeserver = models.ManyToManyField(Webserver, 
                                         verbose_name=_("Ursprungsserver"))
-    homecluster = models.ManyToManyField(cluster,
+    homecluster = models.ManyToManyField(Cluster,
                                          through='Components_Cluster',
                                          verbose_name=_("Ursprungscluster"))
     programmer = models.EmailField(_("Programmierer"))
@@ -60,8 +60,8 @@ class Components(models.Model):
      		("can_see_homeserver", _("Darf die Ursprungsserver sehen")))
 
 class Components_Cluster(models.Model):
-    component = models.ForeignKey(components)
-    cluster = models.ForeignKey(cluster)
+    component = models.ForeignKey(Components)
+    cluster = models.ForeignKey(Cluster)
     path = models.TextField(_("Pfad"))
     code = models.TextField(_("Implementierungscode"))
     class Meta:
