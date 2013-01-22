@@ -40,9 +40,10 @@
               <li><a href="{% url components %}">Verzeichnis</a></li>
               <li class="dropdown"><a href="{% url administration %}" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
                   <ul class="dropdown-menu">
+                      <li> <a href="/admin">Ultimativer Admin</a>
             					<li> <a href="{% url administration_easy %}">Benutzerkonfiguration</a></li>
             					<li> <a href="{% url administration_advanced %}">Serverkonfiguration</a></li>
-                      <li> <a href="{% url administration_advanced %}">Komponentnenkonfiguration</a></li>
+                      <li> <a href="{% url administration_advanced %}">Komponentenkonfiguration</a></li>
                   </ul>
 
 				      <li><a href="{% url impressum %}">Impressum</a></li>
@@ -53,8 +54,8 @@
       				<input type="text" class="search-query" placeholder="Suche">
       			  </li>
       			  <li><a href="{% url search %}">Erweiterte Suche</a></li>
-              <li><a href="{% url login %}">Login</a></li>
-              <li><a href="">Registrieren</a></li>
+				  <li><a href="{% url login %}">Login</a></li>
+              <li><a href="{% url registration_register %}">Registrieren</a></li>
 
               </form>
 

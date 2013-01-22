@@ -126,6 +126,7 @@ ROOT_URLCONF = 'frontend.urls'
 
 TEMPLATE_DIRS = (
     normpath(join(DJANGO_ROOT, 'template')),
+    
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -139,12 +140,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app.ctlweb',
+    'registration', 
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
 
+ACCOUNT_ACTIVATION_DAYS = 7
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error.
@@ -167,6 +170,13 @@ LOGGING = {
         },
     }
 }
+DEFAULT_FROM_EMAIL = 'teamprojektctlweb@gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'teamprojektctlweb@gmail.com'
+EMAIL_HOST_PASSWORD = 'ctlweb2012'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+
 
 try:
     SECRET_KEY = open(SECRET_FILE).read().strip()
