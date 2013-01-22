@@ -4,7 +4,7 @@ from django.template import RequestContext, Template
 from django.template import Context, loader
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
-from ctlweb.models import components, webserver, cluster
+from ctlweb.models import Components, Webserver, Cluster
 
 def component_detail(request, comp_id):
     v_user = request.user

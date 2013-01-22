@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-class webserver(models.Model):
+class Webserver(models.Model):
     name = models.CharField(_("Name"), max_length=255)
     ip = models.IPAddressField(_("IP"), null="True")
     domain = models.CharField(_("Domain"), max_length=100 ,null="True")
@@ -14,7 +14,7 @@ class webserver(models.Model):
         verbose_name = _("Webserver")
         verbose_name_plural = _("Webserver")
                 
-class cluster(models.Model):
+class Cluster(models.Model):
     ip = models.IPAddressField(_("IP"), null="True")
     domain = models.CharField(_("Domain"), max_length=100, null="True")
     port = models.IntegerField(_("Port"))
@@ -25,7 +25,7 @@ class cluster(models.Model):
         verbose_name = _("Cluster")
         verbose_name_plural = _("Cluster")
         
-class userkeys(models.Model):
+class Userkeys(models.Model):
     user = models.OneToOneField(User, verbose_name=_("User"))
     key = models.TextField(_(u"Schlüssel"))
     class Meta:
@@ -38,12 +38,12 @@ class userkeys(models.Model):
 		("can_activate_user", _("Darf User freischalten")),
 		("can_ban_user", _("Darf User bannen")))        
 
-class components(models.Model):
+class Components(models.Model):
     name = models.CharField(_("Name"), max_length=100, unique="True")
     homeserver = models.ManyToManyField(webserver, 
                                         verbose_name=_("Ursprungsserver"))
     homecluster = models.ManyToManyField(cluster,
-                                         through='components_cluster',
+                                         through='Components_Cluster',
                                          verbose_name=_("Ursprungscluster"))
     programmer = models.EmailField(_("Programmierer"))
     brief_description = models.CharField(_("Kurzbeschreibung"), max_length=255)
@@ -59,7 +59,7 @@ class components(models.Model):
 		    ("can_see_homecluster", _("Darf die Ursprungscluster sehen")),
      		("can_see_homeserver", _("Darf die Ursprungsserver sehen")))
 
-class components_cluster(models.Model):
+class Components_Cluster(models.Model):
     component = models.ForeignKey(components)
     cluster = models.ForeignKey(cluster)
     path = models.TextField(_("Pfad"))
