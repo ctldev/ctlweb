@@ -5,7 +5,7 @@ from app.ctlweb.views import *
 
 urlpatterns = patterns('app.ctlweb.views',
         url(r'^$', 'index', name='index'), 
-        #url(r'^login/$', 'login', name='login'), 
+        url(r'^login/$', 'login', name='login'), 
         url(r'^search/$', 'search', name='search'),
         url(r'^components/$', 'index', name='components'),
         url(r'^administration/$', 'index', name='administration'),
