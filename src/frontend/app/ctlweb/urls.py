@@ -6,7 +6,6 @@ from app.ctlweb.views import *
 
 urlpatterns = patterns('app.ctlweb.views',
         url(r'^$', 'index', name='index'), 
-        url(r'^login/$', 'login', name='login'), 
         url(r'^search/$', 'search', name='search'),
         url(r'^components/$', 'index', name='components'),
         url(r'^components/(?P<comp_id>\d+)/$', 'component_detail', name='component'),
@@ -14,8 +13,9 @@ urlpatterns = patterns('app.ctlweb.views',
         url(r'^administration/easy/$', 'index', name='administration_easy'),
         url(r'^administration/advanced/$', 'index', name='administration_advanced'),
         url(r'^impressum/$', 'index', name='impressum'),
-        #url(r'^accounts/login/$', None, name='login'), 
-        #url(r'^accounts/register/$', None, name='register')
 )
 
-
+urlpatterns += patterns('django.contrib.auth.views',
+        url(r'^login/$', 'login', name='login'),
+        url(r'^logout/$', 'logout', {'next_page': '/'}, name='logout'),
+)

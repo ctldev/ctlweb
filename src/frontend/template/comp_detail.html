@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block title %}
+Component {{ component.name }}
+{% endblock title %}
 {% block content %}
 <div class="page-header">
   <h1>{{ component.name }} 
@@ -14,25 +17,41 @@
 </div>
 <table class="table table-condensed">
   <tr>
-	<td>{{ component.brief_description  }} </td>
+	<td>
+	  {{ component.brief_description  }} 
+	</td>
   </tr>
   <tr>
-	<td> Ersteller </td>
-	<td> {{ component.programmer }} </td>
+	<td> 
+	  Ersteller 
+	</td>
+	<td> 
+	  {{ component.programmer }} 
+	</td>
   </tr>
   <tr>
-	<td> Datum </td>
-	<td> {{ component.datum }} </td>
+	<td> 
+	  Datum 
+	</td>
+	<td> 
+	  {{ component.datum }} 
+	</td>
   </tr>
   {% if see_homeserver %}
   <tr>
-	<td> Homeserver </td>
+	<td> 
+	  Homeserver 
+	</td>
 	<td> 
 	  <table class="table table-condensed">  
 		{% for hs in homeserver %}
 		  <tr>
-			<td> {{ hs.name }} </td>
-			<td> {{ hs.domain }} </td>
+			<td> 
+			  {{ hs.name }} 
+			</td>
+			<td> 
+			  {{ hs.domain }} 
+			</td>
 		  </tr>
 		{% endfor %}
 	  </table>
@@ -44,7 +63,8 @@
   <div class="accordion-group">
 	<div class="accordion-heading">
 	  <a class="accordion-toggle" data-toggle="collapse"
-		data-parent="#accordion2" href="#collapseOne">
+		data-parent="#accordion2" href="#collapseOne"
+	  >
 		Beschreibung
 	  </a>
 	</div>
@@ -61,8 +81,12 @@
   <div class="accordion-group">
 	{% for hc in homecluster %}
 	  <div class="accordion-heading">
-		<a class="accordion-toggle" data-toggle="collapse"
-		  data-parent="#accordion1" href="#{{ hc.id }}">
+		<a 
+		  class="accordion-toggle" 
+		  data-toggle="collapse"
+		  data-parent="#accordion1" 
+		  href="#{{ hc.id }}"
+		>
 		  {{ hc.name }} {{ hc.domain }}
 		</a>
 	  </div>
@@ -72,14 +96,22 @@
 		  <table>
 			{% if see_path %}
 			  <tr>
-				<td> Pfad: </td>
-		        <td> {{ h.path }} </td>
+				<td> 
+				  Pfad: 
+				</td>
+				<td> 
+				  {{ h.path }} 
+				</td>
 			  </tr>
 			{% endif %}
 			{% if see_code %}
 			  <tr>
-				<td> Code: </td>
-				<td> {{ h.code }} </td>
+				<td> 
+				  Code: 
+				</td>
+				<td> 
+				  {{ h.code }} 
+				</td>
 			  </tr>
 			{% endif %}
 		  </table>
