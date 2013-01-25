@@ -12,7 +12,7 @@ urlpatterns = patterns('app.ctlweb.views',
         url(r'^administration/$', 'index', name='administration'),
         url(r'^administration/easy/$', 'index', name='administration_easy'),
         url(r'^administration/advanced/$', 'index', name='administration_advanced'),
-        url(r'^impressum/$', 'index', name='impressum'),
+        url(r'^impressum/$', 'impressum', name='impressum'),
 )
 
 urlpatterns += patterns('django.contrib.auth.views',

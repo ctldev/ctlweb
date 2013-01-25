@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}
+Impressum
+{% endblock title %}
+{% block content %}
+
+<div class="transbox">
+  <br/>
+  <h1> 
+	{% blocktrans %}
+	Willkommen auf CTLWEB
+	{% endblocktrans %}
+  </h1>
+    {% include 'impressum_personal.html' %}
+  <br/>
+</div>
+{% endblock %}
