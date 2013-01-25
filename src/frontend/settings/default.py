@@ -126,6 +126,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'frontend.urls'
 
+LOGIN_REDIRECT_URL='/'
+
 TEMPLATE_DIRS = (
     normpath(join(DJANGO_ROOT, 'template')),
     

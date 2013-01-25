@@ -15,7 +15,7 @@ urlpatterns = patterns('app.ctlweb.views',
         url(r'^impressum/$', 'impressum', name='impressum'),
 )
 
-urlpatterns += patterns('django.contrib.auth.views',
-        url(r'^login/$', 'login', name='login'),
-        url(r'^logout/$', 'logout', {'next_page': '/'}, name='logout'),
-)
+#urlpatterns += patterns('django.contrib.auth.views',
+#        url(r'^login/$', 'login', name='login'),
+#        url(r'^logout/$', 'logout', {'next_page': '/'}, name='logout'),
+#)
