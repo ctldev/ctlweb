@@ -28,8 +28,8 @@ def component_detail(request, comp_id):
     see_code = v_user.has_perm('ctlweb.can_see_code')
     see_homecluster = v_user.has_perm('ctlweb.can_see_homecluster')
     see_homeserver = v_user.has_perm('ctlweb.can_see_homeserver')
-    dict_response = get_dict_response(request)
-    dict_response["component"] = com
+    dict_response["user"] = v_user
+    dict_response["component"] = comp
     dict_response["homeserver"] = homeserver
     dict_response["homecluster"] = homecluster
     dict_response["can_change"] = can_change

@@ -5,7 +5,8 @@ Component {{ component.name }}
 {% block content %}
 <div class="page-header">
   <h1>{{ component.name }} 
-	{% if can_change %}
+	{% if can_change or (component.programmer == user.email and
+	user.is_authenticated and user.is_active) %}
 	<small>
 	  <!--Link einfügen -->
 	  <a href="" class="nolink">
@@ -62,8 +63,11 @@ Component {{ component.name }}
 <div class="accordion" id="accordion2">
   <div class="accordion-group">
 	<div class="accordion-heading">
-	  <a class="accordion-toggle" data-toggle="collapse"
-		data-parent="#accordion2" href="#collapseOne"
+	  <a 
+		class="accordion-toggle" 
+		data-toggle="collapse"
+		data-parent="#accordion2" 
+		href="#collapseOne"
 	  >
 		Beschreibung
 	  </a>
