@@ -7,7 +7,7 @@ class ComponentAddForm(forms.ModelForm):
     webserver = forms.ModelMultipleChoiceField(
 	      queryset=Webserver.objects.all(), label=_("Webserver"))
     cluster = forms.ModelMultipleChoiceField(
-            queryset=Cluster.objects.filter(keys not None), label=_("Cluster"))
+            queryset=Cluster.objects.exclude(key__exact=None), label=_("Cluster"))
     class Meta:
         model = Components
         exclude = ('date', 'is_active')
