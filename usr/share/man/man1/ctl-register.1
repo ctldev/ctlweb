@@ -1,0 +1,65 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH ctl-register 1 "January 2013" Linux "User Manuals"
+.SH NAME
+ctl-register \- register a user on a cluster 
+.SH SYNOPSIS
+.\" ctl-register section
+.br
+.B ctl-register
+.RB [\| \-a
+.IR id \|]
+.RB [\| \-k
+.IR publickey \|]
+.RB [\| \-r
+.IR id \|]
+.RB [\| \-o \|]
+.\" Description of ctlweb section
+.SH DESCRIPTION
+.B ctl-register
+usually is executed by the ctlweb-system itself in order to register a user on a specific cluster. Under special circumstances, however, it can be issued by a system administrator to manually add a user.
+
+.SH OPTIONS
+.TP
+.BI \-a\  id\fR,\ \fI \-\-add\fR=\fIid
+Adds the user to a cluster
+.TP
+.BI \-k\  publickey\fR,\ \fI \-\-key\fR=\fIpublickey
+Uses the specified public key as the key for the user on that cluster
+.TP
+.BI \-r\  id\fR,\ \fI \-\-remove\fR=\fIid
+Opposed to the above 
+.B add
+command, this will remove the user with the stated 
+.B id
+.TP
+.BR \-o ", " \-\-overview
+Provides an overview over all registered users
+.\"***********************************************************************
+
+.\".SH FILES
+
+.\"**********************************************************************
+
+.\".SH ENVIRONMENT
+
+.\"**********************************************************************
+
+.\".SH DIAGNOSTICS
+
+.\"**********************************************************************
+
+.\".SH BUGS
+
+.\"**********************************************************************
+
+.SH AUTHOR
+Jörn Hameyer <>
+.SH "SEE ALSO"
+.BR ctlweb (1),
+.BR ctl-web (1),
+.BR ssh (1), 
+
+
+
