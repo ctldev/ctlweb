@@ -42,7 +42,7 @@ class Userkeys(models.Model):
         if User.has_perm('can_activate_user'):
             self.user.is_active=True
 
-    def set_unactive(self, User):
+    def set_inactive(self, User):
         if User.has_perm('can_ban_user'):
             self.user.is_active=False
 
@@ -72,7 +72,7 @@ class Components(models.Model):
         if User.has_perm("can_set_active"):
             self.is_active=True
 
-    def set_unactive(self, User):
+    def set_inactive(self, User):
         if User.has_perm("can_set_active"):
             self.is_active=False
 
