@@ -6,7 +6,7 @@ from django.template import Context, loader
 from django.template import RequestContext, Template
 from django.forms.formsets import formset_factory
 from ctlweb.forms import SearchForm, AddSearchForm
-
+from ctlweb.views.util import *
 
 def search(request):
     SearchFormset = formset_factory(SearchForm)

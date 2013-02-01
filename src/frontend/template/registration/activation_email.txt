@@ -5,6 +5,12 @@ and your address will be removed from our records.
 To activate this account, please click the following link within the next 
 {{ expiration_days }} days:
 
+Test auf Lokalhost:
+
+http://localhost:8000/accounts/activate/{{ activation_key }}
+
+Später für Webserver:
+
 http://{{site.domain}}/accounts/activate/{{ activation_key }}
 
 Sincerely,

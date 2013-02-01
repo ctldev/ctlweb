@@ -22,16 +22,38 @@ class Database:
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
         """
-        return self.__getattribute__("c_"+name)
+        if not "c_" in name:
+            throw AttributeError()
+        return self.__getattribute__(name)
 
-    def create_table():
+    def get_attributes(self):
+        """ Returns all attributes who are stored in the database
+        """
+        attributes = []
+        for attr in dir(self):
+            try:
+                self[attr]
+                attributes.append(attr)
+            except AttributeError e:
+                pass
+        return attributes
+
+    def create_table(self):
         """ Creates a table for the class in which every instance object which
         stars with 'c_'. For example 'c_id'. This variable can be accessed with
-        self.["id"]
+        self["id"]
         """
         pass
+#
+#        connection = sqlite3.connect(Database.db_file)
+#        query = "CREATE TABLE ? ( "
+#        for attr in instance_obj:
+#            query += attr,
+#        
+#        for in instance_obj:
+            
 
-    def remove_table():
+    def remove_table(self):
         """ Should remove the tables created by the class. Every child of
         database which stores is's own data should implement this function.
         """
