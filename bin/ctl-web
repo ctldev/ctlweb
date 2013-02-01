@@ -1,43 +1,46 @@
-#!/bin/bash
-TEMP=`getopt -o a:k:r:o --long a-long:,k-long:,r-long:,o-long: \
-     -n 'example.bash' -- "$@"`
+#!/usr/bin/env python3
+import sys
+import getopt
 
-if [ $? != 0 ] ; then echo "Keine gültige Eingabe!" >&2 ; exit 1 ; fi
+#ctl-web wird von der Webinstanz auf den Cluster ausgeführt, um sich dort zu verifiziern
 
-addfunction(){
-    echo "ich adde($2) "
-    exit
-}
+opt = "a:k:r:o"
+long_opt = ["id=", "public key=", "id=", "overview" ]
+max_output_level = 2
 
-removefunction(){
-    echo " ich lösche($2)"
-    exit
-}
-
-keyfunction(){
-    echo "ich verwende den key ($2)"
-    exit
-}
-
-
-overviewfunction(){
-    echo "ich liefere den Überblick"  
-    exit
-}
-
- 
-
-while true ; do
-    case "$1" in 
-        -a|--a) addfunction $* ; shift ;;  
-        -k|--k) keyfunction $* ;shift  ;;
-        -r|--r) removefunction $* ; shift ;;
-        -o|--o) overviewfunction $* ; shift ;;
-        --) break; shift ;;
+def usage():
+    print("Usage:", sys.argv[0], """[-a <id>| --a=<id> 
+         \t [-k <public key> --key=<public key>]
+         \t [-r <id> | --remove=<>]
+         \t [-o | --overview] """)
+         
+def main():
+    try:
+         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
+         
+         
+    except getopt.GetoptError as err:
+        print(err)
+        usage()
+        sys.exit(2)
+    output = None
+    verbose = 0
+    
+    for o, a in opts:
+        if o in ("-a", "--id"):
+            print("id",o,a)
+                   
+        elif o in ("-k", "--public key"):
+            print("public key",o,a)  
         
-    esac
-done       
+        elif o in ("-r", "--id"):
+            print("id",o,a)
+        
+        elif o in ("-o", "--"):
+            print("doxygen",o,a)           
 
-
+if __name__ == "__main__":
+    main()            
+           
 
 

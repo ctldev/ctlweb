@@ -3,7 +3,7 @@
 import sys
 import getopt
 
-#ermöglicht es Module aus der Datenbank zu holen
+#ermöglicht es Module der Datenbank hinzuzufügen
 
 opt = "a:"
 long_opt = ["add=" ]
