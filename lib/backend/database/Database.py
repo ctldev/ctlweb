@@ -27,7 +27,7 @@ class Database:
         """ Grants access to all instance variables stored in db.
         """
         if not "c_" in name:
-            throw AttributeError()
+            raise AttributeError()
         return self.__getattribute__(name)
 
     def get_attributes(self):
@@ -38,7 +38,7 @@ class Database:
             try:
                 self[attr]
                 attributes.append(attr)
-            except AttributeError e:
+            except AttributeError:
                 pass
         return attributes
 
