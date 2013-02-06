@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from .Database import Database
+import sqlite3
 
 class User(Database):
     """ An registered user
@@ -11,18 +13,18 @@ class User(Database):
 
     def create_table(self):
         cursor = Database.db_connection.cursor()
-        create_table = """CREATE TABLE user (
-                            id TEXT PRIMARY,
-                            pubkey TEXT,
+        create_table = """CREATE TABLE User (
+                            c_id TEXT PRIMARY KEY,
+                            c_pubkey TEXT
                             );
                             """
         cursor.execute(create_table)
-        cursor.commit()
+        Database.db_connection.commit()
 
-    def drop_table():
+    def drop_table(self):
         """ Be carefull with it! Could destroy important data
         """
         cursor = Database.db_connection.cursor()
         cursor.execute("DROP TABLE user;")
-        cursor.commit()
+        Database.db_connection.commit()
 

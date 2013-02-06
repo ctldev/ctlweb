@@ -19,14 +19,17 @@ class Database:
 
         if Database.db_file is None:
             Database.db_file = config['Backend']['Database']
-
-        if Database.db_connection is None:
+        try:
+            Database.db_connection.execute("""SELECT name from sqlite_master
+                                                 LIMIT 1""")
+            Database.db_connection.fetchone()
+        except (sqlite3.ProgrammingError, AttributeError):
             Database.db_connection = sqlite3.connect(Database.db_file)
 
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
         """
-        if not "c_" in name:
+        if not name.find("c_") == 0:
             raise AttributeError()
         return self.__getattribute__(name)
 
@@ -50,17 +53,17 @@ class Database:
         NOT SUPPORTED YET!
         """
         pass
-#
-#        query = "CREATE TABLE ? ( "
-#        for attr in instance_obj:
-#            query += attr,
-#        
-#        for in instance_obj:
-            
 
     def drop_table(self):
         """ Should remove the tables created by the class. Every child of
         database which stores is's own data should implement this function.
+
+        NOT SUPPORTED YET!
+        """
+        pass
+
+    def save(self):
+        """ Saves object into database
 
         NOT SUPPORTED YET!
         """
