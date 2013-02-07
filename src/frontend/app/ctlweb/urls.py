@@ -7,11 +7,20 @@ from app.ctlweb.views import *
 urlpatterns = patterns('app.ctlweb.views',
         url(r'^$', 'index', name='index'), 
         url(r'^search/$', 'search', name='search'),
+
+
         url(r'^components/$', 'index', name='components'),
-        url(r'^components/(?P<comp_id>\d+)/$', 'component_detail', name='component'),
+        url(r'^components/(?P<comp_id>\d+)/$', 'component_detail', 
+            name='component'),
+        url(r'^components/add/(?P<token>\S{20})/$', 'index',
+            name='component_receive'),
+
+
         url(r'^administration/$', 'index', name='administration'),
         url(r'^administration/easy/$', 'index', name='administration_easy'),
         url(r'^administration/advanced/$', 'index', name='administration_advanced'),
+
+
         url(r'^impressum/$', 'impressum', name='impressum'),
 )
 
