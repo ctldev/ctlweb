@@ -36,12 +36,5 @@ def component_detail(request, comp_id):
     dict_response["see_code"] = see_code
     dict_response["see_homecluster"] = see_homecluster
     dict_response["see_homeserver"] = see_homeserver
-
     context = RequestContext(request, dict_response)
     return render_to_response("comp_detail.html", context_instance=context)
-
-def receive_component(request, token):
-#diese Methode soll 'ctl-getmodule'-Antworten aus dem Backend entgegennehmen
-#und diese mit der Datenbank abgleichen. TODO
-    return render_to_response('home.html',
-            context_instance=RequestContext(request))
