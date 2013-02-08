@@ -23,16 +23,32 @@ Component {{ component.name }}
 	</td>
   </tr>
   <tr>
-	<td> 
-	  {% trans "Ersteller" %}
+	<td>
+	  Interface
 	</td>
-	<td> 
-	  {{ component.programmer }} 
+	<td>
+	  {% for i in interfaces %}
+		{{ i.name }}{% if not forloop.last %}, {% endif %}
+	  {% endfor %}
 	</td>
   </tr>
   <tr>
 	<td> 
-	  Datum 
+	  {% trans "Ersteller" %}
+	</td>
+	<td> 
+	  {% for p in programmer.email %}
+		{% for p in users.email %}
+		  <a href="{% url user u.pk %}"> {{ p.email }} </a>
+		{% empty %}
+		  {{ p.email }}
+		{% endfor %}
+	  {% endfor %} 
+	</td>
+  </tr>
+  <tr>
+	<td> 
+	  {% trans "Datum" %} 
 	</td>
 	<td> 
 	  {{ component.datum }} 
