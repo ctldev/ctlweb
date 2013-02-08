@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+#Returns registered modules of server to web
+
+import sys
+import getopt
+
+
+opt = "t:au:k:v:"
+long_opt = ["version", "verbose=", "timestamp=", "all", "url=", "key=" ]
+max_output_level = 2
+
+def usage():
+    print("Usage:", sys.argv[0], """[-t <timestamp>|--timestamp=<timestamp>]
+         \t [-a|--all]
+         \t [-u <push-url>|--url=<push-url>]
+         \t [-k <pub-key>|--key=<pub-key>]
+         \t [-v | --verbose]
+         \t [--version]""")
+         
+def main():
+    try:
+         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
+         
+    except getopt.GetoptError as err:
+        print(err)
+        usage()
+        sys.exit(2)
+    output = None
+    verbose = 0
+    
+    for o, a in opts:
+        if o in ("-t", "--timestamp"):
+            print("timestamp",o,a)
+
+        elif o in ("-a", "--all"):
+            print("all",o,a)
+
+        elif o in ("-u", "--url"):
+            print("url",o,a)
+
+        elif o in ("-k", "--key"):
+            print("key",o,a)
+
+        elif o == "--version":
+            print("version",o,a)
+
+        elif o in ("--verbose","-v"):
+            print("verbose",o,a)
+        
+if __name__ == "__main__":
+    main()            
+            
