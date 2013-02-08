@@ -1,4 +1,6 @@
 # vim: set fileencoding=utf-8
+import datetime
+from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -55,7 +57,8 @@ class Components(models.Model):
                                          verbose_name=_("Ursprungscluster"))
     brief_description = models.CharField(_("Kurzbeschreibung"), max_length=255)
     description = models.TextField(_("Beschreibung"))
-    date = models.DateField(_("Datum"), auto_now=True)
+    date = models.DateTimeField(_("Datum"), auto_now=True)
+    date_creation = models.DateTimeField(_("Erstellungsdatum"), auto_now_add=True)
     is_active = models.BooleanField(_("Freigeschaltet"))
     version = models.CharField(_("Versionsnummer"), max_length=10)
     class Meta:
@@ -101,3 +104,18 @@ class Components_Cluster(models.Model):
 
 class Mails(models.Model):
     text = models.TextField()
+
+class ModuleTokenValidation(models.Model):
+    token = models.CharField(_("Token"), max_length=64)
+    cluster = models.ForeignKey(Cluster)
+    expiration_date = models.DateTimeField(_("Ablaufdatum"))
+    class Meta:
+        app_label = 'ctlweb'
+
+    @staticmethod
+    def create_token(token, cluster):
+        date = datetime.datetime.today() + timedelta(days=2)
+        to = ModuleTokenValidation(token=token, cluster=cluster,
+                expiration_date=date)
+        to.save()
+
