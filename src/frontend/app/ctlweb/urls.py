@@ -12,7 +12,7 @@ urlpatterns = patterns('app.ctlweb.views',
         url(r'^components/$', 'index', name='components'),
         url(r'^components/(?P<comp_id>\d+)/$', 'component_detail', 
             name='component'),
-        url(r'^components/add/(?P<token>\S{64})/$', 'index',
+        url(r'^components/add/(?P<token>\S{64})/$', 'receive_modules',
             name='component_receive'),
 
 

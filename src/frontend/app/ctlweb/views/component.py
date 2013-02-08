@@ -41,9 +41,3 @@ def component_detail(request, comp_id):
     context = Context(dict_response)
     response = HttpResponse(template.render(context))
     return response
-
-def receive_component(request, token):
-#diese Methode soll 'ctl-getmodule'-Antworten aus dem Backend entgegennehmen
-#und diese mit der Datenbank abgleichen. TODO
-    return render_to_response('home.html',
-            context_instance=RequestContext(request))

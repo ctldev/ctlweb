@@ -52,5 +52,6 @@ def request_modules():
         ModuleTokenValidation.create_token(url_token, c)
         ssh.close()
 
-def receive_modules(request):
-    pass
+def receive_modules(request, token):
+    return render_to_response('home.html',
+            context_instance=RequestContext(request))
