@@ -26,7 +26,7 @@ def _gen_sec_token(domain):
     token = hashlib.sha256(secret + domain + hextime).hexdigest()
     return token
 
-def request_modules():
+def request_modules(testing=False):
     ssh = paramiko.SSHClient()
     cluster = Cluster.objects.all()
 
@@ -47,7 +47,8 @@ def request_modules():
             command = "ctl-getmodules -a " + \
                     "-u %s -k %s" % (url, c.key)
         ssh.connect(c.domain, pkey=sshkey, port=c.port)
-        stdin, stdout, stderr = ssh.exec_command(command)
+        if not testing:
+            stdin, stdout, stderr = ssh.exec_command(command)
 #if no error TODO needed?
         ModuleTokenValidation.create_token(url_token, c)
         ssh.close()
