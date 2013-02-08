@@ -5,13 +5,15 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext, Template 
 from ctlweb.views.util import *
+from ctlweb.views.lists import *
 
 def index(request):
     if "search_query" in request.GET:
-        simple_search(request.GET.get('search_query',''))
-        render_to_response('result.html', 
-        context_instance=RequestContext(request))
-
+        query = request.GET.get('search_query','')
+        result = simple_search(query)
+        if result.count() == 1:
+            return component_detail(request, result[0].pk)
+        return lists(request, result, 0)
     return render_to_response("home.html", 
             context_instance=RequestContext(request))
 
