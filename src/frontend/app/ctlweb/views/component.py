@@ -19,14 +19,13 @@ def component_detail(request, comp_id):
     homeserver = comp.components_webservers_set.order_by('name')
     homecluster = comp.components_clusters_set.order_by('domain')
 
-    template = loader.get_template("comp_detail.html")
-
     can_change = v_user.has_perm('ctlweb.change_components')
     see_path = v_user.has_perm('ctlweb.can_see_path')
     see_description = v_user.has_perm('components.can_see_description')
     see_code = v_user.has_perm('ctlweb.can_see_code')
     see_homecluster = v_user.has_perm('ctlweb.can_see_homecluster')
     see_homeserver = v_user.has_perm('ctlweb.can_see_homeserver')
+    dict_response = dict()
     dict_response["user"] = v_user
     dict_response["component"] = comp
     dict_response["homeserver"] = homeserver
@@ -37,7 +36,5 @@ def component_detail(request, comp_id):
     dict_response["see_code"] = see_code
     dict_response["see_homecluster"] = see_homecluster
     dict_response["see_homeserver"] = see_homeserver
-
-    context = Context(dict_response)
-    response = HttpResponse(template.render(context))
-    return response
+    context = RequestContext(request, dict_response)
+    return render_to_response("comp_detail.html", context_instance=context)

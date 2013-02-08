@@ -55,12 +55,12 @@ class Components(models.Model):
     homecluster = models.ManyToManyField(Cluster,
                                          through='Components_Cluster',
                                          verbose_name=_("Ursprungscluster"))
-    programmer = models.EmailField(_("Programmierer"))
     brief_description = models.CharField(_("Kurzbeschreibung"), max_length=255)
     description = models.TextField(_("Beschreibung"))
     date = models.DateTimeField(_("Datum"), auto_now=True)
     date_creation = models.DateTimeField(_("Erstellungsdatum"), auto_now_add=True)
     is_active = models.BooleanField(_("Freigeschaltet"))
+    version = models.CharField(_("Versionsnummer"), max_length=10)
     class Meta:
         app_label = 'ctlweb'
         verbose_name = _("Component")
@@ -84,6 +84,13 @@ class Components(models.Model):
         self.programmer = user.email
         super(Components, self).save(*args, **kwargs)
 
+class Programmer(models.Model):
+    component = models.ForeignKey(Components)
+    email = models.EmailField(_("Programmierer"))
+    class Meta:
+        unique_together = ('component', 'email')
+        app_label = 'ctlweb'
+
 class Components_Cluster(models.Model):
     component = models.ForeignKey(Components)
     cluster = models.ForeignKey(Cluster)
@@ -94,6 +101,9 @@ class Components_Cluster(models.Model):
     permissons = (
             ("can_see_path", "Can see filepath"),
             ("can_see_code", "Can see code to implement"))
+
+class Mails(models.Model):
+    text = models.TextField()
 
 class ModuleTokenValidation(models.Model):
     token = models.CharField(_("Token"), max_length=64)
@@ -108,3 +118,4 @@ class ModuleTokenValidation(models.Model):
         to = ModuleTokenValidation(token=token, cluster=cluster,
                 expiration_date=date)
         to.save()
+
