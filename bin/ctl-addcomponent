@@ -3,7 +3,7 @@
 import sys
 import getopt
 
-#ermöglicht es Module aus der Datenbank zu holen
+#ermöglicht es eine Component aus der Datenbank zu holen
 
 opt = "a:"
 long_opt = ["add=" ]
