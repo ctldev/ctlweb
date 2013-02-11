@@ -1,0 +1,51 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH ctl-getmodule 1 "February 2013" Linux "User Manuals"
+
+.\"***********************************************************************
+
+.SH NAME
+ctl-getmodule \- request and get modules from a specific cluster
+
+.\"***********************************************************************
+   
+.SH SYNOPSIS
+.B ctl-getmodule
+.RB [\| \-t | \-\-timestamp
+.RB <
+.IR timestamp
+.RB >  
+\(dqsince add\(dq]
+.RB [\| -a | \-\-all]
+
+.\" **********************************************************************
+
+.SH DESCRIPTION
+.BR ctl-getmodule
+is a command in order to request information and/or a module itself from a specific cluster. There is also the possibility to list all modules. 
+
+.\"***********************************************************************
+
+.SH OPTIONS
+.TP
+.BI \-t\ \fItimestamp\fR,\ \fB\-\-timestamp=\fItimestamp
+Since when was the requested module added
+.TP
+.BR \-a ", " \-\-all
+List all available modules
+
+.\"***********************************************************************
+
+.\".SH FILES
+
+.\".SH ENVIRONMENT
+
+.\".SH DIAGNOSTICS
+
+.\".SH BUGS
+
+.SH AUTHOR
+Jörn Hameyer <>
+.SH "SEE ALSO"
+.BR ctl (1)

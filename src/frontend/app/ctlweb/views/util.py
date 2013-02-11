@@ -5,8 +5,8 @@ from ctlweb.models import Components
 
 def __searchset(searchtext):
     return (Q(name__icontains = searchtext)|
-            Q(programmer__iexact = searchtext)|
             Q(brief_description__icontains = searchtext)|
+            Q(programmer__email__iexact = searchtext)|
             Q(homeserver__name__icontains = searchtext)|
             Q(homeserver__ip__icontains = searchtext)|
             Q(date__icontains = searchtext))
