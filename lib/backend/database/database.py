@@ -25,6 +25,8 @@ class Database:
             Database.db_connection.fetchone()
         except (sqlite3.ProgrammingError, AttributeError):
             Database.db_connection = sqlite3.connect(Database.db_file)
+#       Creationtime of object
+        c_creation = None
 
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
@@ -68,3 +70,44 @@ class Database:
         NOT SUPPORTED YET!
         """
         pass
+
+    def __conform__(self,protocol):
+        """ For creating an generall repräsentation of the class. The
+        representation looks like the following:
+         "c_id=2,c_pubkey=publickey"
+        """
+        if protocol is sqlite3.PrepareProtocol:
+            attributes = self.get_attributes()
+            repr = ""
+            first = True
+            for attr in attributes:
+                # Works only if all attributes are simple types like 
+                # string, int,...
+                if first:
+                    repr = attr + "=" + self[attr]
+                    first = False
+                else:
+                    repr = attr + "=" + self[attr] + ";" + repr
+            return repr
+
+    @classmethod
+    def get(cls, time_since):
+        """ Returns a tuple of objects stored in the database.
+        """
+        statement = """SELECT adapter FROM ?
+                WHERE ? newer timesince"""
+        cursor = db_connection.cursor()
+        cursor.execute(statement)
+        result_set = []
+        for row in cursor.fetchall():
+            result_set.append(DatabaseFactory(tuple(row)))
+
+    @classmethod
+    def get_excat(cls, name):
+        """ Returns exacly one object with the given (unique) name.
+        """
+        pass
+
+
+class DatabaseFactory:
+    pass
