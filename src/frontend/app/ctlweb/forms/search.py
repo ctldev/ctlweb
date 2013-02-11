@@ -11,8 +11,8 @@ SEARCH_CATEGORY_CHOICES = (
         ('date', _('Datum')),)
 
 class SearchForm(forms.Form):
-    Suchtext = forms.CharField(label=_("Suchtext"))
-    Kategorie = forms.ChoiceField(choices = SEARCH_CATEGORY_CHOICES,
+    searchtext = forms.CharField(label=_("Suchtext"))
+    category = forms.ChoiceField(choices = SEARCH_CATEGORY_CHOICES,
         label=_("Kategorie"))
 
 class AddSearchForm(forms.Form):
@@ -20,9 +20,9 @@ class AddSearchForm(forms.Form):
             ('and', 'und'),
             ('and not', 'und nicht'),
             ('or', 'oder'),)
-    Bindung = forms.ChoiceField(choices = LOGIC_CHOICES, label=_("Bindung"))
-    Suchtext = forms.CharField(label=_("Suchtext"))
-    Kategorie = forms.ChoiceField(choices = SEARCH_CATEGORY_CHOICES,
+    bind = forms.ChoiceField(choices = LOGIC_CHOICES, label=_("Bindung"))
+    searchtext = forms.CharField(label=_("Suchtext"))
+    category = forms.ChoiceField(choices = SEARCH_CATEGORY_CHOICES,
         label=_("Kategorie"))
 
     class Media:

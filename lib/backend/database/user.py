@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from .Database import Database
+from .database import Database
 import sqlite3
 
 class User(Database):

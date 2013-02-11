@@ -26,4 +26,5 @@ class BackendTest(TestCase):
         cluster = Cluster.objects.create(ip=ip, domain=domain, port=port, key=key)
 
     def testBackendConnection(self):
-        request_modules()
+        request_modules(True)
+
