@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import sqlite3
-from .Database import Database
+from .database import Database
 
-class Compontent(Database):
+class Component(Database):
     """ Is an component in the CTL-Database
     """
     def __init__(self, name, exe, ci):
@@ -29,6 +29,6 @@ class Compontent(Database):
         """ Be carefull with it! Could destroy important data
         """
         cursor = Database.db_connection.cursor()
-        cursor.execute("DROP TABLE Compontent;")
+        cursor.execute("DROP TABLE Component;")
         Database.db_connection.commit()
 
