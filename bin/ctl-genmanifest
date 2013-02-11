@@ -2,7 +2,7 @@
 import sys
 import getopt
 
-#generiert ein Manifest für Module
+#generiert ein Manifest für Compontent
 
 opt = "f:d:vx"
 long_opt = ["file=", "folder=", "version=", "doxygen=" ]
