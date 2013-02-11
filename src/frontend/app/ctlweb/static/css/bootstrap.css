@@ -666,11 +666,17 @@ a:hover {
 
 }
 
+.transbox .content {
+  width: 100%; height: 100%;
+  background-color:#ffffff;
+}
+
 .transbox p {
   margin:30px 40px;
   font-weight:bold;
   color:#000000;
 }
+
 
 p {
   margin: 0 0 10px;
