@@ -2,8 +2,8 @@
 import sqlite3
 from .Database import Database
 
-class Module(Database):
-    """ Is an module in the CTL-Database
+class Compontent(Database):
+    """ Is an component in the CTL-Database
     """
     def __init__(self, name, exe, ci):
         """ Documentation text is not supported, because it could be to big.
@@ -16,7 +16,7 @@ class Module(Database):
     def create_table(self):
         connection = Database.db_connection
         cursor = Database.db_connection.cursor()
-        create_table = """CREATE TABLE Module (
+        create_table = """CREATE TABLE Component (
                             id TEXT PRIMARY KEY,
                             exe TEXT,
                             ci TEXT
@@ -29,6 +29,6 @@ class Module(Database):
         """ Be carefull with it! Could destroy important data
         """
         cursor = Database.db_connection.cursor()
-        cursor.execute("DROP TABLE module;")
+        cursor.execute("DROP TABLE Compontent;")
         Database.db_connection.commit()
 
