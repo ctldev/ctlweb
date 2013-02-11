@@ -16,8 +16,13 @@ Component list
 		  </div>
 		  <div id="programmer">
 			<!-- TODO verlinkung auf user-seite -->
-			{% for pro in c.programmer_set.all %}
-			{{ pro.email }}{% if not forloop.last %}, {% endif %}
+			{% for pro in c.programmer_set.all %
+			  {% for pro in users %}
+				<a href="{% url user pro.pk %}">{{ pro.email }}</a>
+			  {% empty %}
+				{{ pro.email }}
+			  {% endfor %}
+			  {% if not forloop.last %}, {% endif %}
 			{% endfor %}
 		  </div>
 		  <div id="version">
