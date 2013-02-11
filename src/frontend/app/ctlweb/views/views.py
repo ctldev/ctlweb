@@ -13,13 +13,12 @@ def index(request):
         result = simple_search(query)
         if result.count() == 1:
             return component_detail(request, result[0].pk)
-        return lists(request, result, 1)
+        return lists(request, result, form=1)
     return render_to_response("home.html", 
             context_instance=RequestContext(request))
 
 def components(request): 
-	return render_to_response("components.html", 
-			context_instance=RequestContext(request))
+    return lists(request)
 	
 def impressum(request):
     return render_to_response("impressum.html",
