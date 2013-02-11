@@ -5,7 +5,7 @@ import sys
 import getopt
 
 
-opt = "t:au:k:v:"
+opt = "t:au:k:v:c:"
 long_opt = ["version", "verbose=", "timestamp=", "all", "url=", "key=" ]
 max_output_level = 2
 
@@ -14,6 +14,7 @@ def usage():
          \t [-a|--all]
          \t [-u <push-url>|--url=<push-url>]
          \t [-k <pub-key>|--key=<pub-key>]
+         \t [-c <ctlconfig-path>]
          \t [-v | --verbose]
          \t [--version]""")
          
@@ -27,6 +28,16 @@ def main():
         sys.exit(2)
     output = None
     verbose = 0
+
+    import configparser
+
+    #TODO Path der ctlweb.conf holen
+    config_file = '/etc/ctlweb.conf'
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    key = None
+    url = None
     
     for o, a in opts:
         if o in ("-t", "--timestamp"):
@@ -36,17 +47,26 @@ def main():
             print("all",o,a)
 
         elif o in ("-u", "--url"):
+            url = a
             print("url",o,a)
 
         elif o in ("-k", "--key"):
+            key = a
             print("key",o,a)
+
+        elif o == "-c":
+            print("path", o, a)
 
         elif o == "--version":
             print("version",o,a)
 
         elif o in ("--verbose","-v"):
             print("verbose",o,a)
+       
+    if(key == None or url == None):
         
+        raise IllegalArgumentException
+
 if __name__ == "__main__":
     main()            
             
