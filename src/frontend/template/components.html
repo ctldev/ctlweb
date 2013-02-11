@@ -5,29 +5,62 @@ Component list
 {% block content %}
 
 <div class="transbox">
-      <br/>
-      <h1> List of available Components </h1>
-            <p></p> <br/>
-	  
-	  {% for c in components %}
-		<div id="component">
-		  <div id="title">
-			<a href="{% url components c.pk %}">{{ c.name }}</a>
+  <br/>
+  {% if not form == 0 %}
+	  <div class="tabbable">
+		<ul class="nav nav-tabs">
+		  <li class="active"><a href="#interface"
+			data-toggle="tab">Interface</a></li>
+		  <li><a href="#component" data-toggle="tab">Components</a></li>
+		</ul>
+		<div class="tab-content">
+		  <div class="tab-pane active" id="interface">
+  {% endif %}
+			<div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
+			  <ul class="nav nav-tabs">
+				<li class="active"><a href="#tab1" data-toggle="tab">Interface 1</a></li>
+				<li><a href="#tab2" data-toggle="tab">Interface 2</a></li>
+			  </ul>
+			  <div class="tab-content">
+				<div class="tab-pane active" id="tab1">
+				  <p>Komponenten von Interface 1</p>
+				</div>
+				<div class="tab-pane" id="tab2">
+				  <p>Komponenten von Interface 2</p>
+				</div>
+			  </div>
+			</div>
+  {% if not form == 0 %}		
 		  </div>
-		  <div id="programmer">
-			<!-- TODO verlinkung auf user-seite -->
-			{% for pro in c.programmer_set.all %}
-			{{ pro.email }}{% if not forloop.last %}, {% endif %}
-			{% endfor %}
+		  <div class="tab-pane" id="component">
+			TODO hier sollen die components hin	  
+			{% for c in components %}
+			  <div id="component">
+				<div id="title">
+				  <a href="{% url components c.pk %}">{{ c.name }}</a>
+				</div>
+				<div id="programmer">
+				  {% for pro in c.programmer_set.all %}
+					{% for pro in users %}
+					  <a href="{% url user pro.pk %}">{{ pro.email }}</a>
+					{% empty %}
+					  {{ pro.email }}
+					{% endfor %}
+					{% if not forloop.last %}, {% endif %}
+				  {% endfor %}
+				</div>
+				<div id="version">
+				  {{ c.version }}
+				</div>
+				<div id="brief description">
+				  {{ c.brief_description }}
+				</div>	
+			  </div>
+		  	{% endfor %}
 		  </div>
-		  <div id="version">
-			{{ c.version }}
-		  </div>
-		  <div id="brief description">
-			{{ c.brief_description }}
-		  </div>	
-		</div>
-
-		{% endfor %}
+		</div>  
+	  </div>
+  {% endif %}  
 </div>
+
 {% endblock content %}
