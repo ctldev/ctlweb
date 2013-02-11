@@ -16,6 +16,7 @@ def advanced_search(searchtext, searched_comps):
         searched_comps = or_search(searchtext, searched_comps)
     if bind == "and not":
         searched_comps = and_not_search(searchtext, searched_comps)
+    return searched_comps
 
 def and_search(searchtext, searched_comps):
     if category == 'name':
