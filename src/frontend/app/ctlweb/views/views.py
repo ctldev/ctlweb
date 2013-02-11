@@ -17,6 +17,12 @@ def index(request):
     return render_to_response("home.html", 
             context_instance=RequestContext(request))
 
+def components(request): 
+	return render_to_response("components.html", 
+			context_instance=RequestContext(request))
+	
 def impressum(request):
     return render_to_response("impressum.html",
             context_instance=RequestContext(request))
+
+
