@@ -1,5 +1,5 @@
 #vim: set fileencoding=utf-8
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls.defaults import patterns, url, include
 from django.views.generic.simple import direct_to_template
 from app.ctlweb.views import *
 
@@ -15,6 +15,8 @@ urlpatterns = patterns('app.ctlweb.views',
         url(r'^administration/easy/$', 'index', name='administration_easy'),
         url(r'^administration/advanced/$', 'index', name='administration_advanced'),
         url(r'^impressum/$', 'impressum', name='impressum'),
+        url(r'^', include('django.contrib.auth.urls')),
+        url(r'^accounts/', include('registration.backends.default.urls')),
 )
 
 #urlpatterns += patterns('django.contrib.auth.views',

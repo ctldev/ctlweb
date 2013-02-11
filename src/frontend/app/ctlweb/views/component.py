@@ -14,8 +14,8 @@ from ctlweb.models import   Components, \
 def component_detail(request, comp_id):
     v_user = request.user
     try:
-        comp = components.objects.get(pk=comp_id)
-    except components.DoesNotExist:
+        comp = Components.objects.get(pk=comp_id)
+    except Components.DoesNotExist:
         raise Http404
     if v_user.email == comp.programmer and 'edit' in request.POST \
             and v_user.has_perm('ctlweb.change_components'):
