@@ -18,7 +18,7 @@ urlpatterns = patterns('app.ctlweb.views',
 )
 
 urlpatterns += patterns('',
-        url(r'^', include('django.contrib.auth.urls')),
+        url(r'^', include('ctlweb.urls_auth')),
         url(r'^accounts/', include('registration.backends.default.urls')),
         )
 
