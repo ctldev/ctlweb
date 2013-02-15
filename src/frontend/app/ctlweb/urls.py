@@ -15,9 +15,12 @@ urlpatterns = patterns('app.ctlweb.views',
         url(r'^administration/easy/$', 'index', name='administration_easy'),
         url(r'^administration/advanced/$', 'index', name='administration_advanced'),
         url(r'^impressum/$', 'impressum', name='impressum'),
+)
+
+urlpatterns += patterns('',
         url(r'^', include('django.contrib.auth.urls')),
         url(r'^accounts/', include('registration.backends.default.urls')),
-)
+        )
 
 #urlpatterns += patterns('django.contrib.auth.views',
 #        url(r'^login/$', 'login', name='login'),
