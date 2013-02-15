@@ -3,7 +3,7 @@
 # It is also provided as a convenience to those who want to deploy these URLs
 # elsewhere.
 
-from django.conf.urls import patterns, url
+from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('',
     url(r'^login/$', 'django.contrib.auth.views.login', name='login'),
