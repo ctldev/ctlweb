@@ -25,8 +25,9 @@ class Database:
             Database.db_connection.fetchone()
         except (sqlite3.ProgrammingError, AttributeError):
             Database.db_connection = sqlite3.connect(Database.db_file)
-#       Creationtime of object
+        # Creationtime of object
         c_creation = None
+
 
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
@@ -75,6 +76,7 @@ class Database:
         """ For creating an generall repräsentation of the class. The
         representation looks like the following:
          "c_id=2,c_pubkey=publickey"
+         TODO: escaping the strings
         """
         if protocol is sqlite3.PrepareProtocol:
             attributes = self.get_attributes()
@@ -89,6 +91,31 @@ class Database:
                 else:
                     repr = attr + "=" + self[attr] + ";" + repr
             return repr
+
+    def convert_point(s):
+        """ Returns an object build out of the string s. This function is used
+        by sqlite3
+         TODO: registration in sqlite3
+         TODO: escaping the strings
+        """
+        items = s.split(sep=";")
+
+    def __eq__(self, db):
+        """ Objects are equal if attributes of get_attribute() are equal.
+        """
+        if not isinstance(db, self.__class__):
+            return False
+        set1 = dir(self)
+        set2 = dir(db)
+        if set1 != set2:
+            return False
+        eq = True
+        for i in self.get_attributes():
+            try:
+                eq &= db[i] == self[i]
+            except AttributeError:
+                return False
+        return eq
 
     @classmethod
     def get(cls, time_since):

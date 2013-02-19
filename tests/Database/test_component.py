@@ -99,10 +99,13 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(repr, "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci",
                 msg="Error in generation of representation")
 
-    def test_rebuild(self):
-        """ Tests if a __conform__ representation could be successfully rebuild
+    def test_convert(self):
+        """ Tests if a __conform__ representation could be successfully
+        rebuild.
         """
-        pass
+        repr =  "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci"
+        comp = Compontent.convert(repr)
+        self.assertEqual(comp, self.comp)
 
 
 if __name__ == '__main__':
