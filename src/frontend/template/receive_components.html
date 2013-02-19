@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}
+Receive Components
+{% endblock title %}
+{% block content %}
+<div class="hidden">
+  <form method="post">
+	{{ comp_form.as_p }}
+	{{ inter_form.as_p }}
+  </form>
+</div>
+<div id="component_success">
+  {{ component_success }}
+</div>
+<div id="interface_success">
+  {{ interface_success }}
+</div>
+{% endblock %}
