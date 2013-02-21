@@ -7,8 +7,8 @@ import sys
 
 lib_path = os.getcwd() + "/../../lib/backend"
 sys.path.append( lib_path )
-from database.User import User
-from database.Database import Database
+from database.user import User
+from database.database import Database
 
 class UserTest(unittest.TestCase):
     """ Tests for user.py

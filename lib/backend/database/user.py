@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from .Database import Database
+from .database import Database
 import sqlite3
 
 class User(Database):
@@ -7,7 +7,7 @@ class User(Database):
     """
 
     def __init__(self, name, pubkey):
-        super()
+        super().__init__()
         self.c_id = name
         self.c_pubkey = pubkey
 
@@ -15,7 +15,8 @@ class User(Database):
         cursor = Database.db_connection.cursor()
         create_table = """CREATE TABLE User (
                             c_id TEXT PRIMARY KEY,
-                            c_pubkey TEXT
+                            c_pubkey TEXT,
+                            adapter TEXT
                             );
                             """
         cursor.execute(create_table)

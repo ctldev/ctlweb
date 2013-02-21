@@ -4,13 +4,18 @@ from django.template import RequestContext, Template
 from django.template import Context, loader
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
-from ctlweb.models import Components, Webserver, Cluster
+from django.contrib.auth.models import User
+from ctlweb.models import   Components, \
+                            Webserver, \
+                            Cluster, \
+                            Interfaces, \
+                            Programmer
 
 def component_detail(request, comp_id):
     v_user = request.user
     try:
-        comp = components.objects.get(pk=comp_id)
-    except components.DoesNotExist:
+        comp = Components.objects.get(pk=comp_id)
+    except Components.DoesNotExist:
         raise Http404
     if v_user.email == comp.programmer and 'edit' in request.POST \
             and v_user.has_perm('ctlweb.change_components'):
@@ -18,8 +23,10 @@ def component_detail(request, comp_id):
         pass
     homeserver = comp.components_webservers_set.order_by('name')
     homecluster = comp.components_clusters_set.order_by('domain')
-
-    template = loader.get_template("comp_detail.html")
+    interface = comp.components_interfaces_set.all()
+    emails = Programmer.objects.filter(component__in=comp).\
+            distinct('email').values_list('email')
+    userlist = User.objects.filter(email__in=emails)
 
     can_change = v_user.has_perm('ctlweb.change_components')
     see_path = v_user.has_perm('ctlweb.can_see_path')
@@ -27,23 +34,19 @@ def component_detail(request, comp_id):
     see_code = v_user.has_perm('ctlweb.can_see_code')
     see_homecluster = v_user.has_perm('ctlweb.can_see_homecluster')
     see_homeserver = v_user.has_perm('ctlweb.can_see_homeserver')
+    dict_response = dict()
     dict_response["user"] = v_user
     dict_response["component"] = comp
     dict_response["homeserver"] = homeserver
     dict_response["homecluster"] = homecluster
+    dict_response["interfaces"] = interface
+    dict_response["programmer"] = emails
+    dict_response["users"] = userlist
     dict_response["can_change"] = can_change
     dict_response["see_path"] = see_path
     dict_response["see_description"] = see_description
     dict_response["see_code"] = see_code
     dict_response["see_homecluster"] = see_homecluster
     dict_response["see_homeserver"] = see_homeserver
-
-    context = Context(dict_response)
-    response = HttpResponse(template.render(context))
-    return response
-
-def receive_component(request, token):
-#diese Methode soll 'ctl-getmodule'-Antworten aus dem Backend entgegennehmen
-#und diese mit der Datenbank abgleichen. TODO
-    return render_to_response('home.html',
-            context_instance=RequestContext(request))
+    context = RequestContext(request, dict_response)
+    return render_to_response("comp_detail.html", context_instance=context)
