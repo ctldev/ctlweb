@@ -102,12 +102,19 @@ def dbimport():
     co1.homeserver.add(w3)
     hc1 = Components_Cluster(cluster=cl1,
                             component=co1,
-                            path="C:\Cluter\Cl1",
-                            code="Implementierungscode von Co1 aif Cl1")
+                            path="C:\Cluster\Cl1",
+                            code="Implementierungscode von Co1 auf Cl1")
     hc1.save()
-    co1.homecluster.add(cluster=cl1, path="C:\Cluster\Cl1", code="Implementierungscode für co1 auf Cluster1")
-    co1.homecluster.add(cluster=cl2, path="C:\Cluster\Cl2", code="Implementierungscode für co1 auf Cluster2")
-    co1.homecluster.add(cluster=cl3, path="C:\Cluster\Cl3", code="Implementierungscode für co1 auf Cluster3")
+    hc2 = Components_Cluster(cluster=cl2,
+                            component=co1,
+                            path="C:\Cluster\Cl2",
+                            code="Implementierungscode von Co1 auf Cl2")
+    hc2.save()
+    hc3 = Components_Cluster(cluster=cl3,
+                            component=co1,
+                            path="C:\Cluster\Cl3",
+                            code="Implementierungscode von Co1 aúf Cl3")
+    hc3.save()
     co1.interfaces.add(i1)
     co1.programmer.add(email="foo@bah.de")
     co1.programmer.add(email="blabla@bla.de")
@@ -119,9 +126,11 @@ def dbimport():
             version="10001a")
     co2.save()
     co2.homeserver.add(w2)
-    co2.homecluster.add(cluster=cl1, path="C:\Cluster\Cl1", code="Implementierungscode für co2 auf Cluster1")
-    co2.homecluster.add(cluster=cl2, path="C:\Cluster\Cl2", code="Implementierungscode für co2 auf Cluster2")
-    co2.homecluster.add(cluster=cl3, path="C:\Cluster\Cl3", code="Implementierungscode für co2 auf Cluster3")
+    hc4 = Components_Cluster(cluster=cl3,
+                            component=co2,
+                            path="C:\Cluster\Cl3",
+                            code="Implementierungscode von Co2 aúf Cl3")
+    hc4.save()
     co2.interfaces.add(i1)
     co2.programmer.add(email="blubble@blub.org")
 
@@ -132,9 +141,16 @@ def dbimport():
             version="1000000000001")
     co3.save()
     co3.homeserver.add(w1)
-    co3.homecluster.add(cluster=cl1, path="C:\Cluster\Cl1", code="Implementierungscode für co3 auf Cluster1")
-    co3.homecluster.add(cluster=cl2, path="C:\Cluster\Cl2", code="Implementierungscode für co3 auf Cluster2")
-    co3.homecluster.add(cluster=cl3, path="C:\Cluster\Cl3", code="Implementierungscode für co3 auf Cluster3")
+    hc5 = Components_Cluster(cluster=cl1,
+                            component=co3,
+                            path="C:\Cluster\Cl1",
+                            code="Implementierungscode von Co3 aúf Cl1")
+    hc5.save()
+    hc6 = Components_Cluster(cluster=cl3,
+                            component=co3,
+                            path="C:\Cluster\Cl3",
+                            code="Implementierungscode von Co3 aúf Cl3")
+    hc6.save()
     co3.interfaces.add(i2)
     co3.programmer.add(email="bah@foo.de")
 
@@ -145,9 +161,11 @@ def dbimport():
             version="10001.a")
     co4.save()
     co4.homserver.add(w1)
-    co4.homecluster.add(cluster=cl1, path="C:\Cluster\Cl1", code="Implementierungscode für co4 auf Cluster1")
-    co4.homecluster.add(cluster=cl2, path="C:\Cluster\Cl2", code="Implementierungscode für co4 auf Cluster2")
-    co4.homecluster.add(cluster=cl3, path="C:\Cluster\Cl3", code="Implementierungscode für co4 auf Cluster3")
+    hc7 = Components_Cluster(cluster=cl1,
+                            component=co4,
+                            path="C:\Cluster\Cl1",
+                            code="Implementierungscode von Co4 aúf Cl1")
+    hc7.save()
     co4.interfaces.add(i3)
     co4.programmer.add(email="bah@foo.de")
     co4.programmer.add(email="abc@xyz.de")
