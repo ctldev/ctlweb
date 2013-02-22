@@ -10,6 +10,14 @@ SEARCH_CATEGORY_CHOICES = (
         ('homeserver', _('Server')),
         ('date', _('Datum')),)
 
+class SearchAreaForm(forms.Form):
+    SEARCHAREA_CHOICES = (
+            ('all', _('Komponenten und Interfaces')),
+            ('components', _('Komponenten')),
+            ('interfaces', _('Interfaces')),)
+    area = forms.ChoiceField(choices = SEARCHAREA_CHOICES,
+            label=_('Suchgebiet'))
+
 class SearchForm(forms.Form):
     searchtext = forms.CharField(label=_("Suchtext"))
     category = forms.ChoiceField(choices = SEARCH_CATEGORY_CHOICES,
@@ -17,9 +25,9 @@ class SearchForm(forms.Form):
 
 class AddSearchForm(forms.Form):
     LOGIC_CHOICES = (
-            ('and', 'und'),
-            ('and not', 'und nicht'),
-            ('or', 'oder'),)
+            ('and', _('und')),
+            ('and not', _('und nicht')),
+            ('or', _('oder')),)
     bind = forms.ChoiceField(choices = LOGIC_CHOICES, label=_("Bindung"))
     searchtext = forms.CharField(label=_("Suchtext"))
     category = forms.ChoiceField(choices = SEARCH_CATEGORY_CHOICES,

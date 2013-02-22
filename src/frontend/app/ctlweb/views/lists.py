@@ -27,13 +27,14 @@ def lists(request,
     if components is not None:
         emails = Programmer.objects.filter(component__in=components).\
                 distinct('email').values_list('email')
-    if direct_interfaces is not None:
-        for d in direct_interfaces:
-            i_components[d.pk] = Components.objects.filter(\
-                    component__interfaces = d)
-            emails += Programmer.objects.\
-                    filter(component__in=i_components[d.pk]).\
-                    distinct('email').values_list('email')
+#TODO Überarbeiten
+#    if direct_interfaces is not None:
+#        for d in direct_interfaces:
+#            i_components[d.pk] = Components.objects.filter(\
+#                    component__interfaces = d)
+#            emails += Programmer.objects.\
+#                    filter(component__in=i_components[d.pk]).\
+#                    distinct('email').values_list('email')
     userlist= User.objects.filter(email__in=emails)
     dict_response = dict()
     dict_response["form"] = form
