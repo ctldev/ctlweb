@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import sqlite3
 from .database import Database
+import sqlite3
 
 class Component(Database):
     """ Is an component in the CTL-Database
@@ -19,7 +19,8 @@ class Component(Database):
         create_table = """CREATE TABLE Component (
                             id TEXT PRIMARY KEY,
                             exe TEXT,
-                            ci TEXT
+                            ci TEXT,
+                            adapter TEXT
                             );
                            """ 
         cursor.execute(create_table)
