@@ -13,23 +13,11 @@ class Component(Database):
         self.c_exe = exe
         self.c_ci = ci
 
-    def create_table(self):
-        connection = Database.db_connection
-        cursor = Database.db_connection.cursor()
-        create_table = """CREATE TABLE Component (
-                            id TEXT PRIMARY KEY,
-                            exe TEXT,
-                            ci TEXT,
-                            adapter TEXT
-                            );
-                           """ 
-        cursor.execute(create_table)
-        connection.commit()
-
-    def drop_table(self):
-        """ Be carefull with it! Could destroy important data
+    @classmethod
+    def create(cls, attr):
+        """ attr is expected to be an dict with the following keys:
+            * c_id
+            * c_exe
+            * c_ci
         """
-        cursor = Database.db_connection.cursor()
-        cursor.execute("DROP TABLE Component;")
-        Database.db_connection.commit()
-
+        return cls(attr["c_id"], attr["c_exe"], attr["c_ci"])

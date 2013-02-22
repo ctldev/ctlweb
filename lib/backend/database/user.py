@@ -11,21 +11,10 @@ class User(Database):
         self.c_id = name
         self.c_pubkey = pubkey
 
-    def create_table(self):
-        cursor = Database.db_connection.cursor()
-        create_table = """CREATE TABLE User (
-                            c_id TEXT PRIMARY KEY,
-                            c_pubkey TEXT,
-                            adapter TEXT
-                            );
-                            """
-        cursor.execute(create_table)
-        Database.db_connection.commit()
-
-    def drop_table(self):
-        """ Be carefull with it! Could destroy important data
+    @classmethod
+    def create(cls, attr):
+        """ Creates User class out of an dict containing the following keys:
+            * c_id
+            * c_pubkey
         """
-        cursor = Database.db_connection.cursor()
-        cursor.execute("DROP TABLE user;")
-        Database.db_connection.commit()
-
+        return cls(attr['c_id'],attr['c_pubkey'])

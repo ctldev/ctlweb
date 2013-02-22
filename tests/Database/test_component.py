@@ -104,7 +104,7 @@ class TestComponent(unittest.TestCase):
         rebuild.
         """
         repr =  "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci"
-        comp = Compontent.convert(repr)
+        comp = Component.convert(repr)
         self.assertEqual(comp, self.comp)
 
 

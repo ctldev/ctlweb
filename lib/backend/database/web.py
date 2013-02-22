@@ -11,21 +11,10 @@ class Web(Database):
         self.c_id = url
         self.c_pubkey = pubkey
 
-    def create_table(self):
-        cursor = Database.db_connection.cursor()
-        create_table = """CREATE TABLE Web (
-                            id TEXT PRIMARY KEY,
-                            pubkey TEXT,
-                            adapter TEXT
-                            );
-                            """
-        cursor.execute(create_table)
-        Database.db_connection.commit()
-
-    def drop_table(self):
-        """ Be carefull with it! Could destroy important data
+    @classmethod
+    def create(cls, attr):
+        """ attr is expected to be an dict with the following keys:
+            * c_id
+            * c_pubkey
         """
-        cursor = Database.db_connection.cursor()
-        cursor.execute("DROP TABLE web;")
-        Database.db_connection.commit()
-
+        return cls(attr['c_id'], attr['c_pubkey'])
