@@ -133,3 +133,13 @@ class ModuleTokenValidation(models.Model):
                 expiration_date=date)
         to.save()
 
+    def is_valid(self, cluster):
+        today = datetime.datetime.today()
+        if isinstance(cluster, basestring):
+            try:
+                cluster = Cluster.objects.get(ip=cluster)
+            except Cluster.DoesNotExist:
+                return False
+        if self.cluster == cluster:
+            return (today <= self.date)
+        return False

@@ -5,6 +5,8 @@ import hashlib
 import time
 import datetime
 import os
+import zipfile
+from ConfigParser import SafeConfigParser
 from ctlweb.models import Cluster
 from ctlweb.models import Components
 from ctlweb.models import ModuleTokenValidation
@@ -60,12 +62,40 @@ def request_modules(testing=False):
         ModuleTokenValidation.create_token(url_token, c)
         ssh.close()
 
-def valid_token(token):
-#TODO
-    return False
+
+PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', )
+
+def _get_client_ip(request):
+    """get the client ip from the request
+    """
+    remote_address = request.META.get('REMOTE_ADDR')
+    # set the default value of the ip to be the REMOTE_ADDR if available
+    # else None
+    ip = remote_address
+    # try to get the first non-proxy ip (not a private ip) from the
+    # HTTP_X_FORWARDED_FOR
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        proxies = x_forwarded_for.split(',')
+        # remove the private ips from the beginning
+        while (len(proxies) > 0 and proxies[0].startswith(PRIVATE_IPS_PREFIX)):
+            proxies.pop(0)
+            # take the first ip which is not a private
+            # one (of a proxy)
+        if len(proxies) > 0:
+            ip = proxies[0]
+    return ip
+
+def valid_token(token, cluster):
+    try:
+        token_db = ModuleTokenValidation.objects.get(token=token)
+    except ModuleTokenValidation.DoesNotExist:
+        return False
+    return token_db.is_valid(cluster)
 
 def receive_modules(request, token):
-    if not valid_token(token):
+    cluster = _get_client_ip(request)
+    if not valid_token(token, cluster):
         raise Http404
     comp_form = ComponentRequestForm(request.POST or None, request.FILES or None)
     interface_form = InterfaceRequestForm(request.POST or None)
@@ -87,7 +117,7 @@ def receive_modules(request, token):
         for chunk in request.FILES['manifest'].chunks():
             destination.write(chunk)
         destination.close()
-        file_success = import_manifest(filename)
+        file_success = _import_manifest(filename)
         os.remove(filename)
     dict_response = dict()
     dict_response["component_success"] = file_success
@@ -96,3 +126,18 @@ def receive_modules(request, token):
     dict_response["inter_form"] = interface_form
     context = RequestContext(request, dict_response)
     return render_to_response('receive_components.html', context_instance=context)
+
+def _import_manifest(filename):
+    if not zipfile.is_zipfile(filename):
+        return False
+    with zipfile.ZipFile(filename, "r") as myzip:
+        settings = myzip.open("control")
+        parser = SafeConfigParser()
+        parser.read(settings)
+#TODO read settings
+        doc_file = myzip.open("doc.txt")
+        desc = doc_file.read()
+        doc_file.close()
+        ci_file = myzip.open(parser.get("DEFAULT", "ci"))
+        ci = ci_file.read()
+        ci_file.close()
