@@ -31,15 +31,18 @@ def dbimport():
             name="Matrizen", 
             description="etliche Matrizenrechnungen",
             key="01")
+    i1.save()
     i2 = Interfaces(
             name="Grundlagen", 
             description="Addition, Subtraktion, Multiplikation und Division"+\
                         "von natürlichen Zahlen",
             key="02")
+    i2.save()
     i3 = Interfaces(
             name="Addition", 
             description="verschiedene Additionsverfahren",
             key="03")
+    i3.save()
 
     #User
     user1 = User(username="user1", 
@@ -90,8 +93,6 @@ def dbimport():
 
 
     #Components
-    #TODO verbindung zu CLuster überarbeiten
-    #TODO Programmer
     co1 = Components(
             name="LU-Zerlegung", 
             brief_description="LU-Zerlegung nach Gauß",
@@ -115,9 +116,11 @@ def dbimport():
                             path="C:\Cluster\Cl3",
                             code="Implementierungscode von Co1 aúf Cl3")
     hc3.save()
-    co1.interfaces.add(i1)
-    co1.programmer.add(email="foo@bah.de")
-    co1.programmer.add(email="blabla@bla.de")
+    i1.components.add(co1)
+    p1 = Programmer(component=co1, email="foo@bah.de")
+    p1.save()
+    p2 = Programmer(component=co1, email="blabla@bla.de")
+    p2.save()
 
     co2 = Components(
             name="Matrix-Addition",
@@ -131,8 +134,9 @@ def dbimport():
                             path="C:\Cluster\Cl3",
                             code="Implementierungscode von Co2 aúf Cl3")
     hc4.save()
-    co2.interfaces.add(i1)
-    co2.programmer.add(email="blubble@blub.org")
+    i1.components.add(co2)
+    p3 = Programmer(component=co2, email="blubble@blub.org")
+    p3.save()
 
     co3 = Components(
             name="Addition",
@@ -151,8 +155,9 @@ def dbimport():
                             path="C:\Cluster\Cl3",
                             code="Implementierungscode von Co3 aúf Cl3")
     hc6.save()
-    co3.interfaces.add(i2)
-    co3.programmer.add(email="bah@foo.de")
+    i2.components.add(co3)
+    p4 = Programmer(component=co3, email="bah@foo.de")
+    p4.save()
 
     co4 = Components(
             name="komplexe Zahlen",
@@ -160,13 +165,14 @@ def dbimport():
             description="Diese Komponente addiert zwei komplexe Zahlen",
             version="10001.a")
     co4.save()
-    co4.homserver.add(w1)
+    co4.homeserver.add(w1)
     hc7 = Components_Cluster(cluster=cl1,
                             component=co4,
                             path="C:\Cluster\Cl1",
                             code="Implementierungscode von Co4 aúf Cl1")
     hc7.save()
-    co4.interfaces.add(i3)
-    co4.programmer.add(email="bah@foo.de")
-    co4.programmer.add(email="abc@xyz.de")
-
+    i3.components.add(co4)
+    p5 = Programmer(component=co4, email="bah@foo.de")
+    p5.save()
+    p6 = Programmer(component=co4, email="abc@xyz.de")
+    p6.save()
