@@ -90,7 +90,7 @@ def dbimport():
     Permission.objects.get(codename="can_see_path").user_set.add(user1)
     Permission.objects.get(codename="can_see_code").user_set.add(user1)
     Permission.objects.get(codename="can_see_code").user_set.add(user2)
-
+    Permission.objects.get(codename="can_set_active").user_set.add(user1)
 
     #Components
     co1 = Components(
@@ -101,6 +101,7 @@ def dbimport():
     co1.save()
     co1.homeserver.add(w1)
     co1.homeserver.add(w3)
+    co1.set_active(user1)
     hc1 = Components_Cluster(cluster=cl1,
                             component=co1,
                             path="C:\Cluster\Cl1",
@@ -129,6 +130,7 @@ def dbimport():
             version="10001a")
     co2.save()
     co2.homeserver.add(w2)
+    co2.set_active(user1)
     hc4 = Components_Cluster(cluster=cl3,
                             component=co2,
                             path="C:\Cluster\Cl3",
@@ -145,6 +147,7 @@ def dbimport():
             version="1000000000001")
     co3.save()
     co3.homeserver.add(w1)
+    co3.set_active(user1)
     hc5 = Components_Cluster(cluster=cl1,
                             component=co3,
                             path="C:\Cluster\Cl1",
@@ -166,6 +169,7 @@ def dbimport():
             version="10001.a")
     co4.save()
     co4.homeserver.add(w1)
+    co4.set_active(user1)
     hc7 = Components_Cluster(cluster=cl1,
                             component=co4,
                             path="C:\Cluster\Cl1",
