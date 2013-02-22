@@ -79,9 +79,12 @@ class Components(models.Model):
         if User.has_perm("can_set_active"):
             self.is_active=False
 
-    def save(self, user, *args, **kwargs):
+    def save(self, 
+            #user, 
+            *args, 
+            **kwargs):
         self.is_active = False
-        self.programmer = user.email
+        #self.programmer = user.email
         super(Components, self).save(*args, **kwargs)
 
 class Interfaces(models.Model):

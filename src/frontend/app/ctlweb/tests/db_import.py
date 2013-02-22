@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from ctlweb.models import *
 import datetime
 
-def import():
+def dbimport():
     #Webserver
     w1 = Webserver( name="Web1", 
                     domain="www.web1.de")
@@ -100,6 +100,11 @@ def import():
     co1.save()
     co1.homeserver.add(w1)
     co1.homeserver.add(w3)
+    hc1 = Components_Cluster(cluster=cl1,
+                            component=co1,
+                            path="C:\Cluter\Cl1",
+                            code="Implementierungscode von Co1 aif Cl1")
+    hc1.save()
     co1.homecluster.add(cluster=cl1, path="C:\Cluster\Cl1", code="Implementierungscode für co1 auf Cluster1")
     co1.homecluster.add(cluster=cl2, path="C:\Cluster\Cl2", code="Implementierungscode für co1 auf Cluster2")
     co1.homecluster.add(cluster=cl3, path="C:\Cluster\Cl3", code="Implementierungscode für co1 auf Cluster3")
