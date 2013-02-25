@@ -8,6 +8,7 @@ lib_path = os.getcwd() + "/../../lib/backend"
 sys.path.append( lib_path )
 from database.component import Component
 from database.database import Database
+from util import Log
 
 class TestComponent(unittest.TestCase):
     """ Testing of module.py
@@ -16,6 +17,7 @@ class TestComponent(unittest.TestCase):
         """ Establishes database connection
         """
         Database.db_file = "test.db" # DB File for Testcase without config
+#        Log.streamoutput(0)
 #       Instance objects
         self.comp = Component("name","/path/to/exe","/path/to/ci")
         self.connection = Database.db_connection
@@ -108,9 +110,15 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(comp, self.comp)
 
     def test_get(self):
+        from datetime import datetime
+        from datetime import timedelta
         self.comp.save()
+        # Test get all
         comps = Component.get()
-        self.assertEquals(comps[0], self.comp, "Could not deserialize data")
+        self.assertEqual(comps[0], self.comp, "Could not deserialize data")
+        time_since = datetime.today() + timedelta(minutes=2)
+        comps = Component.get(time_since)
+        self.assertEqual(comps[0], self.comp, "Could not deserialize data")
 
     def test_get_exacly(self):
         self.comp.save()

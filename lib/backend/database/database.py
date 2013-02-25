@@ -56,26 +56,33 @@ class Database:
         import re
         sql = """SELECT adapter FROM ?
                 WHERE date BETWEEN ? AND date('now')"""
+        values = []
         if re.search("^all$", time_since):
-            Log.debug("Get all objects of %s" % cls.__name__)
-            sql = " SELECT adapter FROM ? "
+            Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
+            sql = "SELECT adapter FROM " + cls.__name__
         elif not re.search(r'^[1-2]\d{3}-[0-1]?\d-[0-3]?\d$', time_since):
+            Log.warning("Got request for %ss with objects newer than %s" %
+                    (cls.__name__, time_since))
             raise ValueError()
-        values = (cls.__name__, time_since)
-        cursor = db_connection.cursor()
-        cursor.execute(statement, time_since)
+        else:
+            values.append(time_since)
+        cursor = Database.db_connection.cursor()
+        cursor.execute(sql, values)
         result_set = []
         for row in cursor.fetchall():
-            result_set.append(cls.convert(row))
+            result_set.append(cls.convert(row[0]))
+        return result_set
 
     @classmethod
     def get_exacly(cls, name):
         """ Returns exacly one object with the given (unique) name.
+
+        NOT WORKING AT THE MOMENT
         """
         sql = """SELECT adapter FROM ?
                 WHERE c_id = ?"""
         values = (cls.__name__, name)
-        cursor = db_connection.cursor()
+        cursor = Database.db_connection.cursor()
         Log.debug("Requesting %s with c_id = %s" % (cls.__name__, name))
         cursor.execute(statement, values)
         return cls.convert(cursor.fetchone())
@@ -92,14 +99,13 @@ class Database:
         sql += self.__name__
         sql += """ (
                 date DATE,
-                adapter TEXT"""
+                adapter TEXT""" 
         for i in self.get_attributes():
             if re.search("^c_id$",i):
                 sql += ", "+i+" PRIMARY KEY"
             else:
                 sql += ", "+i 
         sql += ");"
-        Log.debug("Create Table SQL: %s" % sql)
         cursor.execute(sql)
         self.db_connection.commit()
 
@@ -116,24 +122,23 @@ class Database:
 
     def save(self):
         """ Saves object into database
-
-        NOT SUPPORTED YET!
         """
         cursor = Database.db_connection.cursor()
         attributes = self.get_attributes()
-        table = self.__class__.__name__
+        table = self.__name__
         sql = ""
-        values = []
+        values = {
+                'adapter' : self,
+                }
         for i in attributes:
-            sql += ", ?"
-            values.append(self[i])
+            sql += ", :"+i
+            values[i] = self[i]
         else:
             sql += ")"
-
         try:
-            sql = """INSERT INTO Component 
+            sql = "INSERT INTO " + table + """
                     VALUES
-                    (strftime('%s','now'),"Adapter" """ +sql        
+                    (strftime('%s','now'), :adapter """ +sql        
             cursor.execute(sql,values)
             Database.db_connection.commit()
         except sqlite3.IntegrityError:
