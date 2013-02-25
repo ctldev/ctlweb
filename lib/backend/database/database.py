@@ -52,20 +52,27 @@ class Database:
     @classmethod
     def get(cls, time_since='all'):
         """ Returns a tuple of objects stored in the database.
+        
+        Optional Parameter time_since is instance of datetime.datetime and
+        represents the oldest object to be found by get. Default searches for
+        every object stored in the database.
         """
         import re
-        sql = """SELECT adapter FROM ?
-                WHERE date BETWEEN ? AND date('now')"""
+        from datetime import datetime
+        sql = "SELECT adapter FROM " + cls.__name__ + """
+                WHERE date >= ?"""
         values = []
-        if re.search("^all$", time_since):
+        if type(time_since) == str:
             Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
             sql = "SELECT adapter FROM " + cls.__name__
-        elif not re.search(r'^[1-2]\d{3}-[0-1]?\d-[0-3]?\d$', time_since):
-            Log.warning("Got request for %ss with objects newer than %s" %
+        elif isinstance(time_since, datetime):
+            Log.debug("Database.get(): Get %s newer than %s" % 
                     (cls.__name__, time_since))
-            raise ValueError()
-        else:
+            time_since = time_since.strftime("%s")
             values.append(time_since)
+        else:
+            Log.debug("Wrong dateformat caught in %s.get()" % cls.__name__)
+            raise ValueError()
         cursor = Database.db_connection.cursor()
         cursor.execute(sql, values)
         result_set = []

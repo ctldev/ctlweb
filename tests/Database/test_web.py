@@ -94,6 +94,15 @@ class TestWeb(unittest.TestCase):
         self.assertEqual(res[0], "url", "Got unexpected data")
         self.assertEqual(res[1], "pubkey", "Got unexpected data")
 
+    def test_get(self):
+        self.web.save()
+        webs = Web.get()
+        self.assertEqual(webs[0], self.web, "Unable to get all data")
+        import datetime
+        d = datetime.datetime.now() - datetime.timedelta(minutes=2)
+        webs = Web.get(d)
+        self.assertEqual(webs[0], self.web, "Unable to get new data")
+
 
 if __name__ == '__main__':
     unittest.main()

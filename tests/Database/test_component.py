@@ -17,7 +17,7 @@ class TestComponent(unittest.TestCase):
         """ Establishes database connection
         """
         Database.db_file = "test.db" # DB File for Testcase without config
-#        Log.streamoutput(0)
+        Log.streamoutput(0)
 #       Instance objects
         self.comp = Component("name","/path/to/exe","/path/to/ci")
         self.connection = Database.db_connection
@@ -116,8 +116,9 @@ class TestComponent(unittest.TestCase):
         # Test get all
         comps = Component.get()
         self.assertEqual(comps[0], self.comp, "Could not deserialize data")
-        time_since = datetime.today() + timedelta(minutes=2)
+        time_since = datetime.today() - timedelta(minutes=10)
         comps = Component.get(time_since)
+        Log.debug("test_get(): comps: "+ str(comps))
         self.assertEqual(comps[0], self.comp, "Could not deserialize data")
 
     def test_get_exacly(self):

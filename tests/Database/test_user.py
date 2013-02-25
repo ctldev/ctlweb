@@ -69,6 +69,7 @@ class UserTest(unittest.TestCase):
         self.assertFalse("__doc__" in attrs)
 
     def test_save(self):
+        self.user.save()
 #       Restarting database connection
         self.connection.close()
         Database()
@@ -83,6 +84,14 @@ class UserTest(unittest.TestCase):
         self.assertEqual(result[0], 'Douglas')
         self.assertEqaul(result[1], 'pubkey')
 
+    def test_get(self):
+        self.user.save()
+        results = User.get()
+        self.assertEqual(self.user, results[0], "Unable to get all data")
+        import datetime
+        d = datetime.datetime.now() - datetime.timedelta(minutes=2)
+        results = User.get(d)
+        self.assertEqual(self.user, results[0], "Unable to get new data")
 
 if __name__ == "__main__":
     unittest.main()
