@@ -53,7 +53,7 @@ def main():
         elif o in ("-v", "--verbose"):
             Log.info("Die Verbosity wird erhoeht.")
             Log.verbose = Log.increase_verbosity(Log.verbose)
-            print Log.verbose
+            print(Log.verbose)
         elif o in ("-r", "--id"):
             Log.setHandler = Log.handlerActivation(Log.setHandler)
             print("id",o,a)
