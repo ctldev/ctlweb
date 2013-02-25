@@ -88,8 +88,8 @@ class TestComponent(unittest.TestCase):
         res = cursor.fetchone()
         self.assertIsNotNone(res, "Could not read test data from db.")
         res = tuple(res)
-        self.assertEqual(res[0], "name", "Got unexpected data")
-        self.assertEqual(res[1], "/path/to/exe", "Got unexpected data")
+        self.assertEqual(res[4], "name", "Got unexpected data")
+        self.assertEqual(res[3], "/path/to/exe", "Got unexpected data")
         self.assertEqual(res[2], "/path/to/ci", "Got unexpected data")
 
     def test_conform(self):
