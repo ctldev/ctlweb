@@ -11,6 +11,7 @@ class Log:
     def increase_verbosity(verbose):
         if(verbose < 5):    
             verbose = verbose + 1
+        Log.setHandler = Log.handlerActivation(Log.setHandler) 
         return verbose
     
     @staticmethod    
@@ -30,6 +31,7 @@ class Log:
     
     @staticmethod
     def streamoutput(lvl):
+        root = 0
         root = logging.getLogger()
         logging.root.handlers=[] 
         logging.basicConfig(level = lvl,
@@ -39,6 +41,7 @@ class Log:
 
     @staticmethod
     def fileoutput(lvl):
+        fileLogger = 0
         logging.basicConfig(level = lvl,
                             filemode = 'a',
                             format = "%(asctime)s - %(levelname)s: %(message)s)"
@@ -47,13 +50,13 @@ class Log:
    
         fileLogger = logging.getLogger()
         fileLogger.addHandler(fileHandler)
-        fileLogger.setLevel(Log.choose_level(Log.verbose))
+        fileLogger.setLevel(lvl)
         logging.shutdown()
 
     @staticmethod 
     def handlerActivation(setHandler):
-        Log.streamoutput(Log.choose_level(Log.verbose))
-        Log.fileoutput(Log.choose_level(Log.verbose))
+        Log.streamoutput(Log.choose_level(Log.verbose + 1))
+        Log.fileoutput(Log.choose_level(Log.verbose + 1))
         return True
    
     @staticmethod 
