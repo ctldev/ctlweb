@@ -3,7 +3,11 @@
 import sys
 import getopt
 
+<<<<<<< HEAD:bin/ctl-addmodule
+#ermöglicht es Module der Datenbank hinzuzufügen
+=======
 #ermöglicht es eine Component aus der Datenbank zu holen
+>>>>>>> 736a1de4a9f20c73a19606b7d3b7d1efd772285e:bin/ctl-addcomponent
 
 opt = "a:"
 long_opt = ["add=" ]

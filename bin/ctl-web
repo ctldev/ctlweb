@@ -1,42 +1,71 @@
-#!/bin/bash
-TEMP=`getopt -o a:k:r:o --long a-long:,k-long:,r-long:,o-long: \
-     -n 'example.bash' -- "$@"`
+#!/usr/bin/env python3
+import os
+import sys
+import getopt
+#import logging
+#ctl-web wird von der Webinstanz auf den Cluster ausgefuehrt, um sich dort zu verifiziern
+lib_path = os.getcwd() + "/../lib/backend"
+sys.path.append( lib_path )
+from util import Log 
+opt = "a:k:r:ov"
+long_opt = ["id=", "public key=", "id=", "overview", "verbose" ]
+max_output_level = 2
 
-if [ $? != 0 ] ; then echo "Keine gültige Eingabe!" >&2 ; exit 1 ; fi
+def usage():
+    print("Usage:", sys.argv[0], """[-a <id>| --a=<id> 
+         \t [-k <public key> --key=<public key>]
+         \t [-r <id> | --remove=<>]
+         \t [-o | --overview] """)
 
-addfunction(){
-    echo "ich adde($2) "
-    exit
-}
-
-removefunction(){
-    echo " ich lösche($2)"
-    exit
-}
-
-keyfunction(){
-    echo "ich verwende den key ($2)"
-    exit
-}
-
-
-overviewfunction(){
-    echo "ich liefere den Überblick"  
-    exit
-}
-
- 
-
-while true ; do
-    case "$1" in 
-        -a|--a) addfunction $* ; shift ;;  
-        -k|--k) keyfunction $* ;shift  ;;
-        -r|--r) removefunction $* ; shift ;;
-        -o|--o) overviewfunction $* ; shift ;;
-        --) break; shift ;;
+#    def set_verbosity(verbose):
+#        Logging.verbose = verbose
         
-    esac
-done       
+
+#    def increase_verbosity(verbose):
+#        if(verbose < 5):    
+#            verbose = verbose + 1
+#            set_verbosity(verbose)
+#        return verbose
+    
+def main():    
+    try:
+         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
+    except getopt.GetoptError as err:
+        print(err)
+        usage()
+        sys.exit(2)
+    output = None
+    
+    
+    for o, a in opts:
+        if o in ("-a", "--id"):
+            Log.setHandler = Log.handlerActivation(Log.setHandler)
+            print("id",o,a) 
+            Log.debug("debugtest")
+            Log.error("errortest")
+            Log.critical("criticaltest")
+            Log.warning("warningtest")
+            Log.info( str(a) + "  wird als id inzugefuegt")    
+        elif o in ("-k", "--public key"):
+            Log.setHandler = Log.handlerActivation(Log.setHandler)
+            print("public key",o,a)  
+            logging.info( str(a) +" wird als public key hinzugefuegt") 
+        elif o in ("-v", "--verbose"):
+            Log.info("Die Verbosity wird erhoeht.")
+            Log.verbose = Log.increase_verbosity(Log.verbose)
+            print Log.verbose
+        elif o in ("-r", "--id"):
+            Log.setHandler = Log.handlerActivation(Log.setHandler)
+            print("id",o,a)
+            logging.info(str(a) + "wir als id geloescht")
+                    
+        elif o in ("-o", "--o"):
+            Log.setHandler = Log.handlerActivation(Log.setHandler)
+            print("doxygen",o,a)           
+            Log.info(str(a) + "wird zum doxygen gemacht")
+if __name__ == "__main__":
+    main()            
+           
 
 
 

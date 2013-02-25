@@ -107,6 +107,15 @@ class TestComponent(unittest.TestCase):
         comp = Component.convert(repr)
         self.assertEqual(comp, self.comp)
 
+    def test_get(self):
+        self.comp.save()
+        comps = Component.get()
+        self.assertEquals(comps[0], self.comp, "Could not deserialize data")
+
+    def test_get_exacly(self):
+        self.comp.save()
+        comp = Component.get_exacly(self.comp.c_id)
+        self.assertEquals(comp, self.comp, "Could not deserialize data")
 
 if __name__ == '__main__':
     unittest.main()
