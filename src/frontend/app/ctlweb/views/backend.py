@@ -137,7 +137,7 @@ def _import_manifest(filename, cluster):
         parser.read(settings_file)
 #TODO read settings
         if cluster.domain is not None:
-            if cluster.domain == parser.get("DEFAULT", "host")
+            if cluster.domain == parser.get("DEFAULT", "host"):
                 return False
         doc_file = myzip.open("doc.txt")
         desc = doc_file.read()
