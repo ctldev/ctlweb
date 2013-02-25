@@ -80,6 +80,49 @@ class Database:
 
         NOT SUPPORTED YET!
         """
+        """
+        cursor = Database.db_connection.cursor()
+        pdb.set_trace()
+        attributes = self.get_attributes()
+
+        table = self.__class__.__name__
+        targetcolumns = []  
+        values = [] 
+        updatetargetvalues = []
+        for a in attributes:
+            if a == attributes[-1]:
+                targetcolumns.append(a)
+                values.append(self[a])
+                updatetargetvalues.append(a)
+                updatetargetvalues.append("=")
+                updatetargetvalues.append(self[a])
+            else: 
+                targetcolumns.append(a)
+                targetcolumns.append(",")
+                values.append(self[a])
+                updatetargetvalues.append(a)
+                updatetargetvalues.append("=")
+                updatetargetvalues.append(self[a])
+                updatetargetvalues.append(",")
+        stringtargetcolumns = "".join(targetcolumns)
+        stringvalues = "".join(values)
+        sstringupdatetargetvalues = "".join(updatetargetvalues)
+        parameter = {"table" : table, "columns" : stringtargetcolumns, 
+                "values" : stringvalues, "set" : stringupdatetargetvalues}
+        print(parameter)
+        try:
+            sql = """INSERT INTO :table (:columns) 
+                    VALUES (:values)"""
+            cursor.execute(sql,parameter)
+            Database.db_connection.commit()
+        except SQLiteException:
+            exceptionparameter = (targetcolumns[0], values[0])
+            sql = "UPDATE :table SET :set WHERE ? = ?"
+            cursor.execute(sql,parameter,exceptionparameter)
+            Database.db_connection.commit()
+
+           """ 
+
         pass
 
     def __conform__(self,protocol):

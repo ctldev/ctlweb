@@ -1,9 +1,9 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH ctl 1 "MARCH 1995" Linux "User Manuals"
+.TH ctl-web 1 "MARCH 1995" Linux "User Manuals"
 .SH NAME
-ctl \- execute commands on dedicated clusters, generate manifest data~ 
+ctl-web \- enables the ctl-webinterface to add users to specific clusters  
 .SH SYNOPSIS
 .br
 .B ctl-web
@@ -17,20 +17,36 @@ ctl \- execute commands on dedicated clusters, generate manifest data~
 .SH DESCRIPTION
 .B ctl-web
 .SH OPTIONS
+.TP
 .BI \-a\  id \fR,\ \fB\-\-add= id
-.IP "-c config-file"
-.IR /etc/foo.conf .
-.SH FILES
-.SH ENVIRONMENT
-.SH DIAGNOSTICS
+TODO
+.TP
+.BI \-k\  publickey \fR,\ \fB\-\-key= publickey
+TODO
+.TP
+.BI \-r\  id \fR,\ \fB\-\-remove= id
+TODO
+.TP
+.BI \-a\  id \fR,\ \fB\-\-add= id
+TODO
+.TP
+.BR \-o ", " \-\-overview
+TODO
+
+
+.\" .SH FILES
+
+.\" .SH ENVIRONMENT
+
+.\".SH DIAGNOSTICS
  
-.SH BUGS
+.\" .SH BUGS
+
 .SH AUTHOR
-Jens Schweikhardt <howto at schweikhardt dot net>
+Jörn Hameyer <>
 .SH "SEE ALSO"
-.BR bar (1),
-.BR foo (5),
-.BR xyzzy (1)
+.BR ctl (1),
+.BR foo (5)
 
 
 
