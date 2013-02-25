@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sqlite3
+from util import Log
 
 class Database:
     """ Every class derived from Database gets it's own table in the database.
@@ -53,6 +54,8 @@ class Database:
         stars with 'c_'. For example 'c_id'. This variable can be accessed with
         self["id"]
         """
+        import re
+        Log.debug("Creating Table for %s" % self.__name__)
         cursor = self.db_connection.cursor()
         sql = "CREATE TABLE "
         sql += self.__name__
@@ -60,8 +63,12 @@ class Database:
                 date DATE,
                 adapter TEXT"""
         for i in self.get_attributes():
-            sql += ", "+i 
+            if re.search("^c_id$",i):
+                sql += ", "+i+" PRIMARY KEY"
+            else:
+                sql += ", "+i 
         sql += ");"
+        Log.debug("Create Table SQL: %s" % sql)
         cursor.execute(sql)
         self.db_connection.commit()
 
@@ -69,6 +76,7 @@ class Database:
         """ Should remove the tables created by the class. Every child of
         database which stores is's own data should implement this function.
         """
+        Log.debug("Dropping Table %s" % self.__name__)
         cursor = self.db_connection.cursor()
         sql = "DROP TABLE "
         sql += self.__name__
@@ -148,6 +156,7 @@ class Database:
          TODO: registration in sqlite3
          TODO: escaping the strings
         """
+        Log.debug("Building %s object" % cls.__name__)
         attribute_box = {}
         for attr in s.split(";"):
             key, val = attr.split("=")
@@ -178,14 +187,18 @@ class Database:
         return self.__class__.__name__
 
     @classmethod
-    def get(cls, time_since):
+    def get(cls, time_since='all'):
         """ Returns a tuple of objects stored in the database.
         """
         import re
-        statement = """SELECT adapter FROM ?
+        sql = """SELECT adapter FROM ?
                 WHERE date BETWEEN ? AND date('now')"""
-        if not re.search(r'^[1-2]\d{3}-[0-1]?\d-[0-3]?\d$', time_since):
+        if re.search("^all$", time_since):
+            Log.debug("Get all objects of %s" % cls.__name__)
+            sql = " SELECT adapter FROM ? "
+        elif not re.search(r'^[1-2]\d{3}-[0-1]?\d-[0-3]?\d$', time_since):
             raise ValueError()
+        values = (cls.__name__, time_since)
         cursor = db_connection.cursor()
         cursor.execute(statement, time_since)
         result_set = []
@@ -193,7 +206,13 @@ class Database:
             result_set.append(cls.convert(row))
 
     @classmethod
-    def get_excat(cls, name):
+    def get_exacly(cls, name):
         """ Returns exacly one object with the given (unique) name.
         """
-        pass
+        sql = """SELECT adapter FROM ?
+                WHERE c_id = ?"""
+        values = (cls.__name__, name)
+        cursor = db_connection.cursor()
+        Log.debug("Requesting %s with c_id = %s" % (cls.__name__, name))
+        cursor.execute(statement, values)
+        return cls.convert(cursor.fetchone())
