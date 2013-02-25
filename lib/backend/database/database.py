@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sqlite3
+from util import Log
 
 class Database:
     """ Every class derived from Database gets it's own table in the database.
@@ -48,11 +49,44 @@ class Database:
                 pass
         return attributes
 
+    @classmethod
+    def get(cls, time_since='all'):
+        """ Returns a tuple of objects stored in the database.
+        """
+        import re
+        sql = """SELECT adapter FROM ?
+                WHERE date BETWEEN ? AND date('now')"""
+        if re.search("^all$", time_since):
+            Log.debug("Get all objects of %s" % cls.__name__)
+            sql = " SELECT adapter FROM ? "
+        elif not re.search(r'^[1-2]\d{3}-[0-1]?\d-[0-3]?\d$', time_since):
+            raise ValueError()
+        values = (cls.__name__, time_since)
+        cursor = db_connection.cursor()
+        cursor.execute(statement, time_since)
+        result_set = []
+        for row in cursor.fetchall():
+            result_set.append(cls.convert(row))
+
+    @classmethod
+    def get_exacly(cls, name):
+        """ Returns exacly one object with the given (unique) name.
+        """
+        sql = """SELECT adapter FROM ?
+                WHERE c_id = ?"""
+        values = (cls.__name__, name)
+        cursor = db_connection.cursor()
+        Log.debug("Requesting %s with c_id = %s" % (cls.__name__, name))
+        cursor.execute(statement, values)
+        return cls.convert(cursor.fetchone())
+
     def create_table(self):
         """ Creates a table for the class in which every instance object which
         stars with 'c_'. For example 'c_id'. This variable can be accessed with
         self["id"]
         """
+        import re
+        Log.debug("Creating Table for %s" % self.__name__)
         cursor = self.db_connection.cursor()
         sql = "CREATE TABLE "
         sql += self.__name__
@@ -60,8 +94,12 @@ class Database:
                 date DATE,
                 adapter TEXT"""
         for i in self.get_attributes():
-            sql += ", "+i 
+            if re.search("^c_id$",i):
+                sql += ", "+i+" PRIMARY KEY"
+            else:
+                sql += ", "+i 
         sql += ");"
+        Log.debug("Create Table SQL: %s" % sql)
         cursor.execute(sql)
         self.db_connection.commit()
 
@@ -69,6 +107,7 @@ class Database:
         """ Should remove the tables created by the class. Every child of
         database which stores is's own data should implement this function.
         """
+        Log.debug("Dropping Table %s" % self.__name__)
         cursor = self.db_connection.cursor()
         sql = "DROP TABLE "
         sql += self.__name__
@@ -80,50 +119,28 @@ class Database:
 
         NOT SUPPORTED YET!
         """
-        """
         cursor = Database.db_connection.cursor()
-        pdb.set_trace()
         attributes = self.get_attributes()
-
         table = self.__class__.__name__
-        targetcolumns = []  
-        values = [] 
-        updatetargetvalues = []
-        for a in attributes:
-            if a == attributes[-1]:
-                targetcolumns.append(a)
-                values.append(self[a])
-                updatetargetvalues.append(a)
-                updatetargetvalues.append("=")
-                updatetargetvalues.append(self[a])
-            else: 
-                targetcolumns.append(a)
-                targetcolumns.append(",")
-                values.append(self[a])
-                updatetargetvalues.append(a)
-                updatetargetvalues.append("=")
-                updatetargetvalues.append(self[a])
-                updatetargetvalues.append(",")
-        stringtargetcolumns = "".join(targetcolumns)
-        stringvalues = "".join(values)
-        sstringupdatetargetvalues = "".join(updatetargetvalues)
-        parameter = {"table" : table, "columns" : stringtargetcolumns, 
-                "values" : stringvalues, "set" : stringupdatetargetvalues}
-        print(parameter)
+        sql = ""
+        values = []
+        for i in attributes:
+            sql += ", ?"
+            values.append(self[i])
+        else:
+            sql += ")"
+
         try:
-            sql = """INSERT INTO :table (:columns) 
-                    VALUES (:values)"""
-            cursor.execute(sql,parameter)
+            sql = """INSERT INTO Component 
+                    VALUES
+                    (strftime('%s','now'),"Adapter" """ +sql        
+            cursor.execute(sql,values)
             Database.db_connection.commit()
-        except SQLiteException:
+        except sqlite3.IntegrityError:
             exceptionparameter = (targetcolumns[0], values[0])
             sql = "UPDATE :table SET :set WHERE ? = ?"
             cursor.execute(sql,parameter,exceptionparameter)
             Database.db_connection.commit()
-
-           """ 
-
-        pass
 
     def __conform__(self,protocol):
         """ For creating an generall repräsentation of the class. The
@@ -152,6 +169,7 @@ class Database:
          TODO: registration in sqlite3
          TODO: escaping the strings
         """
+        Log.debug("Building %s object" % cls.__name__)
         attribute_box = {}
         for attr in s.split(";"):
             key, val = attr.split("=")
@@ -180,24 +198,3 @@ class Database:
         """ Provides that the name of the class is callable
         """
         return self.__class__.__name__
-
-    @classmethod
-    def get(cls, time_since):
-        """ Returns a tuple of objects stored in the database.
-        """
-        import re
-        statement = """SELECT adapter FROM ?
-                WHERE date BETWEEN ? AND date('now')"""
-        if not re.search(r'^[1-2]\d{3}-[0-1]?\d-[0-3]?\d$', time_since):
-            raise ValueError()
-        cursor = db_connection.cursor()
-        cursor.execute(statement, time_since)
-        result_set = []
-        for row in cursor.fetchall():
-            result_set.append(cls.convert(row))
-
-    @classmethod
-    def get_excat(cls, name):
-        """ Returns exacly one object with the given (unique) name.
-        """
-        pass
