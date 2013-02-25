@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
+import os
 import sys
 import getopt
-
-#ctl-web wird von der Webinstanz auf den Cluster ausgeführt, um sich dort zu verifiziern
-
-opt = "a:k:r:o"
-long_opt = ["id=", "public key=", "id=", "overview" ]
+#import logging
+#ctl-web wird von der Webinstanz auf den Cluster ausgefuehrt, um sich dort zu verifiziern
+lib_path = os.getcwd() + "/../lib/backend"
+sys.path.append( lib_path )
+from util import Log 
+opt = "a:k:r:ov"
+long_opt = ["id=", "public key=", "id=", "overview", "verbose" ]
 max_output_level = 2
 
 def usage():
@@ -13,34 +16,57 @@ def usage():
          \t [-k <public key> --key=<public key>]
          \t [-r <id> | --remove=<>]
          \t [-o | --overview] """)
-         
-def main():
+
+#    def set_verbosity(verbose):
+#        Logging.verbose = verbose
+        
+
+#    def increase_verbosity(verbose):
+#        if(verbose < 5):    
+#            verbose = verbose + 1
+#            set_verbosity(verbose)
+#        return verbose
+    
+def main():    
     try:
          opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
-         
-         
     except getopt.GetoptError as err:
         print(err)
         usage()
         sys.exit(2)
     output = None
-    verbose = 0
+    
     
     for o, a in opts:
         if o in ("-a", "--id"):
-            print("id",o,a)
-                   
+            Log.setHandler = Log.handlerActivation(Log.setHandler)
+            print("id",o,a) 
+            Log.debug("debugtest")
+            Log.error("errortest")
+            Log.critical("criticaltest")
+            Log.warning("warningtest")
+            Log.info( str(a) + "  wird als id inzugefuegt")    
         elif o in ("-k", "--public key"):
+            Log.setHandler = Log.handlerActivation(Log.setHandler)
             print("public key",o,a)  
-        
+            logging.info( str(a) +" wird als public key hinzugefuegt") 
+        elif o in ("-v", "--verbose"):
+            Log.info("Die Verbosity wird erhoeht.")
+            Log.verbose = Log.increase_verbosity(Log.verbose)
+            print Log.verbose
         elif o in ("-r", "--id"):
+            Log.setHandler = Log.handlerActivation(Log.setHandler)
             print("id",o,a)
-        
-        elif o in ("-o", "--"):
+            logging.info(str(a) + "wir als id geloescht")
+                    
+        elif o in ("-o", "--o"):
+            Log.setHandler = Log.handlerActivation(Log.setHandler)
             print("doxygen",o,a)           
-
+            Log.info(str(a) + "wird zum doxygen gemacht")
 if __name__ == "__main__":
     main()            
            
+
+
 
 

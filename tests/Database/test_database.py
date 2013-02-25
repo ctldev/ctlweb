@@ -6,7 +6,7 @@ import sqlite3
 
 test_root = os.getcwd() + "/../.."
 sys.path.append( test_root + "/lib/backend/")
-from database.Database import Database
+from database.database import Database
 
 class DatabaseTest(unittest.TestCase):
 
