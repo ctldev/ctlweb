@@ -9,7 +9,7 @@ class Webserver(models.Model):
     name = models.CharField(_("Name"), max_length=255)
     ip = models.IPAddressField(_("IP"), null="True")
     domain = models.CharField(_("Domain"), max_length=100 ,null="True")
-    port = models.IntegerField(_("Port"))
+    port = models.IntegerField(_("Port"), null="True")
     class Meta:
         unique_together = ('ip', 'domain')
         app_label = 'ctlweb'
@@ -19,7 +19,7 @@ class Webserver(models.Model):
 class Cluster(models.Model):
     ip = models.IPAddressField(_("IP"), null="True")
     domain = models.CharField(_("Domain"), max_length=100, null="True")
-    port = models.IntegerField(_("Port"))
+    port = models.IntegerField(_("Port"), null="True")
     key = models.TextField(_(u"Schlüssel"), null="True")
     class Meta:
         unique_together = ('ip', 'domain')
@@ -31,15 +31,15 @@ class Userkeys(models.Model):
     user = models.ForeignKey(User, verbose_name=_("User"))
     key = models.TextField(_(u"Schlüssel"))
     class Meta:
+        permissions = (
+		    ("can_request_key", "Can request a userkey"),
+		    ("can_activate_user", "Can activate a user"),
+		    ("can_ban_user", "Can deactivate a user"),)
         unique_together = ('user', 'key')
         app_label = 'ctlweb'
         verbose_name = _(u"Benutzerschlüssel")
         verbose_name_plural = _(u"Benutzerschlüssel")
-	permissions = (
-		("can_request_key", u"Can request a userkey"),
-		("can_activate_user", "Can activate a user"),
-		("can_ban_user", "Can deactivate a user"))
-
+        
     def set_active(self, User):
         if User.has_perm('can_activate_user'):
             self.user.is_active=True
@@ -65,11 +65,11 @@ class Components(models.Model):
         app_label = 'ctlweb'
         verbose_name = _("Component")
         verbose_name_plural = _("Components")        
-    permissions = (
-		    ("can_see_description", "Can read descriptions"),
-		    ("can_see_homecluster", "Can see corresponding cluster"),
-     		("can_see_homeserver", "Can see corresponding server"),
-            ("can_set_active", "Can set active"))
+        permissions = (
+		        ("can_see_description", "Can read descriptions"),
+		        ("can_see_homecluster", "Can see corresponding cluster"),
+     		    ("can_see_homeserver", "Can see corresponding server"),
+                ("can_set_active", "Can set active"),)
     
     def set_active(self, User):
         if User.has_perm("can_set_active"):
@@ -79,9 +79,12 @@ class Components(models.Model):
         if User.has_perm("can_set_active"):
             self.is_active=False
 
-    def save(self, user, *args, **kwargs):
+    def save(self, 
+            #user, 
+            *args, 
+            **kwargs):
         self.is_active = False
-        self.programmer = user.email
+        #self.programmer = user.email
         super(Components, self).save(*args, **kwargs)
 
 class Interfaces(models.Model):
@@ -93,8 +96,8 @@ class Interfaces(models.Model):
     class Meta:
         app_label = 'ctlweb'
         verbose_name = _("Interface")
-    permissions = (
-        ("can_see_key", "Can see the key."))
+        permissions = (
+            ("can_see_key", "Can see the key"),)
 
 class Programmer(models.Model):
     component = models.ForeignKey(Components)
@@ -110,9 +113,9 @@ class Components_Cluster(models.Model):
     code = models.TextField(_("Implementierungscode"))
     class Meta:
         app_label = 'ctlweb'
-    permissons = (
+        permissions = (
             ("can_see_path", "Can see filepath"),
-            ("can_see_code", "Can see code to implement"))
+            ("can_see_code", "Can see code to implement"),)
 
 class Mails(models.Model):
     text = models.TextField()
@@ -133,3 +136,13 @@ class ModuleTokenValidation(models.Model):
                 expiration_date=date)
         to.save()
 
+    def is_valid(self, cluster):
+        today = datetime.datetime.today()
+        if isinstance(cluster, basestring):
+            try:
+                cluster = Cluster.objects.get(ip=cluster)
+            except Cluster.DoesNotExist:
+                return False
+        if self.cluster == cluster:
+            return (today <= self.date)
+        return False

@@ -1,3 +1,5 @@
+#vim: set fileencoding=utf-8
+from django import forms
 class ComponentRequestForm(forms.Form):
     manifest = forms.FileField()
 

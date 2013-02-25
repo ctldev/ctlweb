@@ -92,6 +92,21 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(res[1], "/path/to/exe", "Got unexpected data")
         self.assertEqual(res[2], "/path/to/ci", "Got unexpected data")
 
+    def test_conform(self):
+        """ Test for sqlite3 representation
+        """
+        repr = self.comp.__conform__(sqlite3.PrepareProtocol)
+        self.assertEqual(repr, "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci",
+                msg="Error in generation of representation")
+
+    def test_convert(self):
+        """ Tests if a __conform__ representation could be successfully
+        rebuild.
+        """
+        repr =  "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci"
+        comp = Component.convert(repr)
+        self.assertEqual(comp, self.comp)
+
 
 if __name__ == '__main__':
     unittest.main()

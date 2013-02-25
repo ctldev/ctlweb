@@ -1,28 +1,35 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH ctl-getmodule 1 "February 2013" Linux "User Manuals"
+.TH ctl-getcomponent 1 "February 2013" Linux "User Manuals"
 
 .\"***********************************************************************
 
 .SH NAME
-ctl-getmodule \- request and get modules from a specific cluster
+ctl-getcomponent \- request and get modules from a specific cluster
 
 .\"***********************************************************************
    
 .SH SYNOPSIS
-.B ctl-getmodule
+.B ctl-getcomponent
 .RB [\| \-t | \-\-timestamp
 .RB <
 .IR timestamp
-.RB >  
+.RB >
 \(dqsince add\(dq]
+.RB [\| \-u
+.IR url \|]
+.RB [\| \-k
+.IR key \|]
+.RB [\| \-c
+.IR path \|]
+.RB [\| \-v \|]  
 .RB [\| -a | \-\-all]
 
 .\" **********************************************************************
 
 .SH DESCRIPTION
-.BR ctl-getmodule
+.BR ctl-getcomponent
 is a command in order to request information and/or a module itself from a specific cluster. There is also the possibility to list all modules. 
 
 .\"***********************************************************************
