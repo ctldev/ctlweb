@@ -80,7 +80,7 @@ class Database:
 
         NOT SUPPORTED YET!
         """
-        """
+        
         cursor = Database.db_connection.cursor()
         pdb.set_trace()
         attributes = self.get_attributes()
@@ -120,10 +120,6 @@ class Database:
             sql = "UPDATE :table SET :set WHERE ? = ?"
             cursor.execute(sql,parameter,exceptionparameter)
             Database.db_connection.commit()
-
-           """ 
-
-        pass
 
     def __conform__(self,protocol):
         """ For creating an generall repräsentation of the class. The
