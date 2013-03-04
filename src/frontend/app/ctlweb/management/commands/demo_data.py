@@ -125,6 +125,11 @@ class Command(BaseCommand):
         self.co4.save()
 
     def import_connections(self):
+        self.i1.components.add(self.co1)
+        self.i1.components.add(self.co2)
+        self.i2.components.add(self.co3)
+        self.i3.components.add(self.co4)
+
         self.co1.homeserver.add(self.w1)
         self.co1.homeserver.add(self.w3)
         self.co1.set_active(self.user1)
