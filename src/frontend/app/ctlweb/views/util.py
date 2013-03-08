@@ -20,9 +20,9 @@ def simple_search(request, searchtext):
     searched_interfaces = Interfaces.objects.filter(
             __interface_searchset(searchtext))
     searched_components = Components.objects.filter(__comp_searchset(searchtext))
-    indirect_interfaces = list()
+    indirect_interfaces = Interfaces.objects.all()
     for comp in searched_components:
-        query = Interfaces.objects.filter(components__name__iexcact = comp.name)
+        query = Interfaces.objects.filter(components__name__iexact = comp.name)
         indirect_interfaces = indirect_interfaces | query
     return lists(request, searched_interfaces, indirect_interfaces,
             searched_components, 1)
