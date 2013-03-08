@@ -5,7 +5,7 @@ import os
 
 class Log:
     setHandler = False
-    verbose = -1
+    verbose = 0
     
     @staticmethod   
     def increase_verbosity():
@@ -13,21 +13,6 @@ class Log:
         if(Log.verbose < 5):    
             Log.verbose = Log.verbose +  1
         Log.setHandler = Log.handlerActivation(Log.setHandler) 
-    
-    @staticmethod    
-    def choose_level(verbose):
-        if verbose == 1:
-            return 50 
-        elif verbose == 2:
-            return 40
-        elif verbose == 3:
-            return 30
-        elif verbose == 4:
-            return 20
-        elif verbose == 5:
-            return 10
-        else: 
-            return 60
     
     @staticmethod
     def streamoutput(lvl):
@@ -55,8 +40,9 @@ class Log:
 
     @staticmethod 
     def handlerActivation(setHandler):
-        Log.streamoutput(Log.choose_level(Log.verbose + 1))
-        Log.fileoutput(Log.choose_level(Log.verbose + 1))
+        Log.streamoutput(60-(10*Log.verbose))
+        Log.fileoutput(60-(10*Log.verbose))
+        #verboselevel wird durch die Formel berechnet
         return True
    
     @staticmethod 
