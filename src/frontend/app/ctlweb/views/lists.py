@@ -17,18 +17,26 @@ def lists(request,
     #   1 = Suche
     
     v_user = request.user
-    programmer = Programmer.objects.all()
+    programmer = Programmer.objects.all().order_by('email')
     emails = Programmer.objects.distinct('email').values_list('email')
     u_programmer = User.objects.filter(email__in=emails)
     dict_response = dict()
     if direct_interfaces == None :
         direct_interfaces = Interfaces.objects.none()
+    else :
+        direct_interfaces = direct_interfaces.order_by('name')
     if indirect_interfaces == None :
         indirect_interfaces = Interfaces.objects.none()
+    else :
+        indirect_interfaces = indirect_interfaces.order_by('name')
+        for i in indirect_interfaces:
+            print i.name
     if s_components == None :
         s_components = Components.objects.none()
+    else :
+        s_components = s_components.order_by('name')
     if form == 0:
-        direct_interfaces = Interfaces.objects.all()
+        direct_interfaces = Interfaces.objects.all().order_by('name')
 #    emails = ""
 #    if components is not None:
 #        emails = Programmer.objects.filter(component__in=components).\

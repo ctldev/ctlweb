@@ -19,25 +19,25 @@ Component list
 			<div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
 			  <ul class="nav nav-tabs" id="interfaceList">
 				{% for di in d_interfaces %}
-				  {% if forloop.first %}
-					<li class>
-				  {% else %}
-					<li class>
-				  {% endif %}
+				  <li class>
 					<a href="#i_{{ di.key }}" data-toogle="tab">
 					  {{ di.name }} <br />
 					  <small>{{ di.description }}</small>
 					</a>
 				  </li>
 				{% endfor %}
+				{% for idi in i_interfaces %}
+				  <li class>
+					<a href="#i_{{ idi.key }}" data-toogle="tab">
+					  {{ idi.name }} <br />
+					  <small>{{ idi.description }}</small>
+					</a>
+				  </li>
+				{% endfor %}
 			  </ul>
 			  <div class="tab-content content">
 				{% for di in d_interfaces %}
-				  {% if forloop.first %}
-					<div class="tab-pane" id="i_{{ di.key }}">
-				  {% else %}
-					<div class="tab-pane" id="i_{{ di.key }}">
-				  {% endif %}
+				  <div class="tab-pane" id="i_{{ di.key }}">
 				  {% for c in di.components.all %}
 				  <div class="component"> 
 					{# TODO @Johann: im css "component" hinzufügen #}
@@ -61,9 +61,37 @@ Component list
 						{% endfor %}
 					  </small>
 					</div>
+					{% endfor %}
+				  </div>
+				{% endfor %}  
+				{% for idi in i_interfaces %}
+				  <div class="tab-pane" id="i_{{ idi.key }}">
+				  {% for c in idi.components.all %}
+					{% if c in search_components %}
+					  <div class="component">
+						<a href="{% url component c.id %}">
+						  {{ c.name }} <br />
+						</a>
+						<small>
+						  {{ c.brief_description }} <br />
+						  <u>Programmierer:</u>
+						  {% for pro in programmer %}
+							{% if pro.component == c %}
+							  {% if pro.email in u_programmer.email %}
+								{# TODO Userprofillink einfügen #}
+			  					<a href=""> 
+								  {{ pro.email }}
+								</a>
+							  {% else %}
+								{{ pro.email }}
+							  {% endif %}
+							{% endif %}
+						  {% endfor %}
+						</small>
+					  </div>
+					{% endif %}
 				  {% endfor %}
 				  </div>
-
 				{% endfor %}
 			  </div>
 			</div>
