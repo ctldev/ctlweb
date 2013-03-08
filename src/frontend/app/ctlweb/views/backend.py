@@ -94,9 +94,10 @@ def valid_token(token, cluster):
     return token_db.is_valid(cluster)
 
 def receive_modules(request, token):
-    cluster = _get_client_ip(request)
-    if not valid_token(token, cluster):
+    cluster_ip = _get_client_ip(request)
+    if not valid_token(token, cluster_id):
         raise Http404
+    cluster = Cluster.objects.get(ip=cluster)
     comp_form = ComponentRequestForm(request.POST or None, request.FILES or None)
     interface_form = InterfaceRequestForm(request.POST or None)
     file_success = False
@@ -117,7 +118,7 @@ def receive_modules(request, token):
         for chunk in request.FILES['manifest'].chunks():
             destination.write(chunk)
         destination.close()
-        file_success = _import_manifest(filename)
+        file_success = _import_manifest(filename, cluster)
         os.remove(filename)
     dict_response = dict()
     dict_response["component_success"] = file_success
@@ -127,17 +128,34 @@ def receive_modules(request, token):
     context = RequestContext(request, dict_response)
     return render_to_response('receive_components.html', context_instance=context)
 
-def _import_manifest(filename):
+def _import_manifest(filename, cluster):
     if not zipfile.is_zipfile(filename):
         return False
     with zipfile.ZipFile(filename, "r") as myzip:
-        settings = myzip.open("control")
+        settings_file = myzip.open("control")
         parser = SafeConfigParser()
-        parser.read(settings)
+        parser.read(settings_file)
 #TODO read settings
+        if cluster.domain is not None:
+            if cluster.domain == parser.get("DEFAULT", "host"):
+                return False
         doc_file = myzip.open("doc.txt")
         desc = doc_file.read()
         doc_file.close()
         ci_file = myzip.open(parser.get("DEFAULT", "ci"))
         ci = ci_file.read()
         ci_file.close()
+        domain = settings.SITE_DOMAIN
+        localhost, created = Webserver.objects.get_or_create(domain=domain)
+        exe_name = parser.get("DEFAULT", "name")
+        exe_hash = parser.get("DEFAULT", "exe_hash")
+        component = Components(name=exe_name, homeserver=localhost,
+                homecluster=cluster, brief_description=desc, description=ci,
+                is_active=True, version=version)
+        component.save()
+        interface, created = Interfaces.objects.get_or_create(key=exe_hash)
+        interface.save()
+        interface.components.add(component)
+        interface.save()
+        # TODO Programmierer gegebenfalls mit einbauen
+        return True

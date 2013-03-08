@@ -49,6 +49,51 @@ class Database:
                 pass
         return attributes
 
+    @classmethod
+    def get(cls, time_since='all'):
+        """ Returns a tuple of objects stored in the database.
+        
+        Optional Parameter time_since is instance of datetime.datetime and
+        represents the oldest object to be found by get. Default searches for
+        every object stored in the database.
+        """
+        import re
+        from datetime import datetime
+        sql = "SELECT adapter FROM " + cls.__name__ + """
+                WHERE date >= ?"""
+        values = []
+        if type(time_since) == str:
+            Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
+            sql = "SELECT adapter FROM " + cls.__name__
+        elif isinstance(time_since, datetime):
+            Log.debug("Database.get(): Get %s newer than %s" % 
+                    (cls.__name__, time_since))
+            time_since = time_since.strftime("%s")
+            values.append(time_since)
+        else:
+            Log.debug("Wrong dateformat caught in %s.get()" % cls.__name__)
+            raise ValueError()
+        cursor = Database.db_connection.cursor()
+        cursor.execute(sql, values)
+        result_set = []
+        for row in cursor.fetchall():
+            result_set.append(cls.convert(row[0]))
+        return result_set
+
+    @classmethod
+    def get_exacly(cls, name):
+        """ Returns exacly one object with the given (unique) name.
+
+        NOT WORKING AT THE MOMENT
+        """
+        sql = """SELECT adapter FROM ?
+                WHERE c_id = ?"""
+        values = (cls.__name__, name)
+        cursor = Database.db_connection.cursor()
+        Log.debug("Requesting %s with c_id = %s" % (cls.__name__, name))
+        cursor.execute(statement, values)
+        return cls.convert(cursor.fetchone())
+
     def create_table(self):
         """ Creates a table for the class in which every instance object which
         stars with 'c_'. For example 'c_id'. This variable can be accessed with
@@ -61,14 +106,13 @@ class Database:
         sql += self.__name__
         sql += """ (
                 date DATE,
-                adapter TEXT"""
+                adapter TEXT""" 
         for i in self.get_attributes():
             if re.search("^c_id$",i):
                 sql += ", "+i+" PRIMARY KEY"
             else:
                 sql += ", "+i 
         sql += ");"
-        Log.debug("Create Table SQL: %s" % sql)
         cursor.execute(sql)
         self.db_connection.commit()
 
@@ -85,24 +129,23 @@ class Database:
 
     def save(self):
         """ Saves object into database
-
-        NOT SUPPORTED YET!
         """
         cursor = Database.db_connection.cursor()
         attributes = self.get_attributes()
-        table = self.__class__.__name__
+        table = self.__name__
         sql = ""
-        values = []
+        values = {
+                'adapter' : self,
+                }
         for i in attributes:
-            sql += ", ?"
-            values.append(self[i])
+            sql += ", :"+i
+            values[i] = self[i]
         else:
             sql += ")"
-
         try:
-            sql = """INSERT INTO Component 
+            sql = "INSERT INTO " + table + """
                     VALUES
-                    (strftime('%s','now'),"Adapter" """ +sql        
+                    (strftime('%s','now'), :adapter """ +sql        
             cursor.execute(sql,values)
             Database.db_connection.commit()
         except sqlite3.IntegrityError:
@@ -167,34 +210,3 @@ class Database:
         """ Provides that the name of the class is callable
         """
         return self.__class__.__name__
-
-    @classmethod
-    def get(cls, time_since='all'):
-        """ Returns a tuple of objects stored in the database.
-        """
-        import re
-        sql = """SELECT adapter FROM ?
-                WHERE date BETWEEN ? AND date('now')"""
-        if re.search("^all$", time_since):
-            Log.debug("Get all objects of %s" % cls.__name__)
-            sql = " SELECT adapter FROM ? "
-        elif not re.search(r'^[1-2]\d{3}-[0-1]?\d-[0-3]?\d$', time_since):
-            raise ValueError()
-        values = (cls.__name__, time_since)
-        cursor = db_connection.cursor()
-        cursor.execute(statement, time_since)
-        result_set = []
-        for row in cursor.fetchall():
-            result_set.append(cls.convert(row))
-
-    @classmethod
-    def get_exacly(cls, name):
-        """ Returns exacly one object with the given (unique) name.
-        """
-        sql = """SELECT adapter FROM ?
-                WHERE c_id = ?"""
-        values = (cls.__name__, name)
-        cursor = db_connection.cursor()
-        Log.debug("Requesting %s with c_id = %s" % (cls.__name__, name))
-        cursor.execute(statement, values)
-        return cls.convert(cursor.fetchone())

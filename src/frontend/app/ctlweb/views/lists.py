@@ -10,23 +10,29 @@ from django.contrib.auth.models import User
 def lists(request, 
           direct_interfaces=None, 
           indirect_interfaces=None,
-          components=None, 
+          s_components=None, 
           form=0):
-    # components
-    #   None = komplettes Verzeichnis
-    #   not None = Suchauswahl
     # form:
     #   0 = Verzeichnis
     #   1 = Suche
     
+    v_user = request.user
+    programmer = Programmer.objects.all()
+    emails = Programmer.objects.distinct('email').values_list('email')
+    u_programmer = User.objects.filter(email__in=emails)
+    dict_response = dict()
+    if direct_interfaces == None :
+        direct_interfaces = Interfaces.objects.none()
+    if indirect_interfaces == None :
+        indirect_interfaces = Interfaces.objects.none()
+    if s_components == None :
+        s_components = Components.objects.none()
     if form == 0:
-        components = Components.objects.all()
         direct_interfaces = Interfaces.objects.all()
-    i_components = dict()
-    emails = ""
-    if components is not None:
-        emails = Programmer.objects.filter(component__in=components).\
-                distinct('email').values_list('email')
+#    emails = ""
+#    if components is not None:
+#        emails = Programmer.objects.filter(component__in=components).\
+#                distinct('email').values_list('email')
 #TODO Überarbeiten
 #    if direct_interfaces is not None:
 #        for d in direct_interfaces:
@@ -35,14 +41,15 @@ def lists(request,
 #            emails += Programmer.objects.\
 #                    filter(component__in=i_components[d.pk]).\
 #                    distinct('email').values_list('email')
-    userlist= User.objects.filter(email__in=emails)
-    dict_response = dict()
+#    userlist= User.objects.filter(email__in=emails)
+    dict_response["user"] = v_user
     dict_response["form"] = form
     dict_response["d_interfaces"] = direct_interfaces
     dict_response["i_interfaces"] = indirect_interfaces
-    dict_response["d_components"] = components
-    dict_response["i_components"] = i_components
-    dict_response["users"] = userlist
+    dict_response["search_components"] = s_components
+    dict_response["programmer"] = programmer
+    dict_response["u_programmer"] = u_programmer
+#    dict_response["users"] = userlist
     context = RequestContext(request, dict_response)
     return render_to_response("components.html", context_instance=context)
 

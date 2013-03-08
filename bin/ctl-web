@@ -43,7 +43,6 @@ def main():
         elif o in ("-v", "--verbose"):
             Log.info("Die Verbosity wird erhoeht.")
             Log.increase_verbosity()
-            print Log.verbose
         elif o in ("-r", "--id"):
             print("id",o,a)
             logging.info(str(a) + "wir als id geloescht")
