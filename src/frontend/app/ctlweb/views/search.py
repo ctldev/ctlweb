@@ -59,11 +59,10 @@ def search(request):
                                 category, searched_comps)
             searched_comps = searched_comps.exclude(is_active__icontains =
             "False")
-            indirect_interfaces = Interfaces.objects.all()
+            indirect_interfaces = Interfaces.objects.none()
         #Weiterleiten der nun gefüllten Ergebnisvariablen an die Listenfunktion
-            for component in searched_comps:
-                indirect_interfaces = indirect_interfaces.include(component__name__iexact =
-                        component.name)
+            for comp in searched_comps:
+                indirect_interfaces = indirect_interfaces | Interfaces.objects.all().filter(components__name__iexact = comp.name)
             return lists(request, searched_interfaces, indirect_interfaces,
                     searched_comps, 1)
     #Erstellen des Suchformulars falls keine Suchanfrage vorhanden ist
