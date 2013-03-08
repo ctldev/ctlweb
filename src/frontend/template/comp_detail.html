@@ -3,17 +3,9 @@
 Component {{ component.name }}
 {% endblock title %}
 {% block content %}
+<div class="transbox">
 <div class="page-header">
   <h1>{{ component.name }} 
-	{% if can_change or (component.programmer == user.email and
-	user.is_authenticated and user.is_active) %}
-	<small>
-	  <!--Link einfügen -->
-	  <a href="" class="nolink">
-		<input type="button" name="edit" value="Editieren" />
-	  </a>
-	</small>
-	{% endif %}
   </h1>
 </div>
 <table class="table table-condensed">
@@ -33,22 +25,24 @@ Component {{ component.name }}
 	</td>
   </tr>
   <tr>
-	<td> 
-	  {% trans "Ersteller" %}
+	<td>
+	  Ersteller:
+	  {# {% trans "Ersteller" %} #}
 	</td>
 	<td> 
-	  {% for p in programmer.email %}
-		{% for p in users.email %}
+	  {% for p in programmer %}
+		{% if p in users.email %}
 		  <a href="{% url user u.pk %}"> {{ p.email }} </a>
-		{% empty %}
+		{% else %}
 		  {{ p.email }}
-		{% endfor %}
+		{% endif %}
 	  {% endfor %} 
 	</td>
   </tr>
   <tr>
-	<td> 
-	  {% trans "Datum" %} 
+	<td>
+	  Datum: 
+	  {# {% trans "Datum" %} #}
 	</td>
 	<td> 
 	  {{ component.datum }} 
@@ -140,5 +134,7 @@ Component {{ component.name }}
 	  </div>
 	{% endfor %}
   </div>
+</div>
+{% endif %}
 </div>
 {% endblock content %}				
