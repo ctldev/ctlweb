@@ -31,8 +31,6 @@ def lists(request,
         for d in direct_interfaces:
             indirect_interfaces = indirect_interfaces.exclude(name = d.name)
         indirect_interfaces = indirect_interfaces.order_by('name')  
-        for i in indirect_interfaces:
-            print i.name
     if s_components == None :
         s_components = Components.objects.none()
     else :
