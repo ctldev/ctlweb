@@ -93,5 +93,11 @@ class UserTest(unittest.TestCase):
         results = User.get(d)
         self.assertEqual(self.user, results[0], "Unable to get new data")
 
+    def test_get_exacly(self):
+        self.user.save()
+        user = User.get_exacly(self.user.c_id)
+        self.assertEqual(user, self.user, "Could not deserialize data")
+
+
 if __name__ == "__main__":
     unittest.main()
