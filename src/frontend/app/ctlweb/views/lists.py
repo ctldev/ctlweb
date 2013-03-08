@@ -21,6 +21,12 @@ def lists(request,
     emails = Programmer.objects.distinct('email').values_list('email')
     u_programmer = User.objects.filter(email__in=emails)
     dict_response = dict()
+    if direct_interfaces == None :
+        direct_interfaces = Interfaces.objects.none()
+    if indirect_interfaces == None :
+        indirect_interfaces = Interfaces.objects.none()
+    if s_components == None :
+        s_components = Components.objects.none()
     if form == 0:
         direct_interfaces = Interfaces.objects.all()
 #    emails = ""
