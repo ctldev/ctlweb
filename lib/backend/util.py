@@ -5,14 +5,14 @@ import os
 
 class Log:
     setHandler = False
-    verbose = 0
+    verbose = -1
     
     @staticmethod   
-    def increase_verbosity(verbose):
-        if(verbose < 5):    
-            verbose = verbose + 1
+    def increase_verbosity():
+        global verbose
+        if(Log.verbose < 5):    
+            Log.verbose = Log.verbose +  1
         Log.setHandler = Log.handlerActivation(Log.setHandler) 
-        return verbose
     
     @staticmethod    
     def choose_level(verbose):

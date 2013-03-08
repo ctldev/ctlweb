@@ -39,10 +39,10 @@ def main():
             Log.info( str(a) + "  wird als id inzugefuegt")    
         elif o in ("-k", "--public key"):
             print("public key",o,a)  
-            logging.info( str(a) +" wird als public key hinzugefuegt") 
+            Log.info( str(a) +" wird als public key hinzugefuegt") 
         elif o in ("-v", "--verbose"):
             Log.info("Die Verbosity wird erhoeht.")
-            Log.verbose = Log.increase_verbosity(Log.verbose)
+            Log.increase_verbosity()
             print Log.verbose
         elif o in ("-r", "--id"):
             print("id",o,a)
