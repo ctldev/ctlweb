@@ -18,6 +18,7 @@ Component list
   {% endif %}
 			<div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
 			  <ul class="nav nav-tabs" id="interfaceList">
+				<center><b>Interfaces</b></center>
 				{% for di in d_interfaces %}
 				  <li class>
 					<a href="#i_{{ di.key }}" data-toogle="tab" style="color:
@@ -39,6 +40,7 @@ Component list
 			  <div class="tab-content content">
 				{% for di in d_interfaces %}
 				  <div class="tab-pane" id="i_{{ di.key }}">
+				  <center><b>Komponenten von {{ di.name }}</b></center>
 				  {% for c in di.components.all %}
 				  <div class="component"> 
 					{# TODO @Johann: im css "component" hinzufügen #}
@@ -67,6 +69,7 @@ Component list
 				{% endfor %}  
 				{% for idi in i_interfaces %}
 				  <div class="tab-pane" id="i_{{ idi.key }}">
+				  <center><b>Gefundene Komponenten von {{ idi.name }}</b></center>
 				  {% for c in idi.components.all %}
 					{% if c in search_components %}
 					  <div class="component">
