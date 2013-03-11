@@ -124,7 +124,7 @@ class TestComponent(unittest.TestCase):
     def test_get_exacly(self):
         self.comp.save()
         comp = Component.get_exacly(self.comp.c_id)
-        self.assertEquals(comp, self.comp, "Could not deserialize data")
+        self.assertEqual(comp, self.comp, "Could not deserialize data")
 
 if __name__ == '__main__':
     unittest.main()

@@ -17,16 +17,18 @@ def component_detail(request, comp_id):
         comp = Components.objects.get(pk=comp_id)
     except Components.DoesNotExist:
         raise Http404
-    if v_user.email == comp.programmer and 'edit' in request.POST \
-            and v_user.has_perm('ctlweb.change_components'):
-        #TODO form zum Editieren/Einfügen schreiben & hier aufrufen
-        pass
-    homeserver = comp.components_webservers_set.order_by('name')
-    homecluster = comp.components_clusters_set.order_by('domain')
-    interface = comp.components_interfaces_set.all()
-    emails = Programmer.objects.filter(component__in=comp).\
+    homeserver = comp.homeserver.all().order_by('name')
+    homecluster = comp.homecluster.all().order_by('domain')
+    interface = Interfaces.objects.filter(components = comp)
+    emails = Programmer.objects.filter(component = comp).\
             distinct('email').values_list('email')
+    print "Programmer"
+    for e in emails:
+        print e
     userlist = User.objects.filter(email__in=emails)
+    print "User"
+    for u in userlist:
+        print u.email
 
     can_change = v_user.has_perm('ctlweb.change_components')
     see_path = v_user.has_perm('ctlweb.can_see_path')

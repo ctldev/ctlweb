@@ -32,15 +32,11 @@ def search(request):
                 if form.is_valid():
                     searchtext = form.cleaned_data['searchtext']
                     category = form.cleaned_data['category']
-                    print "Suchgebiet: " + searcharea
-                    print searchtext + " in " + category
                     bind = "first"
                     if searcharea == "all" or searcharea == "interfaces":
-                        print "Interfacesuche gestartet"
                         searched_interfaces = search_interfaces(searchtext, 
                                 bind, category, searched_interfaces)
                     if searcharea == "all" or searcharea == "components":
-                        print "Componentsuche gestartet"
                         searched_comps = search_comps(searchtext, bind, 
                                 category, searched_comps)
             for form in filled_addform:
@@ -48,13 +44,10 @@ def search(request):
                     searchtext = form.cleaned_data['searchtext']
                     category = form.cleaned_data['category']
                     bind = form.cleaned_data['bind']
-                    print bind + " " + searchtext +" in " + category
                     if searcharea == "all" or searcharea == "interfaces":
-                        print "Interfacesuche gestartet"
                         searched_interfaces = search_interfaces(searchtext, 
                                 bind, category, searched_interfaces)
                     if searcharea == "all" or searcharea == "components":
-                        print "Komponentensuche gestartet"
                         searched_comps = search_comps(searchtext, bind, 
                                 category, searched_comps)
             searched_comps = searched_comps.exclude(is_active__icontains =
@@ -94,13 +87,18 @@ def search_interfaces(searchtext, bind, category, searched_interfaces):
 
 def interface_and_search(searchtext, category, searched_interfaces):
     """Modifzierung des Suchergebnisses bei einer interface und Verknüpfung"""
-    if category == 'name' or category == 'all':
+    if category == 'name':
         searched_interfaces = searched_interfaces.filter(
             name__icontains = searchtext)
-    if category == "keywords" or category == 'all':        
+    elif category == "keywords":        
         searched_interfaces = searched_interfaces.filter(
             description__icontains = searchtext)
-        print searchtext + " in Interface-Beschreibung gesucht"
+    elif category == 'all': 
+        searched_names = searched_interfaces.filter(
+            name__icontains = searchtext)
+        searched_keywords = searched_interfaces.filter(
+            description__icontains = searchtext)
+        searched_interfaces = searched_names | searched_keywords
     return searched_interfaces
 
 def interface_and_not_search(searchtext, category, searched_interfaces):
@@ -108,7 +106,7 @@ def interface_and_not_search(searchtext, category, searched_interfaces):
     if category == 'name' or category == 'all':
         searched_interfaces = searched_interfaces.exclude(
             name__icontains = searchtext)
-    elif category == "keywords" or category == 'all':        
+    if category == "keywords" or category == 'all':        
         searched_interfaces = searched_interfaces.exclude(
             description__icontains = searchtext)
     return searched_interfaces
@@ -141,18 +139,28 @@ def and_search(searchtext, category, searched_comps):
     if category == 'name' or category == 'all':
         searched_comps = searched_comps.filter(
             name__icontains = searchtext)
-    if category == 'keywords' or category == 'all':        
+    elif category == 'keywords':        
         searched_comps = searched_comps.filter(
             brief_description__icontains = searchtext)
-        print searchtext + " in Component-Beschreibung gesucht"
-    if category == 'homeserver' or category == 'all':        
+    elif category == 'homeserver':        
         searched_comps = searched_comps.filter(
             homeserver__ip__icontains = searchtext)
         searched_comps = searched_comps.filter(
             homeserver__name__icontains = searchtext)
-    if category == 'date' or category == 'all':        
+    elif category == 'date':        
         searched_comps = searched_comps.filter(
             date__icontains = searchtext)
+    elif category == 'all':
+        searched_name = searched_comps.filter(
+            name__icontains = searchtext)
+        searched_ip = searched_comps.filter(
+            homeserver__ip__icontains = searchtext)
+        searched_servername = searched_comps.filter(
+            homeserver__name__icontains = searchtext)
+        searched_date = searched_comps.filter(
+            date__icontains = searchtext)
+        searched_comps = searched_name | searched_ip | searched_servername |\
+        searched_date
     return searched_comps
         
 def and_not_search(searchtext, category, searched_comps):

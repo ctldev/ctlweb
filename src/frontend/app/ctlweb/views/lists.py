@@ -28,9 +28,9 @@ def lists(request,
     if indirect_interfaces == None :
         indirect_interfaces = Interfaces.objects.none()
     else :
-        indirect_interfaces = indirect_interfaces.order_by('name')
-        for i in indirect_interfaces:
-            print i.name
+        for d in direct_interfaces:
+            indirect_interfaces = indirect_interfaces.exclude(name = d.name)
+        indirect_interfaces = indirect_interfaces.order_by('name')  
     if s_components == None :
         s_components = Components.objects.none()
     else :

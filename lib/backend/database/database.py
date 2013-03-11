@@ -83,16 +83,15 @@ class Database:
     @classmethod
     def get_exacly(cls, name):
         """ Returns exacly one object with the given (unique) name.
-
-        NOT WORKING AT THE MOMENT
         """
-        sql = """SELECT adapter FROM ?
+        sql = "SELECT adapter FROM " + cls.__name__ + """
                 WHERE c_id = ?"""
-        values = (cls.__name__, name)
         cursor = Database.db_connection.cursor()
-        Log.debug("Requesting %s with c_id = %s" % (cls.__name__, name))
-        cursor.execute(statement, values)
-        return cls.convert(cursor.fetchone())
+        Log.debug("Database.get_exacly(): Requesting %s with c_id = %s" \
+                % (cls.__name__, name))
+        Log.debug("Database.get_exacly(): executing query: " + sql)
+        cursor.execute(sql, (name, ))
+        return cls.convert(cursor.fetchone()[0])
 
     def create_table(self):
         """ Creates a table for the class in which every instance object which
