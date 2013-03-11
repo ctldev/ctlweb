@@ -81,8 +81,21 @@ class UserTest(unittest.TestCase):
         self.assertIsNotNone(result,
                 "Couldn't read data from database")
         result = tuple(result)
-        self.assertEqual(result[0], 'Douglas')
-        self.assertEqaul(result[1], 'pubkey')
+        self.assertEqual(result[2], 'Douglas')
+        self.assertEqual(result[3], 'pubkey')
+        #updatecheck
+        self.user.c_pubkey = "newpubkey"
+        self.user.save()
+        self.cursor.execute("""SELECT * FROM User
+                        WHERE c_id = 'Douglas';""")
+        res = self.cursor.fetchone()
+        res = tuple(res)
+        self.assertEqual(res[3], "newpubkey", 
+        "Seems not to be updated correctly")
+        self.assertEqual(res[2], "Douglas",
+        "Seems not to be updated correctly")
+
+
 
     def test_get(self):
         self.user.save()

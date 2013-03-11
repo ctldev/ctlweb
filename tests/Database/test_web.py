@@ -91,8 +91,17 @@ class TestWeb(unittest.TestCase):
         res = cursor.fetchone()
         self.assertIsNotNone(res, "Could not read test data from db.")
         res = tuple(res)
-        self.assertEqual(res[0], "url", "Got unexpected data")
-        self.assertEqual(res[1], "pubkey", "Got unexpected data")
+        self.assertEqual(res[2], "url", "Got unexpected data")
+        self.assertEqual(res[3], "pubkey", "Got unexpected data")
+        #updatecheck
+        self.web.c_pubkey = "newpubkey"
+        self.web.save()
+        cursor.execute("SELECT * FROM Web;")
+        res = cursor.fetchone()
+        res = tuple(res)
+        self.assertEqual(res[3], "newpubkey", 
+        "Seems not to be updated correctly")
+
 
     def test_get(self):
         self.web.save()

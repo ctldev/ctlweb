@@ -148,10 +148,18 @@ class Database:
             cursor.execute(sql,values)
             Database.db_connection.commit()
         except sqlite3.IntegrityError:
-            exceptionparameter = (targetcolumns[0], values[0])
-            sql = "UPDATE :table SET :set WHERE ? = ?"
-            cursor.execute(sql,parameter,exceptionparameter)
+            sql = ""
+            for i in attributes:
+                sql += ", "+i
+                sql += " = '"+self[i]+"'"    
+            sql = "UPDATE " + table + """
+                    SET
+                    date = (strftime('%s', 'now')),
+                    adapter = :adapter """ +sql+ """
+                    WHERE c_id = :c_id """
+            cursor.execute(sql,values)
             Database.db_connection.commit()
+
 
     def __conform__(self,protocol):
         """ For creating an generall repräsentation of the class. The
