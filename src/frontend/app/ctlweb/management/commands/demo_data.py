@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 last_name="xyz",
                 email="abc@xyz.de",
                 is_staff=False,
-                is_active=True,
+                is_active=False,
                 is_superuser=False,
                 last_login=today,
                 date_joined=today)
