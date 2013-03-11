@@ -5,7 +5,7 @@ import os
 
 class Log:
     setHandler = False
-    verbose = 0
+    verbose = 1
     
     @staticmethod   
     def increase_verbosity():
