@@ -15,7 +15,8 @@ class Log:
         Log.setHandler = Log.handlerActivation(Log.setHandler) 
     
     @staticmethod
-    def streamoutput(lvl):
+    def streamoutput():
+        lvl = (60-(10*Log.verbose))
         root = 0
         root = logging.getLogger()
         logging.root.handlers=[] 
@@ -25,7 +26,8 @@ class Log:
         logging.shutdown()
 
     @staticmethod
-    def fileoutput(lvl):
+    def fileoutput():
+        lvl = (60-(10*Log.verbose))
         fileLogger = 0
         logging.basicConfig(level = lvl,
                             filemode = 'a',
@@ -40,9 +42,8 @@ class Log:
 
     @staticmethod 
     def handlerActivation(setHandler):
-        Log.streamoutput(60-(10*Log.verbose))
-        Log.fileoutput(60-(10*Log.verbose))
-        #verboselevel wird durch die Formel berechnet
+        Log.streamoutput()
+        Log.fileoutput()
         return True
    
     @staticmethod 
