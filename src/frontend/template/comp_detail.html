@@ -31,21 +31,31 @@ Component {{ component.name }}
 	</td>
 	<td> 
 	  {% for p in programmer %}
-		{% if p in users.email %}
-		  <a href="{% url user u.pk %}"> {{ p.email }} </a>
-		{% else %}
-		  {{ p.email }}
-		{% endif %}
+		{% if p in users.email %} 
+		  {# url noch nicht vorhanden #}
+		  <a href="{% url user u.pk %}">
+			{{ p.email }}
+		  </a>{% else %}{{ p.email }}{% endif %}{% if not forloop.last %},
+		  {% endif %}
+		  <br /> 
 	  {% endfor %} 
 	</td>
   </tr>
   <tr>
 	<td>
-	  Datum: 
+	  Version:
+	</td>
+	<td>
+	  {{ component.version }}
+	</td>
+  </tr>
+  <tr>
+	<td>
+	  Vom: 
 	  {# {% trans "Datum" %} #}
 	</td>
 	<td> 
-	  {{ component.datum }} 
+	  {{ component.date }} 
 	</td>
   </tr>
   {% if see_homeserver %}
@@ -54,18 +64,12 @@ Component {{ component.name }}
 	  Homeserver 
 	</td>
 	<td> 
-	  <table class="table table-condensed">  
-		{% for hs in homeserver %}
-		  <tr>
-			<td> 
-			  {{ hs.name }} 
-			</td>
-			<td> 
-			  {{ hs.domain }} 
-			</td>
-		  </tr>
-		{% endfor %}
-	  </table>
+	  {% for hs in homeserver %}
+		<a href="{{ hs.domain }}">
+		  {{ hs.name }}
+		</a> 
+		{% if not forloop.last %} <br /> {% endif %}
+	  {% endfor %}
 	</td>
   </tr>
   {% endif %}
@@ -77,20 +81,28 @@ Component {{ component.name }}
 		class="accordion-toggle" 
 		data-toggle="collapse"
 		data-parent="#accordion2" 
-		href="#collapseOne"
+		href="#description"
 	  >
 		Beschreibung
 	  </a>
 	</div>
-  <div id="collapseOne" class="accordion-body collapse in">
+  <div id="description" class="accordion-body collapse">
 	<div class="accordion-inner">
 	  {{ component.description }}
 	</div>
   </div>
+  <script type="text/javascript">
+	$(function() {
+		$('.accordion').on('hide', function (e) {
+		  $(this).find('.accordion-toggle').not($(e.target)).removeClass('active');
+		  });
+	});
+  </script>
 </div>
 </div>
 
 {% if see_homecluster %}
+Cluster:
 <div class="accordion" id="accordion1">
   <div class="accordion-group">
 	{% for hc in homecluster %}
@@ -104,31 +116,37 @@ Component {{ component.name }}
 		  {{ hc.name }} {{ hc.domain }}
 		</a>
 	  </div>
-	  <div id="{{ hc.id }}" class="accordion-body collapse in">
+	  {% if forloop.first %}
+		<div id="{{ hc.id }}" class="accordion-body collapse in">
+	  {% else %}
+		<div id="{{ hc.id }}" class="accordion-body collapse">
+	  {% endif %}
 		<div class="accordion-inner">
 		  {% for h in hc.components_cluster_set.all %}
-		  <table>
-			{% if see_path %}
-			  <tr>
-				<td> 
-				  Pfad: 
-				</td>
-				<td> 
-				  {{ h.path }} 
-				</td>
-			  </tr>
+			{% if h.component = component %}
+			  <table>
+				{% if see_path %}
+				  <tr>
+					<td> 
+					  Pfad: 
+					</td>
+					<td> 
+					  {{ h.path }} 
+					</td>
+				  </tr>
+				{% endif %}
+				{% if see_code %}
+				  <tr>
+					<td> 
+					  Code: 
+					</td>
+					<td> 
+					  {{ h.code }} 
+					</td>
+				  </tr>
+				{% endif %}
+			  </table>
 			{% endif %}
-			{% if see_code %}
-			  <tr>
-				<td> 
-				  Code: 
-				</td>
-				<td> 
-				  {{ h.code }} 
-				</td>
-			  </tr>
-			{% endif %}
-		  </table>
 		  {% endfor %}
 		</div>
 	  </div>

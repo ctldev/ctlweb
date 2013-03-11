@@ -21,11 +21,11 @@ def component_detail(request, comp_id):
     homecluster = comp.homecluster.all().order_by('domain')
     interface = Interfaces.objects.filter(components = comp)
     emails = Programmer.objects.filter(component = comp).\
-            distinct('email').values_list('email')
+            distinct('email')
     print "Programmer"
     for e in emails:
-        print e
-    userlist = User.objects.filter(email__in=emails)
+        print e.email
+    userlist = User.objects.filter(email__in=emails.values_list('email'))
     print "User"
     for u in userlist:
         print u.email
