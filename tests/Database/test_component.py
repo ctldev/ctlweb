@@ -93,6 +93,15 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(res[4], "name", "Got unexpected data")
         self.assertEqual(res[3], "/path/to/exe", "Got unexpected data")
         self.assertEqual(res[2], "/path/to/ci", "Got unexpected data")
+        #updatecheck
+        self.comp.c_exe = "updatedexe"
+        self.comp.save()
+        cursor.execute("SELECT * FROM Component;")
+        res = cursor.fetchone()
+        res = tuple(res)
+        self.assertEqual(res[3], "updatedexe", 
+        "Seems not to be updated correctly")
+
 
     def test_conform(self):
         """ Test for sqlite3 representation
