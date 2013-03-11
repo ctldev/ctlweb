@@ -32,15 +32,11 @@ def search(request):
                 if form.is_valid():
                     searchtext = form.cleaned_data['searchtext']
                     category = form.cleaned_data['category']
-                    print "Suchgebiet: " + searcharea
-                    print searchtext + " in " + category
                     bind = "first"
                     if searcharea == "all" or searcharea == "interfaces":
-                        print "Interfacesuche gestartet"
                         searched_interfaces = search_interfaces(searchtext, 
                                 bind, category, searched_interfaces)
                     if searcharea == "all" or searcharea == "components":
-                        print "Componentsuche gestartet"
                         searched_comps = search_comps(searchtext, bind, 
                                 category, searched_comps)
             for form in filled_addform:
@@ -48,13 +44,10 @@ def search(request):
                     searchtext = form.cleaned_data['searchtext']
                     category = form.cleaned_data['category']
                     bind = form.cleaned_data['bind']
-                    print bind + " " + searchtext +" in " + category
                     if searcharea == "all" or searcharea == "interfaces":
-                        print "Interfacesuche gestartet"
                         searched_interfaces = search_interfaces(searchtext, 
                                 bind, category, searched_interfaces)
                     if searcharea == "all" or searcharea == "components":
-                        print "Komponentensuche gestartet"
                         searched_comps = search_comps(searchtext, bind, 
                                 category, searched_comps)
             searched_comps = searched_comps.exclude(is_active__icontains =
@@ -100,7 +93,6 @@ def interface_and_search(searchtext, category, searched_interfaces):
     elif category == "keywords":        
         searched_interfaces = searched_interfaces.filter(
             description__icontains = searchtext)
-        print searchtext + " in Interface-Beschreibung gesucht"
     elif category == 'all': 
         searched_names = searched_interfaces.filter(
             name__icontains = searchtext)
