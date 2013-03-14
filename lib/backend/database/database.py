@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sqlite3
 from util import Log
+from util import DEFAULT_CONFIG
 
 class Database:
     """ Every class derived from Database gets it's own table in the database.
@@ -13,7 +14,7 @@ class Database:
     db_file = None
     db_connection = None
 
-    def __init__(self, config_file='/etc/ctlweb.conf'):
+    def __init__(self, config_file=DEFAULT_CONFIG):
         import configparser
         config = configparser.ConfigParser()
         config.read(config_file)
@@ -74,7 +75,10 @@ class Database:
             Log.debug("Wrong dateformat caught in %s.get()" % cls.__name__)
             raise ValueError()
         cursor = Database.db_connection.cursor()
-        cursor.execute(sql, values)
+        try:
+            cursor.execute(sql, values)
+        except sqlite3.IntegrityError:
+            return None
         result_set = []
         for row in cursor.fetchall():
             result_set.append(cls.convert(row[0]))
@@ -159,6 +163,8 @@ class Database:
                     WHERE c_id = :c_id """
             cursor.execute(sql,values)
             Database.db_connection.commit()
+        except sqlite3.OperationalError:
+            raise NoSuchTable()
 
 
     def __conform__(self,protocol):
@@ -217,3 +223,9 @@ class Database:
         """ Provides that the name of the class is callable
         """
         return self.__class__.__name__
+
+class NoSuchTable(sqlite3.OperationalError):
+    pass
+
+class DatabaseNotFound(sqlite3.OperationalError):
+    pass

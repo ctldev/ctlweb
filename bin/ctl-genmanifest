@@ -19,7 +19,6 @@ long_opt = ["name=",
         "hostname=",
         "port=",
         "user="]
-max_output_level = 2
 
 def usage():
     print("Usage:", sys.argv[0], """[ -n | --name=name ]
@@ -71,7 +70,7 @@ def main():
     except getopt.GetoptError as err:
         usage()
         sys.exit(2)
-    output = None
+    required = 0
     # package variables
     name = "" # will be set later
     import subprocess
@@ -82,7 +81,6 @@ def main():
     exe_path = "" #  will be set during argument parsing
     exe_hash = "" # I'll explain later (The Doctor)
     ci_name = "" # will be set during argument parsing
-    required = 0
 
     for o, a in opts:
         if o in ("-n", "--name"):
