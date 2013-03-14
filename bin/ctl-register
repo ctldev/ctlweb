@@ -6,13 +6,28 @@ import getopt
 # Fügt den Benutzer dabei der DB hinzu und schreibt die .authorized_keys neu
 
 opt = "a:k:r:ov"
-long_opt = [ "add=", "key=", "remove=", "overview" ]
+long_opt = [ "add=", "key=", "remove=", "overview", "verbose", "version" ]
 max_output_level = 2
 
 def usage():
     print("Usage:", sys.argv[0], """[-a <id>|--add=<id> -k <key>|--key=<key>]
     \t [-r <id>|--remove=<id>] 
-    \t [-o|--overview]""")
+    \t [-o|--overview]
+    \t [-v | --verbose]
+    \t [--version]""")
+
+def add(reg_id,pubkey):
+    """Adds a user with an ID and publickey
+    """
+    user_to_register = user(reg_id,pubkey)
+    user_to_register.save()
+
+def remove(reg_id):
+    """Removes a user with the stated ID
+    """
+
+
+
 
 def main():
     try:
@@ -24,14 +39,30 @@ def main():
         usage()
         sys.exit(2)
     output = None
-    verbose = 0
+    ss_port = 22
+    reg_id = "" #will be set during argument parsing
+    pubkey = "" #will be set during argument parsing
+    required = 0  #checks if all required arguments are given
 
+    #o = options, a = arguments
     for o, a in opts:
         if o in ("-a", "--add"):
-            print("add",o,a)
-
+            if a = "":
+                Log.critical("No valid ID specified, Aborting")
+                exit(1)
+            else:
+                required += 1
+                reg_id = a
+                Log.debug("Adding ID to cluster")
         elif o in ("-k", "--key"):
-            print("key",o,a)
+            if pubkey = "":
+                Log.critical("No valid public key has been specified,
+                        Aborting")
+                exit(1)
+            else:
+                required += 1
+                pubkey = a
+                Log.debug("setting publickey")
 
         elif o in ("-r", "--remove"):
             print("removing",o,a)
@@ -39,9 +70,10 @@ def main():
         elif o in ("-o", "--overview"):
             print("overview",o,a)
 
-        elif o == "-v":
-            if verbose < max_output_level: 
-                verbose = verbose + 1
+        elif o in ("-v", "--verbose"):
+            Log.increase_verbosity()
+        elif o == "version":
+            usage()
         
 if __name__ == "__main__":
     main()

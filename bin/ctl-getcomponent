@@ -3,6 +3,10 @@
 
 import sys
 import getopt
+import requests
+from ..lib import database
+from ..lib import web
+
 
 
 opt = "t:au:k:v:c:"
@@ -31,41 +35,68 @@ def main():
 
     import configparser
 
-    #TODO Path der ctlweb.conf holen
+    """defaultpath für config_file"""
     config_file = '/etc/ctlweb.conf'
-    config = configparser.ConfigParser()
-    config.read(config_file)
 
     key = None
     url = None
+    components = []
     
     for o, a in opts:
         if o in ("-t", "--timestamp"):
-            print("timestamp",o,a)
+            components = database.get(a)
+            
 
         elif o in ("-a", "--all"):
-            print("all",o,a)
+            components = database.get()
 
         elif o in ("-u", "--url"):
             url = a
-            print("url",o,a)
 
         elif o in ("-k", "--key"):
             key = a
-            print("key",o,a)
 
         elif o == "-c":
-            print("path", o, a)
+            if(a != None):
+
+                config_file = a
 
         elif o == "--version":
-            print("version",o,a)
+            print("ctl version 1.0")
 
         elif o in ("--verbose","-v"):
             print("verbose",o,a)
-       
+    
+    """config-file auslesen"""
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+
+    """Check ob URL und Key gesetzt wurden"""
     if(key == None or url == None):
         
-        raise IllegalArgumentException
+        raise ValueError("No URL set or no given Key")
+    
+    else:
+        
+        domain = url[url.index(".") + 1 :]
+        domain = domain[0 : domain.index(".")]
+
+        pubkey = web.get_exact(domain)
+        
+        if(pubkey == key):
+            i = 0
+            while(i < components.length()):
+                files = {'manifest': (config['manifest_storage'] + components[i] +'.tgz')}
+                requests.post(url, files=files)
+                i += 1
+
+        else:
+
+            raise ValueError("wrong publickey")
+
+    """Alles ordnungsgemäß durchgelaufen"""
+    return 0
 
 if __name__ == "__main__":
     main()            

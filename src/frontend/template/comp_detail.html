@@ -65,7 +65,7 @@ Component {{ component.name }}
 	</td>
 	<td> 
 	  {% for hs in homeserver %}
-		<a href="{{ hs.domain }}">
+		<a href="{{ hs.domain }}" target="_blank">
 		  {{ hs.name }}
 		</a> 
 		{% if not forloop.last %} <br /> {% endif %}

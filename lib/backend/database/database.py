@@ -130,6 +130,18 @@ class Database:
         cursor.execute(sql)
         self.db_connection.commit()
 
+    def remove(self):
+        """ Removes rows on the basis of the id 
+        """
+        cursor = Database.db_connection.cursor()
+        table = self.__name__
+        sql = "DELETE FROM " +table+ """
+                WHERE c_id = """ "'%s'" """
+                """ % self["c_id"]
+        cursor.execute(sql)
+        Database.db_connection.commit()
+
+
     def save(self):
         """ Saves object into database
         """

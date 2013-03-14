@@ -71,7 +71,7 @@ class UserTest(unittest.TestCase):
         self.assertTrue("c_id" in attrs)
         self.assertTrue("c_pubkey" in attrs)
         self.assertFalse("__doc__" in attrs)
-
+        
     def test_save(self):
         with self.assertRaises(NoSuchTable):
             self.user.save()
@@ -102,7 +102,13 @@ class UserTest(unittest.TestCase):
         self.assertEqual(res[2], "Douglas",
                 "Seems not to be updated correctly")
 
-
+    def test_remove(self):
+        self.user.save()
+        self.user.remove()
+        self.cursor.execute("""SELECT * FROM User
+                            WHERE c_id = 'Douglas';""")
+        self.assertTrue(self.cursor.fetchone() == None, 
+                "Removing Entries has failed")
 
     def test_get(self):
         self.user.create_table()

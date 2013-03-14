@@ -18,7 +18,7 @@ class TestComponent(unittest.TestCase):
         """ Establishes database connection
         """
         Database.db_file = "test.db" # DB File for Testcase without config
-        Log.streamoutput(5)
+        Log.streamoutput()
 #       Instance objects
         self.comp = Component("name","/path/to/exe","/path/to/ci")
         self.connection = Database.db_connection
@@ -108,6 +108,14 @@ class TestComponent(unittest.TestCase):
         res = tuple(res)
         self.assertEqual(res[3], "updatedexe", 
                 "Seems not to be updated correctly")
+
+    def test_remove(self):
+        self.comp.save()
+        self.comp.remove()
+        self.cursor.execute("""SELECT * FROM Component
+                            WHERE c_id = 'name';""")
+        self.assertTrue(self.cursor.fetchone() == None, 
+                "Removing Entries has failed")
 
     def test_conform(self):
         """ Test for sqlite3 representation
