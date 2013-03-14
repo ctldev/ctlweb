@@ -102,6 +102,15 @@ class TestWeb(unittest.TestCase):
         self.assertEqual(res[3], "newpubkey", 
         "Seems not to be updated correctly")
 
+    def test_remove(self):
+        self.web.save()
+        self.web.remove()
+        self.cursor.execute("""SELECT * FROM Web
+                            WHERE c_id = 'url';""")
+        self.assertTrue(self.cursor.fetchone() == None, 
+                "Removing Entries has failed")
+
+
 
     def test_get(self):
         self.web.save()

@@ -67,7 +67,7 @@ class UserTest(unittest.TestCase):
         self.assertTrue("c_id" in attrs)
         self.assertTrue("c_pubkey" in attrs)
         self.assertFalse("__doc__" in attrs)
-
+        
     def test_save(self):
         self.user.save()
 #       Restarting database connection
@@ -95,7 +95,13 @@ class UserTest(unittest.TestCase):
         self.assertEqual(res[2], "Douglas",
         "Seems not to be updated correctly")
 
-
+    def test_remove(self):
+        self.user.save()
+        self.user.remove()
+        self.cursor.execute("""SELECT * FROM User
+                            WHERE c_id = 'Douglas';""")
+        self.assertTrue(self.cursor.fetchone() == None, 
+                "Removing Entries has failed")
 
     def test_get(self):
         self.user.save()
@@ -106,10 +112,10 @@ class UserTest(unittest.TestCase):
         results = User.get(d)
         self.assertEqual(self.user, results[0], "Unable to get new data")
 
-    def test_get_exacly(self):
-        self.web.save()
-        web = Web.get_exacly(self.web.c_id)
-        self.assertEqual(web, self.web, "Could not deserialize data")
+   # def test_get_exactly(self):
+    #    self.user.save()
+     #   user = User.get_exactly(self.user.c_id)
+      #  self.assertEqual(user, self.user, "Could not deserialize data")
 
 
 if __name__ == "__main__":
