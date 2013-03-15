@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import sys
 import getopt
+from util import find_class
+from util import add
+from util import remove
 
 # registriert benutzer mit id und rsa-pub-key.
 # Fügt den Benutzer dabei der DB hinzu und schreibt die .authorized_keys neu
@@ -16,19 +19,6 @@ def usage():
     \t [-v | --verbose]
     \t [--version]""")
 
-def add(reg_id,pubkey):
-    """Adds a user with an ID and publickey
-    """
-    user_to_register = user(reg_id,pubkey)
-    user_to_register.save()
-
-def remove(reg_id):
-    """Removes a user with the stated ID
-    """
-
-
-
-
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
@@ -42,20 +32,22 @@ def main():
     ss_port = 22
     reg_id = "" #will be set during argument parsing
     pubkey = "" #will be set during argument parsing
-    required = 0  #checks if all required arguments are given
+    required = 0  #checks if all required arguments are give
+    remove_set = false
 
     #o = options, a = arguments
     for o, a in opts:
         if o in ("-a", "--add"):
-            if a = "":
+            if a == "":
                 Log.critical("No valid ID specified, Aborting")
                 exit(1)
             else:
+
                 required += 1
                 reg_id = a
                 Log.debug("Adding ID to cluster")
         elif o in ("-k", "--key"):
-            if pubkey = "":
+            if pubkey == "":
                 Log.critical("No valid public key has been specified,
                         Aborting")
                 exit(1)
@@ -65,15 +57,33 @@ def main():
                 Log.debug("setting publickey")
 
         elif o in ("-r", "--remove"):
+            remove_set = true
             print("removing",o,a)
 
         elif o in ("-o", "--overview"):
+            overview_set = true
             print("overview",o,a)
 
         elif o in ("-v", "--verbose"):
             Log.increase_verbosity()
         elif o == "version":
             usage()
+
+    if required == 2:
+        Log.debug("Switching to add context")
+        add(reg_id,pubkey,database)
+    elif required != 2 and required != 0:
+        Log.critical("Something went wrong with the ID or the Key")
+        usage()
+    elif required != 2 and remove_set
+        Log.debug("Switching to remove context")
+        remove(reg_id,pubkey,database)
+    elif required != 2 and overview_set
+        Log.debug("Switching to overview context")
+        overview()
+    else:
+        Log.debug("No option giving, Aborting")
+        pass
         
 if __name__ == "__main__":
     main()

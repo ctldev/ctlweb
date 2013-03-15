@@ -110,6 +110,7 @@ class TestComponent(unittest.TestCase):
                 "Seems not to be updated correctly")
 
     def test_remove(self):
+        self.comp.create_table()
         self.comp.save()
         self.comp.remove()
         self.cursor.execute("""SELECT * FROM Component

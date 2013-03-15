@@ -181,6 +181,12 @@ def remove(reg_id,reg_pubkey,database):
         get_exacly(cls,reg_id).remove()
     elif(cls == "ctl-register"):
         rm_instance = cls(reg_id, reg_pubkey)
-        get_exactly(cls,reg_id).remove()    
+        get_exactly(cls,reg_id).remove()
+
+def overview():
+    cls = find_class()
+    pass
+
+
 
 

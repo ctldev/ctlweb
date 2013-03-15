@@ -103,6 +103,7 @@ class UserTest(unittest.TestCase):
                 "Seems not to be updated correctly")
 
     def test_remove(self):
+        self.user.create_table()
         self.user.save()
         self.user.remove()
         self.cursor.execute("""SELECT * FROM User
