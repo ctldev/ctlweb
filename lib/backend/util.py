@@ -17,8 +17,18 @@ class Log:
         Log.setHandler = Log.handlerActivation(Log.setHandler) 
     
     @staticmethod
-    def streamoutput(level = 1):
-        Log.verbose = level
+    def set_verbosity(x):
+        print(" verbose-1 " + str(Log.verbose))
+        global verbose
+        if (x <= 5):
+            Log.verbose = x
+        else:
+            Log.verbose = 5
+        print("verbose-2 " + str(Log.verbose))  
+        Log.setHandler = Log.handlerActivation(Log.setHandler) 
+    
+    @staticmethod
+    def streamoutput():
         lvl = (60-(10*Log.verbose))
         root = 0
         root = logging.getLogger()
@@ -140,3 +150,46 @@ def add_component(component, config):
     except NoSuchTable:
         c.create_table()
         c.save()
+
+#determines the calling commando and returns the class accordingly 
+def find_class():
+    if(sys.arg[0] == "ctl-register"):
+        return User
+    elif(sys.arg[0] == "ctl-web"):
+        return Web
+        
+
+def add(reg_id,reg_pubkey,database):
+    cls = find_class()
+    if(database == None):
+        d = Database()
+    else:
+        d = Database(database)
+    if(cls == "ctl-web"):
+        add_instance = cls(reg_id, reg_pubkey)
+        add_instance.save()
+    elif(cls == "ctl-register"):
+        add_instance = cls(reg_id, reg_pubkey)
+        add_instance.save()
+
+def remove(reg_id,reg_pubkey,database):
+    cls = find_class 
+    if(database == None):
+        d = Database()
+    else:
+        d = Database(database)
+    if(cls == "ctl-web"):
+        rm_instance = cls(reg_id, reg_pubkey)
+        get_exacly(cls,reg_id).remove()
+    elif(cls == "ctl-register"):
+        rm_instance = cls(reg_id, reg_pubkey)
+        get_exactly(cls,reg_id).remove()    
+
+def get_conf():    
+    import configparser    
+    config = configparser.ConfigParser()
+    config.read('ctl_conf')
+    a_string = config.get('Essen','Gericht1')
+    print(a_string)
+
+
