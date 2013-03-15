@@ -18,13 +18,11 @@ class Log:
     
     @staticmethod
     def set_verbosity(x):
-        print(" verbose-1 " + str(Log.verbose))
         global verbose
         if (x <= 5):
             Log.verbose = x
         else:
             Log.verbose = 5
-        print("verbose-2 " + str(Log.verbose))  
         Log.setHandler = Log.handlerActivation(Log.setHandler) 
     
     @staticmethod
@@ -184,12 +182,5 @@ def remove(reg_id,reg_pubkey,database):
     elif(cls == "ctl-register"):
         rm_instance = cls(reg_id, reg_pubkey)
         get_exactly(cls,reg_id).remove()    
-
-def get_conf():    
-    import configparser    
-    config = configparser.ConfigParser()
-    config.read('ctl_conf')
-    a_string = config.get('Essen','Gericht1')
-    print(a_string)
 
 
