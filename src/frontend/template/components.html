@@ -76,9 +76,9 @@ Component list
 				  <center><b>Komponenten von {{ di.name }}</b></center>
 				  </h4>
 				  {% for c in di.components.all %}
-				  <div class="component">
+				  
+				  	<div class="component" style="display: block; position: static; margin-bottom: 5px; " >
 				  	<blockquote>
-					{# TODO @Johann: im css "component" hinzufügen #}
 					<strong><a href="{% url component c.id %}">
 					  {{c.name}} <br />
 					</a></strong>
@@ -108,8 +108,7 @@ Component list
 				  <center><b>Gefundene Komponenten von {{ idi.name }}</b></center>
 				  {% for c in idi.components.all %}
 					{% if c in search_components %}
-					  <div class="component">
-					  	
+					  <div class="component" style="display: block; position: static; margin-bottom: 5px; " >	
 					  	<blockquote>
 						<a href="{% url component c.id %}">
 						  {{ c.name }} <br />
