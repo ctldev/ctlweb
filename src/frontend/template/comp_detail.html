@@ -6,30 +6,26 @@ Component {{ component.name }}
 <div class="transbox">
 <div class="page-header">
   <h1>{{ component.name }} 
-  </h1>
-</div>
-<table class="table table-condensed">
-  <tr>
-	<td>
-	  {{ component.brief_description  }} 
-	</td>
-  </tr>
-  <tr>
-	<td>
+  </h1>  
+  <blockquote>
+  {{ component.brief_description  }}
+  </blockquote>
+</div> 
+  <dl class="dl-horizontal">
+	<dt>
 	  Interface
-	</td>
-	<td>
+	</dt>
+	<dd>
 	  {% for i in interfaces %}
 		{{ i.name }}{% if not forloop.last %}, {% endif %}
 	  {% endfor %}
-	</td>
-  </tr>
-  <tr>
-	<td>
+	</dd>
+
+	<dt>
 	  Ersteller:
 	  {# {% trans "Ersteller" %} #}
-	</td>
-	<td> 
+	</dt>
+	<dd> 
 	  {% for p in programmer %}
 		{% if p in users.email %} 
 		  {# url noch nicht vorhanden #}
@@ -39,41 +35,38 @@ Component {{ component.name }}
 		  {% endif %}
 		  <br /> 
 	  {% endfor %} 
-	</td>
-  </tr>
-  <tr>
-	<td>
+	</dd>
+	
+	<dt>
 	  Version:
-	</td>
-	<td>
+	</dt>
+	<dd>
 	  {{ component.version }}
-	</td>
-  </tr>
-  <tr>
-	<td>
-	  Vom: 
+	</dd>
+  	
+  	<dt>
+  	  Datum: 
 	  {# {% trans "Datum" %} #}
-	</td>
-	<td> 
+	</dt>
+	<dd> 
 	  {{ component.date }} 
-	</td>
-  </tr>
+	</dd>
+
   {% if see_homeserver %}
-  <tr>
-	<td> 
+	<dt> 
 	  Homeserver 
-	</td>
-	<td> 
+	</dt>
+	<dd> 
 	  {% for hs in homeserver %}
 		<a href="{{ hs.domain }}" target="_blank">
 		  {{ hs.name }}
 		</a> 
 		{% if not forloop.last %} <br /> {% endif %}
 	  {% endfor %}
-	</td>
-  </tr>
+	</dd>
   {% endif %}
-</table>
+</dl>
+
 <div class="accordion" id="accordion2">
   <div class="accordion-group">
 	<div class="accordion-heading">

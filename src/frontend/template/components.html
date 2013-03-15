@@ -6,7 +6,30 @@ Component list
 
 <div class="transbox">
   <br/>
+  {% if not form == 1 %}
+  <div class="page-header">
+  <h1>Verzeichnis
+  </h1>
+
+  <blockquote>
+  	Eine Auflistung aller Interfaces und ihrer zugehörigen Komponenten
+  </blockquote>
+  </div>
+  {% endif %}
+
   {% if not form == 0 %}
+  <div class="page-header">
+  <h1>Suchergebnisse
+  </h1>
+
+  <blockquote>
+  	Alle direkten und indirekten Ergebnisse für ""
+  	<!--TODO: Suchwortparameter -->
+  </blockquote>
+  </div>
+  {% endif %}
+
+   {% if not form == 0 %}
 	  <div class="tabbable">
 		<ul class="nav nav-tabs">
 		  <li class="active"><a href="#interface"
@@ -16,37 +39,49 @@ Component list
 		<div class="tab-content">
 		  <div class="tab-pane active" id="interface">
   {% endif %}
+
+  <!------------ LEFT CONTENT SIDE ------------------------>
+
 			<div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->
 			  <ul class="nav nav-tabs" id="interfaceList">
+				<h3>
 				<center><b>Interfaces</b></center>
+				</h3>
 				{% for di in d_interfaces %}
 				  <li class>
+				  	
 					<a href="#i_{{ di.key }}" data-toogle="tab" style="color:
 					  #006600">
-					  {{ di.name }} <br />
+					  <strong>{{ di.name }}</strong> <br />
 					  <small>{{ di.description }}</small>
 					</a>
+
 				  </li>
 				{% endfor %}
 				{% for idi in i_interfaces %}
 				  <li class>
 					<a href="#i_{{ idi.key }}" data-toogle="tab">
-					  {{ idi.name }} <br />
+					  <strong>{{ idi.name }} </strong><br />
 					  <small>{{ idi.description }}</small>
 					</a>
 				  </li>
 				{% endfor %}
 			  </ul>
+
+<!-------------------- RIGHT CONTENT SIDE -------------------------->
 			  <div class="tab-content content">
 				{% for di in d_interfaces %}
 				  <div class="tab-pane" id="i_{{ di.key }}">
+				  <h4>
 				  <center><b>Komponenten von {{ di.name }}</b></center>
+				  </h4>
 				  {% for c in di.components.all %}
-				  <div class="component"> 
+				  <div class="component">
+				  	<blockquote>
 					{# TODO @Johann: im css "component" hinzufügen #}
-					<a href="{% url component c.id %}">
+					<strong><a href="{% url component c.id %}">
 					  {{c.name}} <br />
-					</a>
+					</a></strong>
 					  <small>
 						{{ c.brief_description }} <br />
 						<u>Programmierer:</u> 
@@ -63,6 +98,7 @@ Component list
 						  {% endif %}
 						{% endfor %}
 					  </small>
+					</blockquote>
 					</div>
 					{% endfor %}
 				  </div>
@@ -73,6 +109,8 @@ Component list
 				  {% for c in idi.components.all %}
 					{% if c in search_components %}
 					  <div class="component">
+					  	
+					  	<blockquote>
 						<a href="{% url component c.id %}">
 						  {{ c.name }} <br />
 						</a>
@@ -92,6 +130,8 @@ Component list
 							{% endif %}
 						  {% endfor %}
 						</small>
+					</blockquote>
+
 					  </div>
 					{% endif %}
 				  {% endfor %}
