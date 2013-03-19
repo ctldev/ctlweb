@@ -60,8 +60,8 @@ def _generate_button(prefix, page, css_class, value=None, disabled=False,
     else:
         button = "<li>"
     button +=      """ <a href="javascript:void(0)"
-                      class="%s" id="%s%s" 
-                      onclick="loadXMLDoc($(this))"
-                      >%s</a>
-                </li>""" % (css_class, prefix, page, value)
+                      class="%s" id="%s%s" """ % (css_class, prefix, page)
+    if not disabled and not active:
+        button += 'onclick="loadXMLDoc($(this))"'
+    button += ">%s</a></li>" % value
     return button
