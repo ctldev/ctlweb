@@ -9,6 +9,7 @@ lib_path = os.getcwd() + "/../../lib/backend"
 sys.path.append( lib_path )
 from database.user import User
 from database.database import Database
+from database.database import NoSuchTable
 
 class UserTest(unittest.TestCase):
     """ Tests for user.py
@@ -28,7 +29,6 @@ class UserTest(unittest.TestCase):
         self.user = User("Douglas", "pubkey")
         self.connection = Database.db_connection
         self.cursor = self.connection.cursor()
-        self.user.create_table()
 
     def tearDown(self):
         self.connection.close()
@@ -36,6 +36,7 @@ class UserTest(unittest.TestCase):
         os.remove(Database.db_file)
 
     def test_create_table(self):
+        self.user.create_table()
         self.cursor.execute("""SELECT name FROM sqlite_master
                 WHERE name = 'User';""")
         table_exists = False
@@ -47,6 +48,7 @@ class UserTest(unittest.TestCase):
         self.assertTrue(table_exists)
 
     def test_drop_table(self):
+        self.user.create_table()
         self.user.drop_table()
         self.cursor.execute("""SELECT name FROM sqlite_master
                 WHERE name = 'User';""")
@@ -54,6 +56,7 @@ class UserTest(unittest.TestCase):
                 "Database could not been droped")
 
     def test_getitem(self):
+        self.user.create_table()
         self.assertEqual(self.user["c_id"], "Douglas")
         self.assertEqual(self.user["c_pubkey"], "pubkey")
         try:
@@ -63,12 +66,16 @@ class UserTest(unittest.TestCase):
             pass
 
     def test_get_attributes(self):
+        self.user.create_table()
         attrs = self.user.get_attributes()
         self.assertTrue("c_id" in attrs)
         self.assertTrue("c_pubkey" in attrs)
         self.assertFalse("__doc__" in attrs)
-
+        
     def test_save(self):
+        with self.assertRaises(NoSuchTable):
+            self.user.save()
+        self.user.create_table()
         self.user.save()
 #       Restarting database connection
         self.connection.close()
@@ -81,10 +88,31 @@ class UserTest(unittest.TestCase):
         self.assertIsNotNone(result,
                 "Couldn't read data from database")
         result = tuple(result)
-        self.assertEqual(result[0], 'Douglas')
-        self.assertEqaul(result[1], 'pubkey')
+        self.assertEqual(result[2], 'Douglas')
+        self.assertEqual(result[3], 'pubkey')
+        #updatecheck
+        self.user.c_pubkey = "newpubkey"
+        self.user.save()
+        self.cursor.execute("""SELECT * FROM User
+                        WHERE c_id = 'Douglas';""")
+        res = self.cursor.fetchone()
+        res = tuple(res)
+        self.assertEqual(res[3], "newpubkey", 
+                "Seems not to be updated correctly")
+        self.assertEqual(res[2], "Douglas",
+                "Seems not to be updated correctly")
+
+    def test_remove(self):
+        self.user.create_table()
+        self.user.save()
+        self.user.remove()
+        self.cursor.execute("""SELECT * FROM User
+                            WHERE c_id = 'Douglas';""")
+        self.assertTrue(self.cursor.fetchone() == None, 
+                "Removing Entries has failed")
 
     def test_get(self):
+        self.user.create_table()
         self.user.save()
         results = User.get()
         self.assertEqual(self.user, results[0], "Unable to get all data")
@@ -94,6 +122,7 @@ class UserTest(unittest.TestCase):
         self.assertEqual(self.user, results[0], "Unable to get new data")
 
     def test_get_exacly(self):
+        self.user.create_table()
         self.user.save()
         user = User.get_exacly(self.user.c_id)
         self.assertEqual(user, self.user, "Could not deserialize data")

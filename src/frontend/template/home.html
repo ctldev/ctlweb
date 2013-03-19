@@ -4,14 +4,14 @@ Home
 {% endblock title %}
 {% block content %}
 
-<div class="transbox">
-      <br/>
-      <center><h1> 
-            
-            Willkommen auf CTLWEB 
-            
-      </h1>
-            <p>Hier finden Sie DIE Komponenten </p> <br/></center>
-                      <!--Body content-->
-</div>
+    <div class="hero-unit">
+    <h2>Willkommen auf CTLWEB </h2>
+	<p>Hier finden Sie DIE Komponenten </p>
+
+    <p>
+    <a href="{% url components %}" class="btn btn-primary btn-large">
+    	Los geht's!
+    </a>
+    </p>
+    </div>
 {% endblock %}

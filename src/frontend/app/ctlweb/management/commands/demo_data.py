@@ -20,9 +20,9 @@ class Command(BaseCommand):
         self.import_connections()
 
     def import_webserver(self):
-        self.w1 = Webserver(name="Web1", domain="www.web1.de")
-        self.w2 = Webserver(name="Web2", domain="www.web2.com")
-        self.w3 = Webserver(name="Web3", domain="www.web3.en")
+        self.w1 = Webserver(name="Web1", domain="http://www.web1.de")
+        self.w2 = Webserver(name="Web2", domain="https://www.web2.com")
+        self.w3 = Webserver(name="Web3", domain="http://www.web3.en")
 
         self.w1.save()
         self.w2.save()
@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 last_name="xyz",
                 email="abc@xyz.de",
                 is_staff=False,
-                is_active=True,
+                is_active=False,
                 is_superuser=False,
                 last_login=today,
                 date_joined=today)
@@ -127,6 +127,7 @@ class Command(BaseCommand):
     def import_connections(self):
         self.i1.components.add(self.co1)
         self.i1.components.add(self.co2)
+        self.i2.components.add(self.co2)
         self.i2.components.add(self.co3)
         self.i3.components.add(self.co4)
 

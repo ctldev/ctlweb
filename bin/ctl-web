@@ -7,20 +7,46 @@ import getopt
 lib_path = os.getcwd() + "/../lib/backend"
 sys.path.append( lib_path )
 from util import Log
+from database.database import Database
+from database.web import Web
+ 
 
-opt = "a:k:r:ov"
-long_opt = ["id=", "public key=", "id=", "overview", "verbose" ]
+opt = "c:a:k:r:ov"
+long_opt = ["config=","id=", "public key=", "id=", "overview", "verbose" ]
 max_output_level = 2
 
 def usage():
-    print("Usage:", sys.argv[0], """[-a <id>| --a=<id> 
+    print("Usage:", sys.argv[0], """[-c <database>| --config=<database>]
+         \t [-a <id>| --a=<id>] 
          \t [-k <public key> --key=<public key>]
          \t [-r <id> | --remove=<>]
          \t [-o | --overview] """)
 
-def main():    
+#def add(reg_id,reg_pubkey,database):
+#        if(database == ""):
+#            d = Database()
+#        else:
+#            d = Database(database)
+#        add_a_web = Web(reg_id, reg_pubkey)
+#        add_a_web.save()
+
+     
+
+#def get_conf():    
+#    import configparser    
+#    config = configparser.ConfigParser()
+#    config.read('ctl_conf')
+#    a_string = config.get('Essen','Gericht1')
+#    print(a_string)
+
+def main():
+#    get_conf()  
     
-    Log.streamoutput(Log.choose_level(Log.verbose))
+    Log.streamoutput()
+    reg_id = ""
+    reg_pubkey = ""
+    required = 0
+    database = None
     try:
         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
     except getopt.GetoptError as err:
@@ -28,20 +54,33 @@ def main():
         usage()
         sys.exit(2)
     output = None
-    
     for o, a in opts:
-        if o in ("-a", "--id"):
+        if o in ("-c", "--config"):
+            import configparser
+            config = configparser.ConfigParser()
+            config.read(a)
+            database = Database(config.get('Backend','Database'))
+        elif o in ("-a", "--id"):
+            reg_id = a
+            if(reg_id == ""):
+                Log.error("No valid id specified, Aborting ")
+                exit(1)
+            else:
+                required += 1
+                Log.info(" "+str(required)+" ")
+                Log.debug("id " + str(a) + " was added to cluster ")
             print("id",o,a) 
-            Log.debug("debugtest")
-            Log.error("errortest")
-            Log.critical("criticaltest")
-            Log.warning("warningtest")
-            Log.info( str(a) + "  wird als id inzugefuegt")    
         elif o in ("-k", "--public key"):
-            print("public key",o,a)  
-            Log.info( str(a) +" wird als public key hinzugefuegt") 
+            reg_pubkey = a
+            if(reg_pubkey == ""):  
+                Log.error("No valid pub-key specified, Aborting ")
+                exit(1)
+            else:
+                required += 1
+                Log.info(" "+str(required)+" ")
+                Log.info("public key" +  str(a) +" was added to cluster ") 
         elif o in ("-v", "--verbose"):
-            Log.info("Die Verbosity wird erhoeht.")
+            Log.info("Verbosity increased")
             Log.increase_verbosity()
         elif o in ("-r", "--id"):
             print("id",o,a)
@@ -50,6 +89,13 @@ def main():
         elif o in ("-o", "--o"):
             print("doxygen",o,a)           
             Log.info(str(a) + "wird zum doxygen gemacht")
+
+    if(required != 2 ):
+        Log.info(" " +str(required)+ " ")
+        Log.error("no valid id or pubkey specified")
+    else:
+        add(reg_id,reg_pubkey,database)
+
 if __name__ == "__main__":
     main()            
            

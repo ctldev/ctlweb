@@ -8,6 +8,7 @@ lib_path = os.getcwd() + "/../../lib/backend"
 sys.path.append( lib_path )
 from database.component import Component
 from database.database import Database
+from database.database import NoSuchTable
 from util import Log
 
 class TestComponent(unittest.TestCase):
@@ -17,12 +18,11 @@ class TestComponent(unittest.TestCase):
         """ Establishes database connection
         """
         Database.db_file = "test.db" # DB File for Testcase without config
-        Log.streamoutput(0)
+        Log.streamoutput()
 #       Instance objects
         self.comp = Component("name","/path/to/exe","/path/to/ci")
         self.connection = Database.db_connection
         self.cursor = self.connection.cursor()
-        self.comp.create_table()
 
     def tearDown(self):
         """ Closes database connection and removes database from disk
@@ -31,6 +31,7 @@ class TestComponent(unittest.TestCase):
         os.remove(Database.db_file)
 
     def test_create_table(self):
+        self.comp.create_table()
         self.assertIsNotNone(self.connection, 
                 "Database isn't correctly initialized")
         self.cursor.execute("""SELECT name FROM sqlite_master
@@ -41,6 +42,7 @@ class TestComponent(unittest.TestCase):
         self.assertTrue(table_exists)
 
     def test_drop_table(self):
+        self.comp.create_table()
         try:
             self.comp.drop_table()
         except sqlite3.OperationalError:
@@ -53,6 +55,7 @@ class TestComponent(unittest.TestCase):
         """ Tests if access to instance objects with names like c_ are
         possible. Errors or Fails need to be fixed in class Database.
         """
+        self.comp.create_table()
         self.assertEqual(self.comp["c_id"], "name" )
         self.assertEqual(self.comp["c_exe"], "/path/to/exe" )
         self.assertEqual(self.comp["c_ci"], "/path/to/ci" )
@@ -66,6 +69,7 @@ class TestComponent(unittest.TestCase):
         """ Tests if all instance objects are found by get_attributes(). Errors
         or Fails need to be fixed in class Database.
         """
+        self.comp.create_table()
         attrs = self.comp.get_attributes()
         self.assertTrue(attrs, msg="Got no attributes")
         self.assertTrue("c_id" in attrs , 
@@ -80,6 +84,9 @@ class TestComponent(unittest.TestCase):
     def test_save(self):
         """ Checks if data can be made persistent in the database
         """
+        with self.assertRaises(NoSuchTable):
+            self.comp.save()
+        self.comp.create_table()
         self.comp.save()
 #       connection restart
         self.connection.close()
@@ -93,10 +100,28 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(res[4], "name", "Got unexpected data")
         self.assertEqual(res[3], "/path/to/exe", "Got unexpected data")
         self.assertEqual(res[2], "/path/to/ci", "Got unexpected data")
+        #updatecheck
+        self.comp.c_exe = "updatedexe"
+        self.comp.save()
+        cursor.execute("SELECT * FROM Component;")
+        res = cursor.fetchone()
+        res = tuple(res)
+        self.assertEqual(res[3], "updatedexe", 
+                "Seems not to be updated correctly")
+
+    def test_remove(self):
+        self.comp.create_table()
+        self.comp.save()
+        self.comp.remove()
+        self.cursor.execute("""SELECT * FROM Component
+                            WHERE c_id = 'name';""")
+        self.assertTrue(self.cursor.fetchone() == None, 
+                "Removing Entries has failed")
 
     def test_conform(self):
         """ Test for sqlite3 representation
         """
+        self.comp.create_table()
         repr = self.comp.__conform__(sqlite3.PrepareProtocol)
         self.assertEqual(repr, "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci",
                 msg="Error in generation of representation")
@@ -105,6 +130,7 @@ class TestComponent(unittest.TestCase):
         """ Tests if a __conform__ representation could be successfully
         rebuild.
         """
+        self.comp.create_table()
         repr =  "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci"
         comp = Component.convert(repr)
         self.assertEqual(comp, self.comp)
@@ -112,6 +138,7 @@ class TestComponent(unittest.TestCase):
     def test_get(self):
         from datetime import datetime
         from datetime import timedelta
+        self.comp.create_table()
         self.comp.save()
         # Test get all
         comps = Component.get()
@@ -122,6 +149,7 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(comps[0], self.comp, "Could not deserialize data")
 
     def test_get_exacly(self):
+        self.comp.create_table()
         self.comp.save()
         comp = Component.get_exacly(self.comp.c_id)
         self.assertEqual(comp, self.comp, "Could not deserialize data")
