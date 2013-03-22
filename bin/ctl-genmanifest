@@ -5,7 +5,7 @@ import os
 
 lib_path = os.getcwd() + "/../lib/backend"
 sys.path.append( lib_path )
-from util import Log
+from log import Log
 from util import hash_file
 
 #generiert ein Manifest für Compontent

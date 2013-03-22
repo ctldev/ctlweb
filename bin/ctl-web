@@ -6,7 +6,7 @@ import getopt
 #ctl-web wird von der Webinstanz auf den Cluster ausgefuehrt, um sich dort zu verifiziern
 lib_path = os.getcwd() + "/../lib/backend"
 sys.path.append( lib_path )
-from util import Log
+from log import Log
 from util import add
 from util import remove
 from util import find_class

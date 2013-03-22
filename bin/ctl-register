@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
+import os
 import sys
 import getopt
+from os.path import dirname,abspath
+lib_path = dirname(abspath(__file__))  + "/../lib/backend"
+sys.path.append(lib_path)
+from log import Log
 from util import find_class
 from util import add
 from util import remove
+from database.database import Database
+from database.user import User
 
 # registriert benutzer mit id und rsa-pub-key.
 # Fügt den Benutzer dabei der DB hinzu und schreibt die .authorized_keys neu
@@ -30,12 +37,13 @@ def main():
         sys.exit(2)
     output = None
     ss_port = 22
+    database = None
     reg_id = "" #will be set during argument parsing
     pubkey = "" #will be set during argument parsing
-    add_required = 0  #checks if all required arguments are give
-    remove_required = 0
-    add_set = false
-    remove_set = false
+    required = 0  #checks if all required arguments are give
+    add_set = False
+    remove_set = False
+    overview_set = False
 
     #o = options, a = arguments
     for o, a in opts:
@@ -45,7 +53,7 @@ def main():
             config.read(a)
             database = Database(config.get('Backend','Database'))
         elif o in ("-a", "--add"):
-            add_set = true
+            add_set = True
             if a == None:
                 Log.critical("No valid ID specified, Aborting")
                 exit(1)
@@ -53,10 +61,10 @@ def main():
                 Log.debug("Adding ID to cluster")
                 required += 1
                 reg_id = a
-            elif o in ("-k", "--key"):
+        elif o in ("-k", "--key"):
             if a == None:
-                Log.critical("No valid public key has been specified,
-                        Aborting")
+                Log.critical("""No valid public key has been specified,
+                        Aborting""")
                 exit(1)
             else:
                 Log.debug("Setting Public Key")
@@ -64,7 +72,7 @@ def main():
                 pubkey = a
 
         elif o in ("-r", "--remove"):
-            remove_set = true
+            remove_set = True
             if a == None:
                 Log.critical("No ID specified, Aborting")
                 exit(1)
@@ -85,19 +93,20 @@ def main():
 
     if add_set and required == 2:
         Log.debug("Switching to add context")
+        Log.debug(reg_id+ "," +pubkey)
         add(reg_id,pubkey,database)
     elif remove_set and required == 2:
         Log.debug("Switching to remove context")
         remove(reg_id,pubkey,database)
     elif add_set and remove_set and required == 2:
-        Log.critical("It is not possible to add AND remove at the same time,
-        Sry")
+        Log.critical("""It is not possible to add AND remove at the same time,
+        Sry""")
     elif required != 2 and required != 0:
         Log.critical("Something went wrong with the ID or the Key")
         usage()
         Log.info("required is: "+str(required)+"")
     #TODO unsicher, ob add+overview erlaubt sein soll    
-    elif required != 2 and overview_set
+    elif required != 2 and overview_set:
         Log.debug("Switching to overview context")
         overview()
     else:

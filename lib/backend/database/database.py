@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 import sqlite3
-from util import Log
-from util import DEFAULT_CONFIG
+import os
+import sys
+from os.path import dirname,abspath
+lib_path = dirname(abspath(__file__)) + "/../"
+sys.path.append(lib_path)
+from log import Log
+from settings import DEFAULT_CONFIG
 
 class Database:
     """ Every class derived from Database gets it's own table in the database.

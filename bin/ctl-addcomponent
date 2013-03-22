@@ -7,9 +7,9 @@ import os
 
 lib_path = os.getcwd() + "/../lib/backend"
 sys.path.append( lib_path )
-from util import Log
+from log import Log
 from util import hash_file
-from util import DEFAULT_CONFIG
+from settings import DEFAULT_CONFIG
 from util import add_component
 from database.database import Database
 from database.component import Component
