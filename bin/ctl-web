@@ -19,29 +19,11 @@ def usage():
     print("Usage:", sys.argv[0], """[-c <database>| --config=<database>]
          \t [-a <id>| --a=<id>] 
          \t [-k <public key> --key=<public key>]
-         \t [-r <id> | --remove=<>]
+         \t [-r <reg_id> | --remove=<reg_id>]
          \t [-o | --overview] """)
 
-#def add(reg_id,reg_pubkey,database):
-#        if(database == ""):
-#            d = Database()
-#        else:
-#            d = Database(database)
-#        add_a_web = Web(reg_id, reg_pubkey)
-#        add_a_web.save()
-
-     
-
-#def get_conf():    
-#    import configparser    
-#    config = configparser.ConfigParser()
-#    config.read('ctl_conf')
-#    a_string = config.get('Essen','Gericht1')
-#    print(a_string)
-
 def main():
-#    get_conf()  
-    
+   
     Log.streamoutput()
     reg_id = ""
     reg_pubkey = ""
@@ -86,10 +68,6 @@ def main():
             print("id",o,a)
             logging.info(str(a) + "wir als id geloescht")
                     
-        elif o in ("-o", "--o"):
-            print("doxygen",o,a)           
-            Log.info(str(a) + "wird zum doxygen gemacht")
-
     if(required != 2 ):
         Log.info(" " +str(required)+ " ")
         Log.error("no valid id or pubkey specified")
