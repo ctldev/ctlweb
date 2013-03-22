@@ -149,6 +149,7 @@ def new_page(request,
         s_paged_components = pn_comp.page(s_comp_page)
     except (EmptyPage, InvalidPage):
         s_paged_components = pn_comp.page(pn_comp.num_pages)
+    print [i for i in s_paged_components.object_list]
     s_components_page_buttons = util.generate_page_buttons("co_button_",
             pn_comp.num_pages, "co_page", s_comp_page, button_range)
     view = request.GET.get('view', '')

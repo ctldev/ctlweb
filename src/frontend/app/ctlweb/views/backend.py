@@ -49,15 +49,16 @@ def request_modules(testing=False):
         date = date['date_creation__max']
         url_token = _gen_sec_token(domain)
         url = reverse('component_receive', args=[url_token])
+        command = "/home/phipsz/Uni/ctlweb/bin/ctl-getcomponent -a "
         if date is not None:
-            command = "ctl-getcomponent -a " + \
-                    "-u %s -k %s -t %s" % (url, c.key, date)
+            command += "-u %s -k %s -t %s" % (url, c.key, date)
         else:
-            command = "ctl-getcomponent -a " + \
-                    "-u %s -k %s" % (url, c.key)
+            command += "-u %s -k %s" % (url, c.key)
         ssh.connect(c.domain, pkey=sshkey, port=c.port)
-        if not testing:
-            stdin, stdout, stderr = ssh.exec_command(command)
+#        if not testing:
+#            stdin, stdout, stderr = ssh.exec_command(command)
+        stdin, stdout, stderr = ssh.exec_command(command)
+        print stdout.readlines(), stderr.readlines()
 #if no error TODO needed?
         ModuleTokenValidation.create_token(url_token, c)
         ssh.close()
