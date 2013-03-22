@@ -160,12 +160,15 @@
 		</div>
 		<div class="tab-pane" id="component">
 			{% for sc in paged_components.object_list %}
-			  <div class="component">
-				<a href="{% url component sc.id %}">
-				  {{sc.name}} <br />
-				</a>
-				<small>
-				  {{ sc.brief_description }} <br />
+			  <div class="component" style="display: block; position: static; margin-bottom: 5px;">
+				<blockquote>
+					  <strong>
+						<a href="{% url component sc.id %}">
+						{{sc.name}} <br />
+						</a>
+					  </strong>
+					<small>
+				{{ sc.brief_description }} <br />
 				  <u>Programmierer:</u> 
 				  {% for pro in programmer %}
 					{% if pro.component == sc %}
@@ -179,9 +182,11 @@
 					  {% endif %}
 					{% endif %}
 				  {% endfor %} {# pro in... #}
-				</small>		 
+				</small>
+				</blockquote>		 
 			  </div>
 			  {% endfor %} {# sc in.... #}
+			  <br />
 			  <div class="pagination">
 				<ul>
 				  {% for button in s_components_page_buttons %}
