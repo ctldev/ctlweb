@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 #Returns registered component of server to web
 
+import os
 import sys
 import getopt
 import requests
-from ..lib import database
-from ..lib import web
+
+lib_path = os.getcwd() + "/../lib/backend"
+sys.path.append(lib_path)
+from database.database import Database 
+from database.web import Web
 
 
 
@@ -44,11 +48,11 @@ def main():
     
     for o, a in opts:
         if o in ("-t", "--timestamp"):
-            components = database.get(a)
+            components = Database.get(a)
             
 
         elif o in ("-a", "--all"):
-            components = database.get()
+            components = Database.get()
 
         elif o in ("-u", "--url"):
             url = a
@@ -82,7 +86,7 @@ def main():
         domain = url[url.index(".") + 1 :]
         domain = domain[0 : domain.index(".")]
 
-        pubkey = web.get_exact(domain)
+        pubkey = Web.get_exact(domain)
         
         if(pubkey == key):
             i = 0
