@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 #Returns registered component of server to web
 
+from os.path import abspath, dirname
 import sys
 import getopt
 import requests
-from ..lib import database
-from ..lib import web
+
+lib_path = dirname(abspath(__file__)) + "/../lib/backend"
+sys.path.append(lib_path)
+from util import Log
+from database.database import Database 
+from database.web import Web
 
 
 
@@ -30,8 +35,6 @@ def main():
         print(err)
         usage()
         sys.exit(2)
-    output = None
-    verbose = 0
 
     import configparser
 
@@ -44,16 +47,20 @@ def main():
     
     for o, a in opts:
         if o in ("-t", "--timestamp"):
-            components = database.get(a)
+            Log.debug("retrieve components from database")
+            components = Database.get(a)
             
 
         elif o in ("-a", "--all"):
-            components = database.get()
+            Log.debug("retrieve components from database")
+            components = Database.get()
 
         elif o in ("-u", "--url"):
+            Log.debug("set url")
             url = a
 
         elif o in ("-k", "--key"):
+            Log.debug("set public-key")
             key = a
 
         elif o == "-c":
@@ -62,10 +69,14 @@ def main():
                 config_file = a
 
         elif o == "--version":
-            print("ctl version 1.0")
+            
+            #TODO get version
+
+            print("ctl version beta 1")
+            sys.exit()
 
         elif o in ("--verbose","-v"):
-            print("verbose",o,a)
+            Log.increase_verbosity()
     
     """config-file auslesen"""
     config = configparser.ConfigParser()
@@ -79,11 +90,13 @@ def main():
     
     else:
         
+        Log.debug("check public-key")
         domain = url[url.index(".") + 1 :]
         domain = domain[0 : domain.index(".")]
 
-        pubkey = web.get_exact(domain)
+        pubkey = Web.get_exact(domain)
         
+        Log.debug("send postdata to url")
         if(pubkey == key):
             i = 0
             while(i < components.length()):
@@ -93,7 +106,7 @@ def main():
 
         else:
 
-            raise ValueError("wrong publickey")
+            raise ValueError("wrong public-key")
 
     """Alles ordnungsgemäß durchgelaufen"""
     return 0

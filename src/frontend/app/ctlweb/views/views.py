@@ -7,6 +7,10 @@ from django.template import RequestContext, Template
 from ctlweb.views.util import *
 from ctlweb.views.lists import *
 
+def admin_index(request): 
+	return render_to_response("admin/base_site.html", 
+			context_instance=RequestContext(request))
+
 def index(request):
     if "search_query" in request.GET:
         query = request.GET.get('search_query','')
@@ -16,6 +20,8 @@ def index(request):
 
 def components(request): 
     return lists(request)
+
+
 	
 def impressum(request):
     return render_to_response("impressum.html",

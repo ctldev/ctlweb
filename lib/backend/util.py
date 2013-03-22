@@ -151,9 +151,9 @@ def add_component(component, config):
 
 #determines the calling commando and returns the class accordingly 
 def find_class():
-    if(sys.arg[0] == "ctl-register"):
+    if(sys.argv[0] == "ctl-register"):
         return User
-    elif(sys.arg[0] == "ctl-web"):
+    elif(sys.argv[0] == "ctl-web"):
         return Web
         
 
@@ -171,7 +171,7 @@ def add(reg_id,reg_pubkey,database):
         add_instance.save()
 
 def remove(reg_id,reg_pubkey,database):
-    cls = find_class 
+    cls = find_class() 
     if(database == None):
         d = Database()
     else:
@@ -183,9 +183,11 @@ def remove(reg_id,reg_pubkey,database):
         rm_instance = cls(reg_id, reg_pubkey)
         get_exactly(cls,reg_id).remove()
 
-def overview():
+def overview(time_since='all'):
     cls = find_class()
-    pass
+    print(get(cls,time_since))
+
+    
 
 
 
