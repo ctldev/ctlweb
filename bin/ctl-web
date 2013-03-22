@@ -7,12 +7,15 @@ import getopt
 lib_path = os.getcwd() + "/../lib/backend"
 sys.path.append( lib_path )
 from util import Log
+from util import add
+from util import remove
+from util import find_class
 from database.database import Database
 from database.web import Web
  
 
 opt = "c:a:k:r:ov"
-long_opt = ["config=","id=", "public key=", "id=", "overview", "verbose" ]
+long_opt = ["config=","id=", "public key=", "reg_id=", "overview", "verbose" ]
 max_output_level = 2
 
 def usage():
@@ -25,10 +28,12 @@ def usage():
 def main():
    
     Log.streamoutput()
-    reg_id = ""
-    reg_pubkey = ""
+    reg_id = None
+    reg_pubkey = None
     required = 0
     database = None
+    add_set = None
+    remove_set = None
     try:
         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
     except getopt.GetoptError as err:
@@ -42,38 +47,51 @@ def main():
             config = configparser.ConfigParser()
             config.read(a)
             database = Database(config.get('Backend','Database'))
-        elif o in ("-a", "--id"):
-            reg_id = a
-            if(reg_id == ""):
+        elif o in ("-a", "--add"):
+            add_set = True
+            if(a == None):
                 Log.error("No valid id specified, Aborting ")
                 exit(1)
             else:
                 required += 1
+                reg_id = a
                 Log.info(" "+str(required)+" ")
                 Log.debug("id " + str(a) + " was added to cluster ")
             print("id",o,a) 
         elif o in ("-k", "--public key"):
-            reg_pubkey = a
-            if(reg_pubkey == ""):  
+            if(a == None):  
                 Log.error("No valid pub-key specified, Aborting ")
                 exit(1)
             else:
                 required += 1
+                reg_pubkey = a
                 Log.info(" "+str(required)+" ")
                 Log.info("public key" +  str(a) +" was added to cluster ") 
         elif o in ("-v", "--verbose"):
             Log.info("Verbosity increased")
             Log.increase_verbosity()
-        elif o in ("-r", "--id"):
-            print("id",o,a)
-            logging.info(str(a) + "wir als id geloescht")
-                    
-    if(required != 2 ):
-        Log.info(" " +str(required)+ " ")
-        Log.error("no valid id or pubkey specified")
+        elif o in ("-r", "--remove"):
+            remove_set = True
+            if(a == None):
+                Log.error(" No valid id specified, Aborting ")
+                exit(1)
+            else:
+                required += 1
+                reg_id = a
+                print("pub_id",o,a)
+                logging.info(str(a) + "wir als id geloescht")
+    
+    if(add_set != remove_set ):            
+        if(required != 2 ):
+            Log.info(" " +str(required)+ " ")
+            Log.error("no valid id or pubkey specified")
+        else:
+            if(add_set == True):
+                add(reg_id,reg_pubkey,database)
+            else:
+                remove(reg_id,reg_pubkey,database)
     else:
-        add(reg_id,reg_pubkey,database)
-
+        Log.info("no add xor remove")
 if __name__ == "__main__":
     main()            
            
