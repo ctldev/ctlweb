@@ -12,4 +12,6 @@ class Cluster(models.Model):
         app_label = 'ctlweb'
         verbose_name = _("Cluster")
         verbose_name_plural = _("Cluster")
- 
+    
+    def __unicode__(self):
+        return self.domain

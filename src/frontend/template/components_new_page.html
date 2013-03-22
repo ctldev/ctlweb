@@ -160,7 +160,8 @@
 		</div>
 		<div class="tab-pane" id="component">
 			{% for sc in paged_components.object_list %}
-			  <div class="component" style="display: block; position: static; margin-bottom: 5px;">
+			  <div class="component" 
+				  style="display: block; position: static; margin-bottom: 5px; margin-right: 400px;">
 				<blockquote>
 					  <strong>
 						<a href="{% url component sc.id %}">

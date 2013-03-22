@@ -46,6 +46,9 @@ class Components(models.Model):
         #self.programmer = user.email
         super(Components, self).save(*args, **kwargs)
 
+    def __unicode__(self):
+        return self.name + ' ' + self.version
+
 class Components_Cluster(models.Model):
     component = models.ForeignKey(Components)
     cluster = models.ForeignKey(Cluster)
@@ -56,5 +59,7 @@ class Components_Cluster(models.Model):
         permissions = (
             ("can_see_path", "Can see filepath"),
             ("can_see_code", "Can see code to implement"),)
-
-
+        verbose_name = _("Component - Cluster - Verbindung")
+        verbose_name_plural = _("Component - Cluster - Verbindungen")
+    def __unicode__(self):
+        return str(self.id)

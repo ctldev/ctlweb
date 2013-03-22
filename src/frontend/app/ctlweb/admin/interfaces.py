@@ -2,18 +2,22 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
-from ctlweb.models import Interfaces
-from ctlweb.admin.components import *
+from ctlweb.models import Interfaces, Interfaces_Components
+
+class Components_Inline(admin.StackedInline):
+    model = Interfaces_Components
+    extra = 0
 
 class InterfacesAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('name',)}),
         (_('Description'), {'fields': ('description',)}),
         (_('Key'), {'fields': ('key',)}),
-        (_('Components'), {'fields': ('components',)}),
+#        (_('Components'), {'fields': ('components',)}),
     )
     list_display = ['key', 'name']
     search_fields = ('key', 'name', 'description')
     ordering = ['key']
+    inlines = [Components_Inline,]
 
 admin.site.register(Interfaces, InterfacesAdmin)

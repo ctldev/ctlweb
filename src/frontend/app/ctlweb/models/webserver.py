@@ -13,3 +13,5 @@ class Webserver(models.Model):
         verbose_name = _("Webserver")
         verbose_name_plural = _("Webserver")
 
+    def __unicode__(self):
+        return self.name + u" (" + self.domain + u")"
