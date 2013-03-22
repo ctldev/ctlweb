@@ -57,6 +57,7 @@ Suche
   	{{addform.management_form}}
 	<table id="formset" class="form">
 	  {% for form in addform %}
+	  <tr><td>{{ form.initial.id }}
 	    {% if forloop.first %}
 		  <thead>
 		    <tr>
