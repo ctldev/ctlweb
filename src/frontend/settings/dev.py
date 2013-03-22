@@ -35,6 +35,10 @@ DATABASES = {
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
+PAGINATION_PAGE_RANGE_INTERFACES = 5
+PAGINATION_PAGE_RANGE_COMPONENTS = 5
+PAGINATION_BUTTON_RANGE = 3
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error.

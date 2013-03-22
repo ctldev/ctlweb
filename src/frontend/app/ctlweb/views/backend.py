@@ -95,7 +95,7 @@ def valid_token(token, cluster):
 
 def receive_modules(request, token):
     cluster_ip = _get_client_ip(request)
-    if not valid_token(token, cluster_id):
+    if not valid_token(token, cluster_ip):
         raise Http404
     cluster = Cluster.objects.get(ip=cluster)
     comp_form = ComponentRequestForm(request.POST or None, request.FILES or None)
