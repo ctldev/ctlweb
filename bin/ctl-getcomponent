@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 #Returns registered component of server to web
 
-import os
+from os.path import abspath, dirname
 import sys
 import getopt
 import requests
 
-lib_path = os.getcwd() + "/../lib/backend"
+lib_path = dirname(abspath(__file__)) + "/../lib/backend"
 sys.path.append(lib_path)
+from util import Log
 from database.database import Database 
 from database.web import Web
 
@@ -66,10 +67,10 @@ def main():
                 config_file = a
 
         elif o == "--version":
-            print("ctl version 1.0")
+            usage()
 
         elif o in ("--verbose","-v"):
-            print("verbose",o,a)
+            Log.increase_verbosity()
     
     """config-file auslesen"""
     config = configparser.ConfigParser()

@@ -151,9 +151,9 @@ def add_component(component, config):
 
 #determines the calling commando and returns the class accordingly 
 def find_class():
-    if(sys.arg[0] == "ctl-register"):
+    if(sys.argv[0] == "ctl-register"):
         return User
-    elif(sys.arg[0] == "ctl-web"):
+    elif(sys.argv[0] == "ctl-web"):
         return Web
         
 
