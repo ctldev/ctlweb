@@ -25,7 +25,7 @@ class Database:
         config.read(config_file)
 
         if Database.db_file is None:
-            Database.db_file = config['Backend']['Database']
+            Database.db_file = config.get('BACKEND','Database')
         try:
             Database.db_connection.execute("""SELECT name from sqlite_master
                                                  LIMIT 1""")

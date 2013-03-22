@@ -46,7 +46,7 @@ def main():
             import configparser
             config = configparser.ConfigParser()
             config.read(a)
-            database = Database(config.get('Backend','Database'))
+            database = Database(config.get('BACKEND','Database'))
         elif o in ("-a", "--add"):
             add_set = True
             if(a == None):
