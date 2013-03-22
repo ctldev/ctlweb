@@ -104,8 +104,10 @@ Component list
 		target.innerHTML = xmlhttp.responseText;
 		var arrScripts = target.getElementsByTagName("script");
 		var scriptText = "";
-		for(var i in arrScripts) {
-		  scriptText += arrScripts[i].innerHTML;
+		for(var i=0; i<arrScripts.length; i++) {
+		  if(arrScripts[i].innerHTML !== "undefined") {
+			scriptText += arrScripts[i].innerHTML;
+		  }
 		}
 		if(scriptText.length != 0)  {
 		  eval.call(window, scriptText);
