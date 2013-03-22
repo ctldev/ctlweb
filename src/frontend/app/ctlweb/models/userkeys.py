@@ -24,4 +24,5 @@ class Userkeys(models.Model):
         if User.has_perm('can_ban_user'):
             self.user.is_active=False
 
-
+    def __unicode__(self):
+        return self.key

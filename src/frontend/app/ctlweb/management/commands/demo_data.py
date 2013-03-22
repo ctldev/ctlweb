@@ -99,7 +99,9 @@ class Command(BaseCommand):
         permissions.get(codename="can_see_code").user_set.add(self.user1)
         permissions.get(codename="can_see_code").user_set.add(self.user2)
         permissions.get(codename="can_set_active").user_set.add(self.user1)
-
+        permissions.get(codename="add_group").user_set.add(self.user1)
+        permissions.get(codename="change_user").user_set.add(self.user1)
+        permissions.get(codename="change_group").user_set.add(self.user1)
     def import_components(self):
         self.co1 = Components(name="LU-Zerlegung",
                 brief_description="LU-Zerlegung nach Gauß",
@@ -125,21 +127,28 @@ class Command(BaseCommand):
         self.co4.save()
 
     def import_connections(self):
-        self.i1.components.add(self.co1)
-        self.i1.components.add(self.co2)
-        self.i2.components.add(self.co2)
-        self.i2.components.add(self.co3)
-        self.i3.components.add(self.co4)
+        self.ic1 = Interfaces_Components(interface=self.i1,
+                component=self.co1)
+        self.ic2 = Interfaces_Components(interface=self.i1,
+                component=self.co2)       
+        self.ic3 = Interfaces_Components(interface=self.i2,
+                component=self.co2)       
+        self.ic4 = Interfaces_Components(interface=self.i2,
+                component=self.co3)       
+        self.ic5 = Interfaces_Components(interface=self.i3,
+                component=self.co4)
+        
+        self.ic1.save()
+        self.ic2.save()
+        self.ic3.save()
+        self.ic4.save()
+        self.ic5.save()
 
         self.co1.homeserver.add(self.w1)
         self.co1.homeserver.add(self.w3)
-        self.co1.set_active(self.user1)
         self.co2.homeserver.add(self.w2)
-        self.co2.set_active(self.user1)
         self.co3.homeserver.add(self.w1)
-        self.co3.set_active(self.user1)
         self.co4.homeserver.add(self.w1)
-        self.co4.set_active(self.user1)
 
         self.hc1 = Components_Cluster(cluster=self.cl1,
                 component=self.co1,
@@ -191,3 +200,8 @@ class Command(BaseCommand):
         self.p4.save()
         self.p5.save()
         self.p6.save()
+
+        self.co1.set_active(self.user1)
+        self.co2.set_active(self.user1)
+        self.co3.set_active(self.user1)
+        self.co4.set_active(self.user1)

@@ -11,4 +11,5 @@ class Programmer(models.Model):
         unique_together = ('component', 'email')
         app_label = 'ctlweb'
 
-
+    def __unicode__(self):
+        return self.email
