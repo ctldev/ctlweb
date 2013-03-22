@@ -4,7 +4,8 @@ from django.views.generic.simple import direct_to_template
 from app.ctlweb.views import *
 
 urlpatterns = patterns('app.ctlweb.views',
-        url(r'^$', 'index', name='index'), 
+        url(r'^$', 'index', name='index'),
+        url(r'^admin_index/$', 'admin_index', name='admin_index'),
         url(r'^search/$', 'search', name='search'),
         url(r'^components/$', 'components', name='components'),
         url(r'^components/(?P<comp_id>\d+)/$', 'component_detail', 

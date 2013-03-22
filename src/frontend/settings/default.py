@@ -82,6 +82,7 @@ STATICFILES_FINDERS = (
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
+    'apptemplates.Loader',
 #     'django.template.loaders.eggs.Loader',
 )
 
