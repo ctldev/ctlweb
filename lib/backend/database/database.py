@@ -9,7 +9,7 @@ from log import Log
 from settings import DEFAULT_CONFIG
 
 class Database:
-    """ Every class derived from Database gets it's own table in the database.
+    """ Every class derived from Database get its own table in the database.
     The columns are defined by the instance attributes starting with 'c_'. Only
     attributes in the following type can be stored:
 
@@ -91,7 +91,7 @@ class Database:
 
     @classmethod
     def get_exacly(cls, name):
-        """ Returns exacly one object with the given (unique) name.
+        """ Returns exactly one object with the given (unique) name.
         """
         sql = "SELECT adapter FROM " + cls.__name__ + """
                 WHERE c_id = ?"""
@@ -104,7 +104,7 @@ class Database:
 
     def create_table(self):
         """ Creates a table for the class in which every instance object which
-        stars with 'c_'. For example 'c_id'. This variable can be accessed with
+        starts with 'c_'. For example 'c_id'. This variable can be accessed with
         self["id"]
         """
         import re
@@ -126,7 +126,7 @@ class Database:
 
     def drop_table(self):
         """ Should remove the tables created by the class. Every child of
-        database which stores is's own data should implement this function.
+        database which stores its own data should implement this function.
         """
         Log.debug("Dropping Table %s" % self.__name__)
         cursor = self.db_connection.cursor()
@@ -185,7 +185,7 @@ class Database:
 
 
     def __conform__(self,protocol):
-        """ For creating an generall repräsentation of the class. The
+        """ For creating an general representation of the class. The
         representation looks like the following:
          "c_id=2;c_pubkey=publickey"
          TODO: escaping the strings
@@ -206,7 +206,7 @@ class Database:
 
     @classmethod
     def convert(cls, s):
-        """ Returns an object build out of the string s. This function is used
+        """ Returns an object built out of the string s. This function is used
         by sqlite3
          TODO: registration in sqlite3
          TODO: escaping the strings
