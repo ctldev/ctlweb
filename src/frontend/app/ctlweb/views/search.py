@@ -79,7 +79,6 @@ def search(request):
                 indirect_interfaces = indirect_interfaces | Interfaces.objects.all().filter(components__name__iexact = comp.name)
             indirect_interfaces = indirect_interfaces.distinct()
             searched_interfaces = searched_interfaces.distinct()
-            searched_comps = searched_comps.distinct()
             return lists(request, searched_interfaces, indirect_interfaces,
                     searched_comps, 1)
 #Erstellen des Suchformulars falls keine Suchanfrage vorhanden ist
