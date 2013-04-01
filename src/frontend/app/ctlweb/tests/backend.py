@@ -1,12 +1,17 @@
 # vim: set fileencoding=utf-8
 
 from django.test import TestCase
+from django.utils.unittest import skipIf, skipUnless
+from django.conf import settings
 import paramiko
-from os.path import expanduser
+from os.path import expanduser, abspath, dirname
 from ctlweb.models import Cluster
-from ctlweb.views.backend import request_modules
+from ctlweb.models import Components
+from ctlweb.models import Interfaces
+from ctlweb.views.backend import request_modules, _import_manifest
 
 class BackendTest(TestCase):
+    use_ssh = False
     def setUp(self):
         ip = "127.0.0.1"
         domain = "localhost"
@@ -22,9 +27,27 @@ class BackendTest(TestCase):
             ssh.connect(ip, pkey=sshkey, port=port)
             ssh.close()
         except:
-            self.assertTrue(False, "local SSH-Server running?")
+           print "No local SSH-Connection allowed, skipping"
+           use_ssh = False
+
         cluster = Cluster.objects.create(ip=ip, domain=domain, port=port, key=key)
 
-    def testBackendConnection(self):
-        request_modules(True)
+    @skipIf(use_ssh, "ssh possible")
+    @skipIf(True, "")
+    def testBackendLocal(self):
+        request_modules(ssh=False, pretend=True)
 
+    @skipUnless(use_ssh, "ssh not possible")
+    @skipIf(True, "")
+    def testBackendSSH(self):
+        request_modules(ssh=True, pretend=True)
+
+    def testComponentParser(self):
+        ip = "127.0.0.1"
+        cluster = Cluster.objects.get(ip=ip)
+        filename = dirname(dirname(settings.DJANGO_ROOT)) + "/"
+        filename += "usr/share/doc/ctlweb/example_package.tgz"
+        success = _import_manifest(filename, cluster)
+        self.failUnlessEqual(success, True)
+        self.failUnless(Components.objects.all().values_list())
+        self.failUnless(Interfaces.objects.all().values_list())

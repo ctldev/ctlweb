@@ -5,8 +5,8 @@ import sys
 from os.path import dirname,abspath
 lib_path = dirname(abspath(__file__)) + "/../"
 sys.path.append(lib_path)
-from log import Log
-from settings import DEFAULT_CONFIG
+from util import Log
+from util import DEFAULT_CONFIG
 
 class Database:
     """ Every class derived from Database get its own table in the database.

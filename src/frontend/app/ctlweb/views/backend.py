@@ -6,9 +6,14 @@ import time
 import datetime
 import os
 import zipfile
+import tarfile
 from ConfigParser import SafeConfigParser
 from ctlweb.models import Cluster
 from ctlweb.models import Components
+from ctlweb.models import Components_Cluster
+from ctlweb.models import Interfaces
+from ctlweb.models import Interfaces_Components
+from ctlweb.models import Webserver
 from ctlweb.models import ModuleTokenValidation
 from ctlweb.forms import ComponentRequestForm
 from ctlweb.forms import InterfaceRequestForm
@@ -35,7 +40,7 @@ def _gen_sec_token(domain):
     token = hashlib.sha256(secret + domain + hextime).hexdigest()
     return token
 
-def request_modules(testing=False):
+def request_modules(ssh=True, pretend=False):
     ssh = paramiko.SSHClient()
     cluster = Cluster.objects.all()
 
@@ -49,19 +54,26 @@ def request_modules(testing=False):
         date = date['date_creation__max']
         url_token = _gen_sec_token(domain)
         url = reverse('component_receive', args=[url_token])
-        command = "/home/phipsz/Uni/ctlweb/bin/ctl-getcomponent -a "
+        command = "./ctl-getcomponent -a "
+        if pretend:
+            command += " --pretend"
         if date is not None:
             command += "-u %s -k %s -t %s" % (url, c.key, date)
         else:
             command += "-u %s -k %s" % (url, c.key)
-        ssh.connect(c.domain, pkey=sshkey, port=c.port)
-#        if not testing:
-#            stdin, stdout, stderr = ssh.exec_command(command)
-        stdin, stdout, stderr = ssh.exec_command(command)
-        print stdout.readlines(), stderr.readlines()
+        if ssh:
+            ssh.connect(c.domain, pkey=sshkey, port=c.port)
+            stdin, stdout, stderr = ssh.exec_command(command)
+            error_messages = stderr.readlines()
+            if error_messages:
+                message = 'An error occured while running command over SSH:\n'
+                for line in error_messages:
+                    message += line
+                raise ValueError(message)
+            print stdout.readlines(), stderr.readlines()
 #if no error TODO needed?
-        ModuleTokenValidation.create_token(url_token, c)
-        ssh.close()
+            ModuleTokenValidation.create_token(url_token, c)
+            ssh.close()
 
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', )
@@ -130,33 +142,47 @@ def receive_modules(request, token):
     return render_to_response('receive_components.html', context_instance=context)
 
 def _import_manifest(filename, cluster):
-    if not zipfile.is_zipfile(filename):
-        return False
-    with zipfile.ZipFile(filename, "r") as myzip:
-        settings_file = myzip.open("control")
+#    if not zipfile.is_zipfile(filename):
+#        raise ValueError("File is not a zip")
+#    with zipfile.ZipFile(filename, "r") as myzip:
+    temp_path = '/tmp/'
+    with tarfile.open(filename, 'r:gz') as myzip:
+        settings_file = myzip.extract("control", temp_path)
+        control_file = temp_path + 'control'
         parser = SafeConfigParser()
-        parser.read(settings_file)
+        parser.read(control_file)
 #TODO read settings
         if cluster.domain is not None:
             if cluster.domain == parser.get("DEFAULT", "host"):
                 return False
-        doc_file = myzip.open("doc.txt")
+        doc_file = myzip.extractfile("doc.txt")
         desc = doc_file.read()
         doc_file.close()
-        ci_file = myzip.open(parser.get("DEFAULT", "ci"))
+        ci_name = parser.get('DEFAULT', 'ci')
+        myzip.extract(ci_name, temp_path)
+        ci_file = open(temp_path + ci_name)
         ci = ci_file.read()
         ci_file.close()
         domain = settings.SITE_DOMAIN
         localhost, created = Webserver.objects.get_or_create(domain=domain)
         exe_name = parser.get("DEFAULT", "name")
         exe_hash = parser.get("DEFAULT", "exe_hash")
-        component = Components(name=exe_name, homeserver=localhost,
-                homecluster=cluster, brief_description=desc, description=ci,
-                is_active=True, version=version)
+        path = parser.get('DEFAULT', 'exe')
+        version = "1.0"
+        if parser.has_option('DEFAULT', 'version'):
+            version = parser.get("DEFAULT", "version")
+        component = Components(name=exe_name, brief_description=desc, 
+                description=ci, is_active=True, version=version)
         component.save()
+        component.homeserver.add(localhost)
+        comp_cluster = Components_Cluster(component=component,
+                cluster=cluster, path=path, code=ci)
+        comp_cluster.save()
         interface, created = Interfaces.objects.get_or_create(key=exe_hash)
         interface.save()
-        interface.components.add(component)
-        interface.save()
+        inter_comp = Interfaces_Components(interface=interface,
+                component=component)
+        inter_comp.save()
         # TODO Programmierer gegebenfalls mit einbauen
         return True
+    return False

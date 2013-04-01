@@ -8,14 +8,17 @@ import requests
 
 lib_path = dirname(abspath(__file__)) + "/../lib/backend"
 sys.path.append(lib_path)
-from log import Log
-from database.database import Database 
+from util import Log
+from util import DEFAULT_CONFIG
+from database.component import Component
+from database.database import Database
 from database.web import Web
 
 
 
-opt = "t:au:k:v:c:"
-long_opt = ["version", "verbose=", "timestamp=", "all", "url=", "key=" ]
+opt = "t:au:k:v:c:p:"
+long_opt = ["version", "verbose=", "timestamp=", "all", "url=", "key=",
+"pretend" ]
 max_output_level = 2
 
 def usage():
@@ -25,12 +28,12 @@ def usage():
          \t [-k <pub-key>|--key=<pub-key>]
          \t [-c <ctlconfig-path>]
          \t [-v | --verbose]
+         \t [-p | --pretend]
          \t [--version]""")
          
 def main():
     try:
          opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
-         
     except getopt.GetoptError as err:
         print(err)
         usage()
@@ -39,44 +42,43 @@ def main():
     import configparser
 
     """defaultpath für config_file"""
-    config_file = '/etc/ctlweb.conf'
+    config_file = DEFAULT_CONFIG
 
     key = None
     url = None
+    timestamp = None
     components = []
+    pretend = False
     
     for o, a in opts:
         if o in ("-t", "--timestamp"):
             Log.debug("retrieve components from database")
-            components = Database.get(a)
-            
-
+            timestamp = a
         elif o in ("-a", "--all"):
             Log.debug("retrieve components from database")
-            components = Database.get()
-
         elif o in ("-u", "--url"):
             Log.debug("set url")
             url = a
-
         elif o in ("-k", "--key"):
             Log.debug("set public-key")
             key = a
-
         elif o == "-c":
             if(a != None):
-
                 config_file = a
-
+        elif o in ("-p", "--pretend"):
+            pretend = True
         elif o == "--version":
-            
             #TODO get version
 
             print("ctl version beta 1")
             sys.exit()
-
         elif o in ("--verbose","-v"):
             Log.increase_verbosity()
+    Database(config_file)
+    if timestamp:
+        components = Component.get(timestamp)
+    else:
+        components = Component.get()
     
     """config-file auslesen"""
     config = configparser.ConfigParser()
@@ -85,28 +87,24 @@ def main():
 
     """Check ob URL und Key gesetzt wurden"""
     if(key == None or url == None):
-        
         raise ValueError("No URL set or no given Key")
     
-    else:
-        
-        Log.debug("check public-key")
-        domain = url[url.index(".") + 1 :]
-        domain = domain[0 : domain.index(".")]
+    Log.debug("check public-key")
+    domain = url[url.index(".") + 1 :]
+    domain = domain[0 : domain.index(".")]
 
-        pubkey = Web.get_exact(domain)
-        
-        Log.debug("send postdata to url")
-        if(pubkey == key):
-            i = 0
-            while(i < components.length()):
-                files = {'manifest': (config['manifest_storage'] + components[i] +'.tgz')}
+    pubkey = Web.get_exact(domain)
+    
+    Log.debug("send postdata to url")
+    if(pubkey == key):
+        i = 0
+        while(i < components.length()):
+            files = {'manifest': (config['manifest_storage'] + components[i] +'.tgz')}
+            if not pretend:
                 requests.post(url, files=files)
-                i += 1
-
-        else:
-
-            raise ValueError("wrong public-key")
+            i += 1
+    else:
+        raise ValueError("wrong public-key")
 
     """Alles ordnungsgemäß durchgelaufen"""
     return 0

@@ -8,9 +8,6 @@ from database.user import User
 from database.web import Web
 from settings import DEFAULT_CONFIG
  
-
-
-   
 def hash_file(file, block_size=512):
     import hashlib
     import base64
@@ -120,9 +117,3 @@ def remove(reg_id,reg_pubkey,database):
 def overview(time_since='all'):
     cls = find_class()
     print(get(cls,time_since))
-
-    
-
-
-
-
