@@ -8,9 +8,12 @@ ctl-register \- register a user on a cluster
 .\" ctl-register section
 .br
 .B ctl-register
+.RB [\| \-c
+.IR configfile \|]
 .RB [\| \-a
-.IR id \|]
-.RB [\| \-k
+.IR id \|
+\||\|
+.RB \| \-k
 .IR publickey \|]
 .RB [\| \-r
 .IR id \|]
@@ -21,6 +24,9 @@ ctl-register \- register a user on a cluster
 usually is executed by the ctlweb-system itself in order to register a user on a specific cluster. Under special circumstances, however, it can be issued by a system administrator to manually add a user.
 
 .SH OPTIONS
+.TP
+.BI \-c\  configfile\fR,\ \fI \-\-config-file\fR=\fIconfigfile
+If this option is not given, a default config-file will be used.
 .TP
 .BI \-a\  id\fR,\ \fI \-\-add\fR=\fIid
 Adds the user to a cluster

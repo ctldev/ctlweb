@@ -1,37 +1,42 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH ctl-web 1 "MARCH 1995" Linux "User Manuals"
+.TH ctl-web 1 "January 2013" Linux "User Manuals"
 .SH NAME
 ctl-web \- enables the ctl-webinterface to add users to specific clusters  
 .SH SYNOPSIS
 .br
 .B ctl-web
+.RB [\| \-c
+.IR configfile \|]
 .RB [\| \-a 
-.IR id \|]
-.RB [\| \-k 
+.IR id \|
+\||\|
+.RB \| \-k 
 .IR publickey \|]
 .RB [\| \-r
 .IR id \|]
 .RB [\| \-o \|]
 .SH DESCRIPTION
 .B ctl-web
+does register URLs to a cluster. Of course this command also offers the
+deletion of them.
 .SH OPTIONS
 .TP
+.BI \-c\ configfile \fR,\ \fB\-\-config-file\fR=\fIconfigfile
+If this option is not given, a default config file will be used.
+.TP
 .BI \-a\  id \fR,\ \fB\-\-add= id
-TODO
+Adds the specified URL to the cluster.
 .TP
 .BI \-k\  publickey \fR,\ \fB\-\-key= publickey
-TODO
+Adds the specified Public Key to a cluster.
 .TP
 .BI \-r\  id \fR,\ \fB\-\-remove= id
-TODO
-.TP
-.BI \-a\  id \fR,\ \fB\-\-add= id
-TODO
+Removes the URL with the specified ID.
 .TP
 .BR \-o ", " \-\-overview
-TODO
+Provides an overview over all registered URLS on a cluster
 
 
 .\" .SH FILES
@@ -46,7 +51,7 @@ TODO
 Jörn Hameyer <>
 .SH "SEE ALSO"
 .BR ctl (1),
-.BR foo (5)
+.BR ctl-register (1)
 
 
 
