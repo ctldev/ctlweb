@@ -15,7 +15,7 @@ a.section:link, a.section:visited { color: #666666; }
 {% endblock %}
  
 {% block branding %}
-<h1 id="site-name" > {% trans 'CTLWEB Administration' %}</h1>
+<h1 id="site-name" > <a href ="{% url index %}">CTLWEB </a> Administration</h1>
 {% endblock %}
  
 {% block nav-global %}{% endblock %}
