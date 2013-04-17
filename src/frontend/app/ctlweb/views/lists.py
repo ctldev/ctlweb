@@ -53,6 +53,8 @@ def new_page(request,
           indirect_interfaces=None,
           s_components=None, 
           form=0):
+    """ this method handles the ajax-requests to dynamically reloading the new
+    pages"""
     # form:
     #   0 = Verzeichnis
     #   1 = Suche
@@ -95,6 +97,7 @@ def new_page(request,
     components_page_range = settings.PAGINATION_PAGE_RANGE_COMPONENTS
     button_range = settings.PAGINATION_BUTTON_RANGE
     interfaces = direct_interfaces | indirect_interfaces
+    #get active pages
     inter_page = request.GET.get('di_page', 1)
     if not inter_page == "last":
         try:

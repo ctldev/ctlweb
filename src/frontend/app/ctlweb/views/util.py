@@ -39,6 +39,7 @@ def simple_search(request, searchtext):
             searched_components, 1)
 
 def generate_page_buttons(prefix, page_count, css_class, page, button_range):
+    """generate buttons for pagination"""
     buttons = []
     buttons.append(_generate_button(prefix, "first", css_class, "|&laquo;",
             disabled=(page==1)))
@@ -63,6 +64,7 @@ def generate_page_buttons(prefix, page_count, css_class, page, button_range):
 
 def _generate_button(prefix, page, css_class, value=None, disabled=False,
         active=False):
+    """helper to generate th pagination-buttons"""
     if value == None:
         value = page
     if disabled:
