@@ -88,14 +88,22 @@
           class="dropdown-toggle" 
           data-toggle="dropdown"
           >
-            Profil <b class="caret"></b>
+          {% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}
+          <b class="caret"></b>
           </a>
               <ul class="dropdown-menu">
-          <li> 
-          <a href="{% url logout %}">
-          LogOut
-          </a>
+          <li>
+            <a href="/password_change">
+              Change Password 
+            </a>
           </li>
+
+          <li>
+            <a href="{% url logout %}">
+            LogOut
+            </a>
+          </li>
+          
         </li>
         </ul>
           {% else %}
