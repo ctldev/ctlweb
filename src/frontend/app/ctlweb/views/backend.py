@@ -26,6 +26,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 class CTLMissingHostKeyPolicy(paramiko.MissingHostKeyPolicy):
+    """Accepting those Keys that are placed in the Database"""
     def missing_host_key(self, client, hostname, key):
         q_query = (Q(ip__exact=hostname)|Q(domain__exact=hostname))
         query = Cluster.objects.filter(q_query)
@@ -35,16 +36,19 @@ class CTLMissingHostKeyPolicy(paramiko.MissingHostKeyPolicy):
         raise SSHException('Unknown server %s' % hostname)
 
 def _gen_sec_token(domain):
+    """generate a secure Token to not let everybody contribute fake Modules"""
     secret = settings.SECRET_KEY
     hextime = '%08x' % time.time()
     token = hashlib.sha256(secret + domain + hextime).hexdigest()
     return token
 
 def request_modules(ssh=True, pretend=False):
+    """request all Modules of all Clusters of the Database"""
     ssh = paramiko.SSHClient()
     cluster = Cluster.objects.all()
 
     for c in cluster:
+        #paramiko-based commands
         sshkey = paramiko.PKey(data=c.key)
         ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
         domain = c.domain
@@ -55,12 +59,15 @@ def request_modules(ssh=True, pretend=False):
         url_token = _gen_sec_token(domain)
         url = reverse('component_receive', args=[url_token])
         command = "./ctl-getcomponent -a "
+        #append --pretend for testing
         if pretend:
             command += " --pretend"
+        # append date if database is not empty to get only latest results
         if date is not None:
             command += "-u %s -k %s -t %s" % (url, c.key, date)
         else:
             command += "-u %s -k %s" % (url, c.key)
+        # use ssh for testing if enabled, ssh is also used normally
         if ssh:
             ssh.connect(c.domain, pkey=sshkey, port=c.port)
             stdin, stdout, stderr = ssh.exec_command(command)
@@ -100,6 +107,7 @@ def _get_client_ip(request):
     return ip
 
 def valid_token(token, cluster):
+    """test if a given token is valid for the given cluster"""
     try:
         token_db = ModuleTokenValidation.objects.get(token=token)
     except ModuleTokenValidation.DoesNotExist:
@@ -107,6 +115,7 @@ def valid_token(token, cluster):
     return token_db.is_valid(cluster)
 
 def receive_modules(request, token):
+    """handle incoming POST-request to receive modules"""
     cluster_ip = _get_client_ip(request)
     if not valid_token(token, cluster_ip):
         raise Http404
@@ -115,6 +124,7 @@ def receive_modules(request, token):
     interface_form = InterfaceRequestForm(request.POST or None)
     file_success = False
     interface_success = False
+    #handle interface-form
     if interface_form.is_valid():
         clean_data = interface_form.cleaned_data
         name = clean_data["name"]
@@ -123,6 +133,7 @@ def receive_modules(request, token):
         interface = Interface(name=name, description=description, key=key)
         interface.save()
         interface_success = True
+    #handle component-form
     if comp_form.is_valid():
         date = datetime.datetime.today()
         date = datetime.datetime.strftime(date, '%s')
@@ -142,16 +153,13 @@ def receive_modules(request, token):
     return render_to_response('receive_components.html', context_instance=context)
 
 def _import_manifest(filename, cluster):
-#    if not zipfile.is_zipfile(filename):
-#        raise ValueError("File is not a zip")
-#    with zipfile.ZipFile(filename, "r") as myzip:
+    """handle the uploaded module-file, return True on succes, else False"""
     temp_path = '/tmp/'
     with tarfile.open(filename, 'r:gz') as myzip:
         settings_file = myzip.extract("control", temp_path)
         control_file = temp_path + 'control'
         parser = SafeConfigParser()
         parser.read(control_file)
-#TODO read settings
         if cluster.domain is not None:
             if cluster.domain == parser.get("DEFAULT", "host"):
                 return False

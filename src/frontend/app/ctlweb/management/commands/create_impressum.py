@@ -3,16 +3,21 @@
 from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
+    """Befehl zur Erstellung eines individuellen Impressums. Es werden auf der
+    Kommandozeile einige Daten abgefragt. Dabei sind einige optional und können
+    leer sein, während andere angegeben werden müssen. Diese werden solange 
+    abgefragt bis etwas eingegeben wurde."""
+
     option_list = BaseCommand.option_list + ()
     def handle(self, *args, **options):
-        self.get_input()
-
-    def get_input(self):
+#Deklarierung der Variablen, die auf Leere überpüft werden und deswegen einen
+#leeren String brauchen.
         org_name = org_street = org_city = admin_name = ""
-        print admin_name
-        print org_name
+#Angaben die nicht leer sein dürfen werden mit while Schleifen darauf geprüft,
+#sodass sie so lange abgefragt werden bis sie nicht leer sind.
         while (org_name==""):
             print "Geben Sie bitte die Daten Ihrer Betreiberfirma/Betreiberorganisation an: "
+#Verwendung von raw_input zur Vermeidung von Kompatibiltätsproblemen
             org_name = raw_input("Eingabe: ")
         print "Geben Sie bitte eine Unterabteilung ein, falls zutreffend."
         org_part = raw_input("Eingabe: ")
@@ -33,9 +38,11 @@ class Command(BaseCommand):
         admin_tel = raw_input("Eingabe: ")
         print "Geben Sie bitte die E-Mail Addresse des Betreuers an."
         admin_mail = raw_input("Eingabe: ")
+#Start der Generierung des HTML-Codes des Impressum
         impressum_string = \
             "<p><h4>Betreiber</p></h4> \n" \
             + org_name + "</br> \n"
+#Optionale Angaben werden ignoriert wenn dazugehörige Variable leerer String.
         if (org_part != ""):
             impressum_string = impressum_string + org_part + "</br> \n"
         impressum_string = impressum_string \
@@ -43,6 +50,7 @@ class Command(BaseCommand):
             + "Tel.: " + org_tel + "</br> \n" + "Fax: " + org_fax + \
             "</br> </p> \n \n"  + "<p><h4>Zuständiger Bearbeiter</h4> \n" \
             + admin_name + "</br> \n" + admin_tel + "</br> \n" + admin_mail \
+#Rechtliche Hinweise immer gleich.
             + "</p> <br/> <br/> \
             <p><strong>Haftung für Inhalte</strong></p> \
             Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. \
@@ -94,10 +102,7 @@ class Command(BaseCommand):
             Die Betreiber der Seiten behalten sich ausdrücklich rechtliche Schritte \
             im Falle der unverlangten Zusendung von Werbeinformationen, etwa durch Spam-Mails, \
             vor.<br />"
-        self.write_impressum(impressum_string)
-
-        
-    def write_impressum(self, text):
+#Schreiben des String der den HTML-Code enthält.
         impressum_file = open("./template/impressum_personal.html","w")
-        impressum_file.write(text)
+        impressum_file.write(impressum_string)
         impressum_file.close()
