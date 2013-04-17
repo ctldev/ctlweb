@@ -102,6 +102,7 @@ class Command(BaseCommand):
         permissions.get(codename="add_group").user_set.add(self.user1)
         permissions.get(codename="change_user").user_set.add(self.user1)
         permissions.get(codename="change_group").user_set.add(self.user1)
+    
     def import_components(self):
         self.co1 = Components(name="LU-Zerlegung",
                 brief_description="LU-Zerlegung nach Gauß",

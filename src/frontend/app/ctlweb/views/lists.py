@@ -15,6 +15,10 @@ def lists(request,
           indirect_interfaces=None,
           s_components=None, 
           form=0):
+    """
+    Die Methode stellt die äußere Form der Componentdarstellungsseiten dar.
+
+    """
     # form:
     #   0 = Verzeichnis
     #   1 = Suche
@@ -28,23 +32,9 @@ def lists(request,
     emails = Programmer.objects.distinct('email').values_list('email')
     u_programmer = User.objects.filter(email__in=emails)
     dict_response = dict()
-#    emails = ""
-#    if components is not None:
-#        emails = Programmer.objects.filter(component__in=components).\
-#                distinct('email').values_list('email')
-#TODO Überarbeiten
-#    if direct_interfaces is not None:
-#        for d in direct_interfaces:
-#            i_components[d.pk] = Components.objects.filter(\
-#                    component__interfaces = d)
-#            emails += Programmer.objects.\
-#                    filter(component__in=i_components[d.pk]).\
-#                    distinct('email').values_list('email')
-#    userlist= User.objects.filter(email__in=emails)
     dict_response["user"] = v_user
     dict_response["form"] = form
     dict_response["post_data"] = request.POST.urlencode()
-#    dict_response["users"] = userlist
     context = RequestContext(request, dict_response)
     return render_to_response("components.html", context_instance=context)
 
@@ -80,24 +70,12 @@ def new_page(request,
         s_components = s_components.order_by('name')
     if form == 0:
         direct_interfaces = Interfaces.objects.all().order_by('name')
-#    emails = ""
-#    if components is not None:
-#        emails = Programmer.objects.filter(component__in=components).\
-#                distinct('email').values_list('email')
-#TODO Überarbeiten
-#    if direct_interfaces is not None:
-#        for d in direct_interfaces:
-#            i_components[d.pk] = Components.objects.filter(\
-#                    component__interfaces = d)
-#            emails += Programmer.objects.\
-#                    filter(component__in=i_components[d.pk]).\
-#                    distinct('email').values_list('email')
-#    userlist= User.objects.filter(email__in=emails)
     interface_page_range = settings.PAGINATION_PAGE_RANGE_INTERFACES
     components_page_range = settings.PAGINATION_PAGE_RANGE_COMPONENTS
     button_range = settings.PAGINATION_BUTTON_RANGE
     interfaces = direct_interfaces | indirect_interfaces
-    #get active pages
+
+    # get active pagenumbers
     inter_page = request.GET.get('di_page', 1)
     if not inter_page == "last":
         try:
@@ -152,7 +130,6 @@ def new_page(request,
         s_paged_components = pn_comp.page(s_comp_page)
     except (EmptyPage, InvalidPage):
         s_paged_components = pn_comp.page(pn_comp.num_pages)
-    print [i for i in s_paged_components.object_list]
     s_components_page_buttons = util.generate_page_buttons("co_button_",
             pn_comp.num_pages, "co_page", s_comp_page, button_range)
     view = request.GET.get('view', '')
@@ -168,7 +145,6 @@ def new_page(request,
     dict_response["programmer"] = programmer
     dict_response["u_programmer"] = u_programmer
     dict_response["view"] = view
-#    dict_response["users"] = userlist
     context = RequestContext(request, dict_response)
     return render_to_response("components_new_page.html",
             context_instance=context)

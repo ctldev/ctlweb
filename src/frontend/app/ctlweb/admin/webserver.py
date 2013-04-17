@@ -5,6 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from ctlweb.models import Webserver
 
 class WebserverAdmin(admin.ModelAdmin):
+    """
+    Umfasst die Webservereinstellungen fürs Backend
+
+    """
     fieldsets = (
             (None, {'fields': ('name', 'domain')}),
             (_('Informations'), {'fields': ('ip',  'port')}),

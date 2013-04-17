@@ -5,6 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from ctlweb.models.components import *
 
 class Interfaces(models.Model):
+    """
+    Repräsentiert die Interfaces
+
+    """
     name = models.CharField(_("Name"), max_length=100, unique="True")
     description = models.TextField(_("Beschreibung"))
     components = models.ManyToManyField(Components,
@@ -21,6 +25,10 @@ class Interfaces(models.Model):
         return self.name
 
 class Interfaces_Components(models.Model):
+    """
+    Erstellt eine Verbindung zwischen Interfaces und Components.
+
+    """
     interface = models.ForeignKey(Interfaces)
     component = models.ForeignKey(Components)
     class Meta:

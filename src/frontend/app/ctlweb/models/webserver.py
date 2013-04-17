@@ -3,6 +3,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 class Webserver(models.Model):
+    """
+    Repräsentiert die Webserver
+
+    """
     name = models.CharField(_("Name"), max_length=255)
     ip = models.IPAddressField(_("IP"), null="True")
     domain = models.CharField(_("Domain"), max_length=100 ,null="True")
