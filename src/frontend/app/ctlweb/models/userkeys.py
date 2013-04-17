@@ -4,6 +4,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 class Userkeys(models.Model):
+    """
+    Repräsentiert die Userkeys
+    Stellt Methoden zur Verfügung um User zu blocken (set_inactive)
+    bzw. wieder zu aktivieren (set_active).
+
+    """
     user = models.ForeignKey(User, verbose_name=_("User"))
     key = models.TextField(_(u"Schlüssel"))
     class Meta:

@@ -8,6 +8,11 @@ from ctlweb.models.webserver import *
 from ctlweb.models.cluster import *
 
 class Components(models.Model):
+    """
+    Repräsentiert die Components
+    Stellt die Methoden set_active und set_inactive zur Verfügung.
+
+    """
     name = models.CharField(_("Name"), max_length=100, unique="True")
     homeserver = models.ManyToManyField(Webserver, 
                                         verbose_name=_("Ursprungsserver"))
@@ -50,10 +55,17 @@ class Components(models.Model):
         return self.name + ' ' + self.version
 
 class Components_Cluster(models.Model):
+    """
+    Erstellt die Verbindungsklasse zwischen den Components und den Clustern.
+    Das code-Attribut stellt dabei den Quellcode der Component dar, während
+    ctl den Befehl zur Ausführung speichert.
+
+    """
     component = models.ForeignKey(Components)
     cluster = models.ForeignKey(Cluster)
     path = models.TextField(_("Pfad"))
-    code = models.TextField(_("Implementierungscode"))
+    code = models.TextField(_("Quellcode"))
+    ctl = models.TextField(_("CTL-Befehl"))  # Beim Speichern generiert
     class Meta:
         app_label = 'ctlweb'
         permissions = (
@@ -61,5 +73,18 @@ class Components_Cluster(models.Model):
             ("can_see_code", "Can see code to implement"),)
         verbose_name = _("Component - Cluster - Verbindung")
         verbose_name_plural = _("Component - Cluster - Verbindungen")
+
+    def __create_ctl(self):
+        """ return String
+        Generiert den CTL-Befehl
+
+        """
+        #TODO
+        return ""
+    
+    def save(self, *args, **kwargs):
+        self.ctl = self.__create_ctl()
+        super(Components_Cluster, self).save(*args, **kwargs)
+
     def __unicode__(self):
         return str(self.id)

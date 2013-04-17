@@ -5,6 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from ctlweb.models.components import *
 
 class Programmer(models.Model):
+    """
+    Repräsentiert die Programmierer
+
+    """
     component = models.ForeignKey(Components)
     email = models.EmailField(_("Programmierer"))
     class Meta:

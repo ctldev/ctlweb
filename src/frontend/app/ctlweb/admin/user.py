@@ -29,12 +29,12 @@ def set_non_staff(modeladmin, request, queryset):
     set_non_staff.short_description = _("Benutzer "+\
             "Redakteurrechte entziehen")
 
-def set_admin(modeladmin, request, queryset):
+def set_superuser(modeladmin, request, queryset):
     if request.user.is_superuser:
         queryset.update(is_superuser=True, is_staff=True, is_active=True)
     set_admin.short_description = _("Benutzer Adminrechte geben")
 
-def set_non_admin(modeladmin, request, queryset):
+def set_non_superuser(modeladmin, request, queryset):
     if request.user.is_superuser:
         admins = User.objects.filter(is_superuser=True).count()
         if admins > queryset.count():
@@ -42,6 +42,10 @@ def set_non_admin(modeladmin, request, queryset):
     set_non_admin.short_description = _("Benutzer Adminrechte entziehen")
 
 class CtlwebUserAdmin(UserAdmin):
+    """
+    Fügt dem Backend weitere Usereinstellungen hinzu
+
+    """
     readonly_fields=('last_login', 'date_joined')
     list_display = ['username', 
                     'first_name',
@@ -53,8 +57,8 @@ class CtlwebUserAdmin(UserAdmin):
                 set_inactive, 
                 set_staff, 
                 set_non_staff,
-                set_admin,
-                set_non_admin,
+                set_superuser,
+                set_non_superuser,
               ]
 
 admin.site.unregister(User)

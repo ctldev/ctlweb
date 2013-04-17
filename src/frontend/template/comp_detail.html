@@ -117,7 +117,17 @@ Cluster:
 		<div class="accordion-inner">
 		  {% for h in hc.components_cluster_set.all %}
 			{% if h.component = component %}
-			  <table>
+			    <table>
+				{% if user.is_authenticated %}
+				  <tr>
+				    <td>
+					CTL-Befehl:
+				    </td>
+				    <td>
+					{{ h.ctl }}
+				    </td>
+				  </tr>
+				{% endif %} 
 				{% if see_path %}
 				  <tr>
 					<td> 

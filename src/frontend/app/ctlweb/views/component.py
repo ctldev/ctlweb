@@ -12,6 +12,10 @@ from ctlweb.models import   Components, \
                             Programmer
 
 def component_detail(request, comp_id):
+    """
+    Übergibt die Componentdaten ans entsprechende Template weiter
+    
+    """
     v_user = request.user
     try:
         comp = Components.objects.get(pk=comp_id)
@@ -22,13 +26,7 @@ def component_detail(request, comp_id):
     interface = Interfaces.objects.filter(components = comp)
     emails = Programmer.objects.filter(component = comp).\
             distinct('email')
-#    print "Programmer"
-#    for e in emails:
-#        print e.email
     userlist = User.objects.filter(email__in=emails.values_list('email'))
-#    print "User"
-#    for u in userlist:
-#        print u.email
 
     can_change = v_user.has_perm('ctlweb.change_components')
     see_path = v_user.has_perm('ctlweb.can_see_path')

@@ -31,6 +31,10 @@ class Programmer_Inline(admin.StackedInline):
     extra = 0
 
 class ComponentsAdmin(admin.ModelAdmin):
+    """
+    Umfasst die Componenteinstellungen fürs Backend
+
+    """
     fieldsets = (
         (None, {'fields': ('name', 'version', 'is_active')}),
         (_('Description'), {'fields': ('brief_description', 'description')}),

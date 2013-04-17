@@ -9,11 +9,14 @@ class Components_Inline(admin.StackedInline):
     extra = 0
 
 class InterfacesAdmin(admin.ModelAdmin):
+    """
+    Umfasst die Interfaceeinstellungen fürs Backend
+
+    """
     fieldsets = (
         (None, {'fields': ('name',)}),
         (_('Description'), {'fields': ('description',)}),
         (_('Key'), {'fields': ('key',)}),
-#        (_('Components'), {'fields': ('components',)}),
     )
     list_display = ['key', 'name']
     search_fields = ('key', 'name', 'description')
