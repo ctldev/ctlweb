@@ -9,6 +9,7 @@ from log import Log
 from util import find_class
 from util import add
 from util import remove
+from util import overview
 from database.database import Database
 from database.user import User
 
@@ -83,7 +84,7 @@ def main():
             print("removing",o,a)
 
         elif o in ("-o", "--overview"):
-            overview_set = true
+            overview_set = True
             print("overview",o,a)
 
         elif o in ("-v", "--verbose"):
@@ -108,7 +109,7 @@ def main():
     #TODO unsicher, ob add+overview erlaubt sein soll    
     elif required != 2 and overview_set:
         Log.debug("Switching to overview context")
-        overview()
+        overview(database)
     else:
         Log.debug("No option has been given, Aborting")
         exit(1)

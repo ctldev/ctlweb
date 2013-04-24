@@ -6,7 +6,7 @@ sys.path.append(lib_path)
 from database.database import Database
 from database.user import User
 from database.web import Web
-from settings import DEFAULT_CONFIG
+from util.settings import DEFAULT_CONFIG
  
 def hash_file(file, block_size=512):
     import hashlib
