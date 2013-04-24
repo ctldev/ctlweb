@@ -70,8 +70,7 @@ def search(request):
                         searched_comps = search_comps(searchtext, bind, 
                                 category, searched_comps)
 #Entfernen der inaktiven Components aus dem Suchergebnis
-            searched_comps = searched_comps.exclude(is_active__icontains =
-            "False")
+            searched_comps = searched_comps.exclude(is_active = False)
 #Bestimmen der Interfaces, die nicht gefunden wurden, aber zu gefundenen
 #aber zu gefundenen Komponenten gehören
             indirect_interfaces = Interfaces.objects.none()

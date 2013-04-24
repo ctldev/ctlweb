@@ -68,6 +68,7 @@ def new_page(request,
         s_components = Components.objects.none()
     else :
         s_components = s_components.order_by('name')
+    s_components = s_components.exclude(is_active=False)
     if form == 0:
         direct_interfaces = Interfaces.objects.all().order_by('name')
     interface_page_range = settings.PAGINATION_PAGE_RANGE_INTERFACES
@@ -102,6 +103,7 @@ def new_page(request,
             for c in inter.components.all():
                 if c not in s_components:
                     components = components.exclude(pk=c.pk)
+        components = components.exclude(is_active=False)
         pn_comp = Paginator(components, components_page_range)
         if comp_page == "last":
             comp_page = pn_comp.num_pages
