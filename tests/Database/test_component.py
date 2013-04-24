@@ -20,7 +20,7 @@ class TestComponent(unittest.TestCase):
         Database.db_file = "test.db" # DB File for Testcase without config
         Log.streamoutput()
 #       Instance objects
-        self.comp = Component("name","/path/to/exe","/path/to/ci")
+        self.comp = Component("name","/path/to/exe","/path/to/manifest")
         self.connection = Database.db_connection
         self.cursor = self.connection.cursor()
 
@@ -58,7 +58,7 @@ class TestComponent(unittest.TestCase):
         self.comp.create_table()
         self.assertEqual(self.comp["c_id"], "name" )
         self.assertEqual(self.comp["c_exe"], "/path/to/exe" )
-        self.assertEqual(self.comp["c_ci"], "/path/to/ci" )
+        self.assertEqual(self.comp["c_manifest"], "/path/to/manifest" )
         try:
             self.comp["db_file"]
             self.assertTrue(false, "Got access to wrong variable")
@@ -76,7 +76,7 @@ class TestComponent(unittest.TestCase):
                 msg="Caught the following attributes: %s"%attrs)
         self.assertTrue("c_exe" in attrs ,
                 msg="Caught the following attributes: %s" % attrs)
-        self.assertTrue("c_ci" in attrs ,
+        self.assertTrue("c_manifest" in attrs ,
                 msg="Caught the following attributes: %s" % attrs)
         self.assertFalse("__doc__" in attrs,
                 msg="Caught __doc__ attribute which is wrong")
@@ -97,20 +97,19 @@ class TestComponent(unittest.TestCase):
         res = cursor.fetchone()
         self.assertIsNotNone(res, "Could not read test data from db.")
         res = tuple(res)
-        self.assertEqual(res[4], "name", "Got unexpected data")
-        self.assertEqual(res[3], "/path/to/exe", "Got unexpected data")
-        self.assertEqual(res[2], "/path/to/ci", "Got unexpected data")
+        self.assertEqual(res[3], "name", "Got unexpected data")
+        self.assertEqual(res[2], "/path/to/exe", "Got unexpected data")
+        self.assertEqual(res[4], "/path/to/manifest", "Got unexpected data")
         #updatecheck
         self.comp.c_exe = "updatedexe"
         self.comp.save()
         cursor.execute("SELECT * FROM Component;")
         res = cursor.fetchone()
         res = tuple(res)
-        self.assertEqual(res[3], "updatedexe", 
+        self.assertEqual(res[2], "updatedexe", 
                 "Seems not to be updated correctly")
 
     def test_remove(self):
-        self.comp.create_table()
         self.comp.save()
         self.comp.remove()
         self.cursor.execute("""SELECT * FROM Component
@@ -123,7 +122,8 @@ class TestComponent(unittest.TestCase):
         """
         self.comp.create_table()
         repr = self.comp.__conform__(sqlite3.PrepareProtocol)
-        self.assertEqual(repr, "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci",
+        self.assertEqual(repr,
+                "c_manifest=/path/to/manifest;c_id=name;c_exe=/path/to/exe",
                 msg="Error in generation of representation")
 
     def test_convert(self):
@@ -131,7 +131,7 @@ class TestComponent(unittest.TestCase):
         rebuild.
         """
         self.comp.create_table()
-        repr =  "c_id=name;c_exe=/path/to/exe;c_ci=/path/to/ci"
+        repr =  "c_id=name;c_exe=/path/to/exe;c_manifest=/path/to/manifest"
         comp = Component.convert(repr)
         self.assertEqual(comp, self.comp)
 

@@ -5,10 +5,9 @@ import getopt
 from os.path import dirname,abspath
 lib_path = dirname(abspath(__file__))  + "/../lib/backend"
 sys.path.append(lib_path)
-from log import Log
-from util import find_class
-from util import add
-from util import remove
+from util import Log
+from util.util import add
+from util.util import remove
 from database.database import Database
 from database.user import User
 
