@@ -7,12 +7,12 @@ import os
 
 lib_path = os.getcwd() + "/../lib/backend"
 sys.path.append( lib_path )
-from log import Log
-from util import hash_file
-from settings import DEFAULT_CONFIG
-from util import add_component
-from database.database import Database
-from database.component import Component
+from util.log import Log
+from util.util import hash_file
+from util.util import add_component
+from util.settings import DEFAULT_CONFIG
+from database import Database
+from database import Component
 from database.database import NoSuchTable
 from database.database import DatabaseNotFound
 
