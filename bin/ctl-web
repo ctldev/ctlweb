@@ -9,6 +9,7 @@ sys.path.append( lib_path )
 from util import Log
 from util.util import add
 from util.util import remove
+from util.util import overview
 from database.database import Database
 from database.web import Web
  
@@ -20,6 +21,7 @@ max_output_level = 2
 def usage():
     print("Usage:", sys.argv[0], """[-c <database>| --config=<database>]
          \t [-a <id>| --a=<id>] 
+         \t [-v | --verbose]  
          \t [-k <public key> --key=<public key>]
          \t [-r <reg_id> | --remove=<reg_id>]
          \t [-o | --overview] """)
@@ -78,8 +80,9 @@ def main():
                 required += 1
                 reg_id = a
                 print("pub_id",o,a)
-                logging.info(str(a) + "wir als id geloescht")
-    
+                Log.info(str(a) + "wir als id geloescht")
+        elif o in ("-o","--overview"):
+            overview(a)
     if(add_set != remove_set ):            
         if(required != 2 ):
             Log.info(" " +str(required)+ " ")
