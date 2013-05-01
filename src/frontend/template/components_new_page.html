@@ -1,11 +1,14 @@
+{% load i18n %}
 <br/>
 {% if not form == 1 %}
 <div class="page-header">
   <h1>
-	Verzeichnis
+	{% trans "Verzeichnis" %}
   </h1>
   <blockquote>
+	{% blocktrans %} 
 	Eine Auflistung aller Interfaces und ihrer zugehörigen Komponenten
+	{% endblocktrans %}
   </blockquote>
 </div>
 {% endif %}
@@ -15,25 +18,24 @@
 	Suchergebnisse
   </h1>
   <blockquote>
-	Alle direkten und indirekten Ergebnisse für
+	{% trans "Alle direkten und indirekten Ergebnisse für " %}
 	{% if searchquery %}
 	  {{ searchquery }}.
 	{% else %}
-	  die Suche.
+	  {% trans "die Suche." %}
 	{% endif %}
-	{# TODO: Suchwortparameter #}
   </blockquote>
 </div>
 	<div class="tabbable">
 	  <ul class="nav nav-tabs" id="viewSelection">
 		<li class="active">
 		  <a href="#interface" data-toggle="tab" id="viewInterface">
-			Interface
+			{% trans "Interfaces" %}
 		  </a>
 		</li>
 		<li>
 		  <a href="#component" data-toggle="tab" id="viewComponent">
-			Components
+			{% trans "Components" %}
 		  </a>
 		</li>
 	  </ul>
@@ -44,7 +46,7 @@
 <div class="tabbable tabs-left"> 
   {# Only required for left/right tabs #}
 			<ul class="nav nav-tabs" id="interfaceList">
-			  <center><b>Interfaces</b></center>
+			  <center><b>{% trans "Interfaces" %}</b></center>
 			  {% for di in interfaces.object_list %}
 				<li>
 				  {% if di.is_direct %}
@@ -76,9 +78,12 @@
 				  <center>
 					<b>
 					{% if not di.is_direct %}
-					  Gefundene
+					  {% trans "Gefundene" %}
 					{% endif %}
-					Komponenten von {{ di.name }}</b>
+					  {% blocktrans with name=di.name %} 
+						Komponenten von {{ name }} 
+					  {% endblocktrans %}
+					</b>
 				  </center>
 				  {% for c in di.paged_components.object_list %}
 					{% if c in search_components or di.is_direct %}
@@ -92,7 +97,13 @@
 					  </strong>
 						<small>
 						  {{ c.brief_description }} <br />
-						  <u>Programmierer:</u> 
+						  <u>
+							{% blocktrans count counter=programmer|length %}
+							  Programmierer:
+							{% plural %}
+							  Programmierer:
+							{% endblocktrans %}
+						  </u> 
 						  {% for pro in programmer %}
 							{% if pro.component == c %}
 							  {% if pro.email in u_programmer.email %}
@@ -188,7 +199,13 @@
 					  </strong>
 					<small>
 				{{ sc.brief_description }} <br />
-				  <u>Programmierer:</u> 
+				  <u>
+					{% blocktrans count counter=programmer|length %}
+					  Programmierer:
+					{% plural %}
+					  Programmierer:
+					{% endblocktrans %}
+				  </u> 
 				  {% for pro in programmer %}
 					{% if pro.component == sc %}
 					  {% if pro.email in u_programmer.email %}
