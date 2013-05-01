@@ -1,6 +1,6 @@
 {% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8">
 	<title>
@@ -32,6 +32,16 @@
 	data-spy="scroll" 
 	data-target=".navbar"
   >
+
+
+    {% comment %}
+    -----------------------------------------------------
+    Top Navigation Bar - made possible with Bootstrap 
+    ----------------------------------------------------
+    {% endcomment %}
+
+
+
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -55,17 +65,17 @@
 			  </li>
 			  <li>
 			    <a href="{% url components %}">
-				  Verzeichnis
+				    {% trans "Verzeichnis" %}
 			    </a>
 			  </li>
         <li class="administration">
         <a href="/admin">
-        Administration
+		{% trans "Administration" %}
         </a>
         </li>
 			  <li>
 				<a href="{% url impressum %}">
-				  Impressum
+					{% trans "Impressum" %}
 				</a>
 			  </li>
 			</ul>
@@ -73,16 +83,29 @@
 			<form class="navbar-search pull-right" action="/">
               <ul class="nav pull-right">  
       		    <li>
-      			  <input name="search_query" type="text" class="search-query" placeholder="Suche">
+      			  <input name="search_query" type="text"
+			  class="search-query" placeholder={% trans "Suche"%}>
       		    </li>
       		    <li>
 			      <a href="{% url search %}">
-				    Erweiterte Suche
+				      {% trans "Erweiterte Suche" %}
 				  </a>
 			    </li>
 
+
+        {% comment %}
+        ------------------------------------------------------------
+        If user is authenticated, account functions (change Password / Logout) are possible
+        ------------------------------------------------------------
+        {% endcomment %}
+
+
           {% if user.is_authenticated %}
-			    <li class="dropdown">
+			    
+
+          {# Bootstrap's "dropdown" - menu funtionality #} 
+
+          <li class="dropdown">
           <a 
           href="{{ user.id }}" 
           class="dropdown-toggle" 
@@ -94,29 +117,36 @@
               <ul class="dropdown-menu">
           <li>
             <a href="/password_change">
-              Change Password 
+		    {% trans "Passwort ändern" %} 
             </a>
           </li>
 
           <li>
             <a href="{% url logout %}">
-            LogOut
+		    {% trans "LogOut" %}
             </a>
           </li>
           
         </li>
         </ul>
+
+        {% comment %}
+        ------------------------------------------------------------
+        If user isn't authenticated, login/register is made possible
+        ------------------------------------------------------------
+        {% endcomment %}
+
           {% else %}
           <li>
 			      <a href="{% url login %}">
-				    Login
+				      {% trans "Login" %}
 			      </a>
 			    </li>
           
 
 			    <li>
 			      <a href="{% url registration_register %}">
-				    Registrieren
+				      {% trans "Registrieren" %}
 				  </a>
 			    </li>
           {% endif %}
@@ -127,26 +157,30 @@
       </div>
     </div>
 
-    <div id="messages">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-			<a class="close" data-dismiss="alert" href="#">
-			  <!--×-->&times;
-			</a>
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    </div>
+
+        {% comment %}
+        ------------------------------------------------------------
+        Bootstrap's "container" functionality, to layout spaces of a page 
+        ------------------------------------------------------------
+        {% endcomment %}
 
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span1">
-          
-                  <!--Sidebar content-->
+            
+        {# Left space: Empty, as left side bar #}
+
+                
         </div>
         <div class="span10">
+
+        {% comment %}
+        Actual responsible space for showing the main content: 
+        External content from other templates are being integrated by Django-tags 
+        ""{% block content %}{% endblock %}""
+        {% endcomment %}
+          
+
           {% block content %}
           {% endblock %}  
         </div>

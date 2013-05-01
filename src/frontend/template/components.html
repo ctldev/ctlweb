@@ -5,6 +5,7 @@ Component list
 {% block headextra %}
 <script type="text/javascript">
   function getValueOfGET(key) {
+	{# get value of a GET-parameter #}
 	key = escape(key);
 	var kvp = document.location.search.substr(1).split('&');
 	var i = kvp.length;
@@ -19,10 +20,13 @@ Component list
   }
 
   function getModifiedUrlByGet(key, value) {
+	{# return modified current url #}
 	return getModifiedUrl(document.location.search, key, value);
   }
 
   function getModifiedUrl(url, key, value) {
+	{# return modified given url, change value of given key to value #}
+	{# change button-chars to text for further handling #}
 	if(value == "»") {
 	  value = "next";
 	}
@@ -35,12 +39,15 @@ Component list
 	else if(value == "|«") {
 	  value = "first";
 	}
+	{# escape key and value to prevent html-injections #}
 	key = escape(key);
 	value = escape(value);
+	{# retrieve GET-parameter #}
 	var kvp = url.substr(1).split('&');
 	var i = kvp.length;
 	var x;
 	var replaced = false;
+	{# cycle parameter, change value of given key if found #}
 	while(i--) {
 	  x = kvp[i].split('=');
 	  if(x[0] == key) {
@@ -50,9 +57,11 @@ Component list
 		continue;
 	  }
 	}
+	{# if key has not been found, append key-value pair to list #}
 	if(!replaced) {
 	  kvp[kvp.length] = [key, replaceGet("1", value)].join('=');
 	}
+	{# regenerate url from key-value-store #}
 	url = "?" + kvp.join('&');
 	if(key == "di_page") {
 	  url = getModifiedUrl(url, "di_co_page", "1");
@@ -64,6 +73,7 @@ Component list
   }
 
   function replaceGet(old_val, new_val) {
+	{# return modified value of a given key #}
 	old_val = parseInt(old_val);
 	if(new_val == "prev" || new_val == "«") {
 	  new_val = old_val - 1;
@@ -81,6 +91,7 @@ Component list
   }
 
   function loadXMLDoc(element) {
+	{# use ajax to dynamically reload the page content #}
 	var get_url;
 	if(element == "load") {
 	  get_url = "" + getModifiedUrlByGet("ajax", true);
@@ -121,7 +132,7 @@ Component list
 		  var cookies = document.cookie.split(';');
 		  for (var i = 0; i < cookies.length; i++) {
 			var cookie = jQuery.trim(cookies[i]);
-			// Does this cookie string begin with the name we want?
+			{# Does this cookie string begin with the name we want? #}
 			if(cookie.substring(0, name.length + 1) == (name + '=')) {
 			  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
 			  break;
@@ -131,7 +142,7 @@ Component list
 		return cookieValue;
 	  }
 	  if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-		// Only send the token to relative URLs i.e. locally.
+		{# Only send the token to relative URLs i.e. locally. #}
 		xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 	  }
 	};
@@ -146,8 +157,9 @@ Component list
 	param = "{{ post_data }}&csrfmiddlewaretoken={{ csrf_token }}";
 	xmlhttp.open("POST", get_url, true);
 	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	//xmlhttp.setRequestHeader("Content-length", param.length);
-	//xmlhttp.setRequestHeader("Connection", "close");
+	{# deprecated: #}
+	{#  xmlhttp.setRequestHeader("Content-length", param.length); #}
+	{#  xmlhttp.setRequestHeader("Connection", "close"); #}
 	xmlhttp.send(param);
 	get_url = "" + getModifiedUrl(get_url, "ajax", "");
 	window.history.pushState("object or string", "new Title", get_url);

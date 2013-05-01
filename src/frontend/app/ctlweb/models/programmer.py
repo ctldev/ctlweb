@@ -12,8 +12,10 @@ class Programmer(models.Model):
     component = models.ForeignKey(Components)
     email = models.EmailField(_("Programmierer"))
     class Meta:
-        unique_together = ('component', 'email')
-        app_label = 'ctlweb'
+       verbose_name = _("Programmierer")
+       verbose_name_plural = _("Programmierer")
+       unique_together = ('component', 'email')
+       app_label = 'ctlweb'
 
     def __unicode__(self):
         return self.email

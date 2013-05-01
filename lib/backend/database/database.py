@@ -27,9 +27,19 @@ class Database:
         reader.read(config_file)
 
         if Database.store is None:
-            Database.store = reader.get('Backend','Manifest_store')
+            try:
+                Database.store = reader.get('Backend','Manifest_store')
+            except configparser.Error:
+                Log.critical("""Your Config-File seems to be malformated! Check
+                your Config-File and try again!""")
+                sys.exit(1)
         if Database.db_file is None:
-            Database.db_file = reader.get('Backend','Database')
+            try:
+                Database.db_file = config.get('Backend','Database')
+            except configparser.Error:
+                Log.critical("""Your Config-File seems to be malformated! Check
+                your Config-File and try again!""")
+                sys.exit(1)
         try:
             Database.db_connection.execute("""SELECT name from sqlite_master
                                                  LIMIT 1""")

@@ -27,6 +27,7 @@ def simple_search(request, searchtext):
     searched_interfaces = Interfaces.objects.filter(
             __interface_searchset(searchtext))
     searched_components = Components.objects.filter(__comp_searchset(searchtext))
+    searched_components = searched_components.exclude(is_active=False)
 #Suche Interfaces deren Components gefunden wurden ohne selbst gefunden zu sein
     indirect_interfaces = Interfaces.objects.none()
     for comp in searched_components:

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}
-Suche
+{% trans "Suche" %}
 {% endblock title %}
 {% block headextra %}
 {{ addform.media }}
@@ -74,6 +75,28 @@ Suche
 		  id="{{ form.prefix }}-row"
 		>
 		  {% for field in form.visible_fields %}
+			<td class="hidden">
+			  {# Include the hidden fields in the form #}
+			  {% if forloop.first %}
+				{% for hidden in form.hidden_fields %}
+				  {{ hidden }}
+				{% endfor%}
+			  {% endif %}
+			  {{ field.errors.as_ul }}
+			  {{ field }}
+			</td>
+		  {% endfor %}
+		  <td class="hidden">
+			<a href="javascript:void(0)"  class="btn btn-inverse delete-row">
+			  Suchfeld löschen
+			</a>
+		  </td>
+		</tr>
+		<tr 
+		  class="{% cycle row1,row2 %} dynamic-form" 
+		  id="{{ form.prefix }}-row"
+		>
+		  {% for field in form.visible_fields %}
 			<td>
 			  {# Include the hidden fields in the form #}
 			  {% if forloop.first %}
@@ -87,18 +110,18 @@ Suche
 		  {% endfor %}
 		  <td>
 			<a href="javascript:void(0)"  class="btn btn-inverse delete-row">
-			  Suchfeld löschen
+			  {% trans "Suchfeld löschen" %}
 			</a>
 		  </td>
 		</tr>
 	  {% endfor %}
 	</table>
 	<a href="javascript:void(0)"  class="btn btn-inverse add-row">
-	  Weiteres Suchfeld
+	  {% trans "Weiteres Suchfeld" %}
 	</a>
 
 	<button class="btn btn-inverse">
-	  Suche starten
+	  {% trans "Suche starten" %}
 	</button>
   </form>
 </div>

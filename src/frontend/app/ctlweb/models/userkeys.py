@@ -22,13 +22,13 @@ class Userkeys(models.Model):
         verbose_name = _(u"Benutzerschlüssel")
         verbose_name_plural = _(u"Benutzerschlüssel")
         
-    def set_active(self, User):
-        if User.has_perm('can_activate_user'):
-            self.user.is_active=True
-
-    def set_inactive(self, User):
-        if User.has_perm('can_ban_user'):
-            self.user.is_active=False
+#    def set_active(self, User):
+#        if User.has_perm('can_activate_user'):
+#            self.user.is_active=True
+#
+#    def set_inactive(self, User):
+#        if User.has_perm('can_ban_user'):
+#            self.user.is_active=False
 
     def __unicode__(self):
         return self.key
