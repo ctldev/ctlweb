@@ -18,7 +18,8 @@ class TestWeb(unittest.TestCase):
                         Hostname = localhost
                         User = foo
                         SSH-Port = 22
-                        Database = test.db""")
+                        Database = test.db
+                        Manifest_store = /dev/null""")
         return conffile
 
     def setUp(self):

@@ -35,7 +35,7 @@ class Database:
                 sys.exit(1)
         if Database.db_file is None:
             try:
-                Database.db_file = config.get('Backend','Database')
+                Database.db_file = reader.get('Backend','Database')
             except configparser.Error:
                 Log.critical("""Your Config-File seems to be malformated! Check
                 your Config-File and try again!""")
