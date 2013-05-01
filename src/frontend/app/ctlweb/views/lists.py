@@ -145,6 +145,10 @@ def new_page(request,
     dict_response["programmer"] = programmer
     dict_response["u_programmer"] = u_programmer
     dict_response["view"] = view
+
+    if "search_query" in request.GET:
+        dict_response["searchquery"] = request.GET.get('search_query', None)
+
     context = RequestContext(request, dict_response)
     return render_to_response("components_new_page.html",
             context_instance=context)

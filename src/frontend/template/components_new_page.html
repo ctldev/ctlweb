@@ -15,7 +15,12 @@
 	Suchergebnisse
   </h1>
   <blockquote>
-	Alle direkten und indirekten Ergebnisse für ""
+	Alle direkten und indirekten Ergebnisse für
+	{% if searchquery %}
+	  {{ searchquery }}.
+	{% else %}
+	  die Suche.
+	{% endif %}
 	{# TODO: Suchwortparameter #}
   </blockquote>
 </div>
@@ -56,6 +61,7 @@
 				{% endfor %} {# di in... #}
 			  <div class="pagination">
 				<ul>
+				  {# printing page buttons for interfaces #}
 				  {% for button in interface_page_buttons %}
 					{{ button|safe }}
 				  {% endfor %}
@@ -106,6 +112,7 @@
 				  {% endfor %}{# c in... #}
 				  <div class="pagination">
 					<ul>
+					  {# printing page buttons for interface-specific components #}
 					  {% for button in di.page_buttons %}
 						{{ button|safe }}
 					  {% endfor %}
@@ -117,13 +124,16 @@
 		  </div>
 		  <script type="text/javascript">
 			$(function() {
-			  $('#interfaceList a').click(function(e) {
+				{# handle request when clicking on left side #}
+				$('#interfaceList a').click(function(e) {
+				{# prevent href, generate new url and get new content #}
 				e.preventDefault();
 				var value = $(this).attr('href').substr(1);
 				var url = getModifiedUrlByGet("item", value);
-				window.history.pushState("object or string", "new Title", url);
+				window.history.pushState("", null, url);
 				$(this).tab('show');
 			  });
+			  {# select item on left side, defaults to first #}
 			  var item = getValueOfGET("item");
 			  if(item == '') {
 				item = 'interfaceList a:first';
@@ -132,13 +142,21 @@
 				item += "_list";
 			  }
 			  $('#'+item).tab('show');
+			  {# preventing bug: selecting wrong item by mistake #}
+			  $('#interfaceList .pagination a').click(function(e) {
+				var value = "";
+				var url = getModifiedUrlByGet("item", value);
+				window.history.pushState({}, null, url);
+			  });
 
 			  {% if not form == 0 %}
+			  {# interfaceList or componentList, depending on selection and if #}
+			  {# searchmode active. Also handling clicks on related tabs #}
 			  $('#viewSelection a').click(function(e) {
 				e.preventDefault();
 				var value = $(this).attr('href').substr(1);
 				var url = getModifiedUrlByGet("view", value);
-				window.history.pushState("object or string", "new Title", url);
+				window.history.pushState({}, null, url);
 				$(this).tab('show');
 				});
 
@@ -146,7 +164,7 @@
 			  if(view == 'component') {
 				$('#viewComponent').tab('show');
 				var url = getModifiedUrlByGet("view", "component");
-				window.history.pushState("object or string", "new Title", url);
+				window.history.pushState({}, null, url);
 			  }
 			  else {
 				$('#viewInterface').tab('show');
@@ -190,6 +208,7 @@
 			  <br />
 			  <div class="pagination">
 				<ul>
+				  {# printing page buttons for component-only-view #}
 				  {% for button in s_components_page_buttons %}
 					{{ button|safe }}
 				  {% endfor %}
