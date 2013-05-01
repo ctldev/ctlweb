@@ -13,8 +13,17 @@ def set_active(modeladmin, request, queryset):
 def set_inactive(modeladmin, request, queryset):
     active = User.objects.filter(is_active=True).count()
     if active > queryset.count():
-        set_non_staff(modeladmin, request, queryset)
-        queryset.update(is_active=False)
+        if User.objects.filter(is_superuser=True).count()>queryset.count():
+            set_non_superuser(modeladmin, request, queryset)
+            if User.objects.filter(is_staff=True).count()>queryset.count():
+                set_non_staff(modeladmin, request, queryset)
+                queryset.update(is_active=False)
+        else :
+            if User.objects.filter(is_staff=True).count()>queryset.count():
+                set_non_staff(modeladmin, request, queryset)
+                queryset.update(is_active=False)
+            else :
+                 queryset.filter(is_superuser=False, is_staff=False).update(is_active=False)
     set_inactive.short_description = _("Benutzer deaktivieren")
                           
 def set_staff(modeladmin, request, queryset):
@@ -24,22 +33,24 @@ def set_staff(modeladmin, request, queryset):
 def set_non_staff(modeladmin, request, queryset):
     staff = User.objects.filter(is_staff=True).count()
     if staff > queryset.count():
-        set_non_admin(modeladmin, request, queryset)
-        queryset.update(is_staff=False)
+        if User.objects.filter(is_superuser=True).count()>queryset.count():
+            set_non_superuser(modeladmin, request, queryset)
+        else :
+            queryset.filter(is_superuser=False).update(is_staff=False)
     set_non_staff.short_description = _("Benutzer "+\
             "Redakteurrechte entziehen")
 
 def set_superuser(modeladmin, request, queryset):
     if request.user.is_superuser:
         queryset.update(is_superuser=True, is_staff=True, is_active=True)
-    set_admin.short_description = _("Benutzer Adminrechte geben")
+    set_superuser.short_description = _("Benutzer Adminrechte geben")
 
 def set_non_superuser(modeladmin, request, queryset):
     if request.user.is_superuser:
         admins = User.objects.filter(is_superuser=True).count()
         if admins > queryset.count():
             queryset.update(is_superuser=False)
-    set_non_admin.short_description = _("Benutzer Adminrechte entziehen")
+    set_non_superuser.short_description = _("Benutzer Adminrechte entziehen")
 
 class CtlwebUserAdmin(UserAdmin):
     """
@@ -60,6 +71,11 @@ class CtlwebUserAdmin(UserAdmin):
                 set_superuser,
                 set_non_superuser,
               ]
+    def save_model(self, request, obj, form, change):
+        if obj == request.user :
+            pass
+        else :
+            obj.save()
 
 admin.site.unregister(User)
 admin.site.register(User, CtlwebUserAdmin)
