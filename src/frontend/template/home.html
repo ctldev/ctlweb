@@ -1,17 +1,17 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}
 Home
 {% endblock title %}
 {% block content %}
 
     <div class="hero-unit">
-    <h2>Willkommen auf CTLWEB </h2>
-	<p>Hier finden Sie DIE Komponenten </p>
-
+	  <h2> {% trans "Willkommen auf CTLWEB" %} </h2>
+	  <p>{% trans "Hier finden Sie DIE Komponenten" %} </p>
     <p>
     <a href="{% url components %}" class="btn btn-primary btn-large">
     	Los geht's!
     </a>
     </p>
     </div>
-{% endblock %}
+{% endblock content %}
