@@ -9,7 +9,7 @@ lib_path = os.getcwd() + "/../lib/backend"
 sys.path.append( lib_path )
 from util.log import Log
 from util.util import hash_file
-from util.util import add_component
+#from util.util import add_component
 from util.settings import DEFAULT_CONFIG
 from database import Database
 from database import Component
@@ -61,7 +61,7 @@ def main():
             else:
                 Log.critical("Can't handle more than one function!")
                 exit(1)
-            print("To be implemented: remove",o,a)
+            component = a
         elif o == "-v":
             Log.increase_verbosity()
         elif o in ("-c", "--config"):
@@ -90,13 +90,20 @@ def main():
             Log.critical("Unable to find or create database on %s." \
                     % Database.db_file)
             exit(1)
-    try:
-        Log.debug("Adding component to database and manifest store")
-        add_component(component, config=config)
-    except KeyError as e:
-        Log.critical("Unable to add component.")
-        exit(1)
-
+    if mode == MODE['add']:
+        try:
+            Log.debug("Adding component to database and manifest store")
+#            add_component(component, config=config)
+        except KeyError as e:
+            Log.critical("Unable to add component.")
+            exit(1)
+    elif mode == MODE['remove']:
+        try:
+            Log.debug("Removing component from database and manifest store")
+#            remove_component(component, config=config)
+        except KeyError as e:
+            Log.critical("Unable to remove component.")
+            exit(1)
 
 if __name__ == "__main__":
     main()            

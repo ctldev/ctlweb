@@ -20,7 +20,7 @@ class TestComponent(unittest.TestCase):
         Database.db_file = "test.db" # DB File for Testcase without config
         Log.streamoutput()
 #       Instance objects
-        self.comp = Component("name","/path/to/exe","/path/to/manifest")
+        self.comp = Component("name","/path/to/exe")
         self.connection = Database.db_connection
         self.cursor = self.connection.cursor()
 
@@ -58,7 +58,6 @@ class TestComponent(unittest.TestCase):
         self.comp.create_table()
         self.assertEqual(self.comp["c_id"], "name" )
         self.assertEqual(self.comp["c_exe"], "/path/to/exe" )
-        self.assertEqual(self.comp["c_manifest"], "/path/to/manifest" )
         try:
             self.comp["db_file"]
             self.assertTrue(false, "Got access to wrong variable")
@@ -75,8 +74,6 @@ class TestComponent(unittest.TestCase):
         self.assertTrue("c_id" in attrs , 
                 msg="Caught the following attributes: %s"%attrs)
         self.assertTrue("c_exe" in attrs ,
-                msg="Caught the following attributes: %s" % attrs)
-        self.assertTrue("c_manifest" in attrs ,
                 msg="Caught the following attributes: %s" % attrs)
         self.assertFalse("__doc__" in attrs,
                 msg="Caught __doc__ attribute which is wrong")
@@ -99,7 +96,6 @@ class TestComponent(unittest.TestCase):
         res = tuple(res)
         self.assertEqual(res[3], "name", "Got unexpected data")
         self.assertEqual(res[2], "/path/to/exe", "Got unexpected data")
-        self.assertEqual(res[4], "/path/to/manifest", "Got unexpected data")
         #updatecheck
         self.comp.c_exe = "updatedexe"
         self.comp.save()
@@ -110,6 +106,7 @@ class TestComponent(unittest.TestCase):
                 "Seems not to be updated correctly")
 
     def test_remove(self):
+        self.comp.create_table()
         self.comp.save()
         self.comp.remove()
         self.cursor.execute("""SELECT * FROM Component
@@ -123,7 +120,7 @@ class TestComponent(unittest.TestCase):
         self.comp.create_table()
         repr = self.comp.__conform__(sqlite3.PrepareProtocol)
         self.assertEqual(repr,
-                "c_manifest=/path/to/manifest;c_id=name;c_exe=/path/to/exe",
+                "c_id=name;c_exe=/path/to/exe",
                 msg="Error in generation of representation")
 
     def test_convert(self):
@@ -131,7 +128,7 @@ class TestComponent(unittest.TestCase):
         rebuild.
         """
         self.comp.create_table()
-        repr =  "c_id=name;c_exe=/path/to/exe;c_manifest=/path/to/manifest"
+        repr =  "c_id=name;c_exe=/path/to/exe"
         comp = Component.convert(repr)
         self.assertEqual(comp, self.comp)
 
@@ -153,6 +150,95 @@ class TestComponent(unittest.TestCase):
         self.comp.save()
         comp = Component.get_exacly(self.comp.c_id)
         self.assertEqual(comp, self.comp, "Could not deserialize data")
+
+class TestComponentAdd(unittest.TestCase):
+    """ Full tests for adding compontents
+    """
+
+    def setUp(self):
+        import os
+        self.component = None # tgz file
+        self.test_folder = None # folder where you'll find the evil
+        self.control = None # contol-file
+        self.ci = None # ci file
+        self.doc = None # component documentation
+        self._create_component()
+        Database.db_file = os.path.join(self.test_folder, 'test.db')
+        Database.store = os.path.join(self.test_folder, 'store')
+        os.mkdir(Database.store)
+
+    def tearDown(self):
+        import os
+        for f in os.listdir( os.path.join(self.test_folder, 'store')):
+            os.remove( os.path.join(self.test_folder, 'store', f))
+        os.rmdir( os.path.join(self.test_folder, 'store'))
+        for f in os.listdir(self.test_folder):
+            os.remove(os.path.join(self.test_folder, f))
+        os.rmdir(self.test_folder)
+
+    def test_read_control(self):
+        """ checks if the control parsing is done correctly
+        """
+        data = Component._read_control(self.control)
+        self.assertEqual(data, {"c_id": "example",
+                "c_exe": "/home/foo/example.exe",
+                },
+                )
+
+    def test_unpack(self):
+        """ checks if unpacking is done correctly
+        """
+        data = Component._unpack(self.component)
+        self.assertEqual(data, {"c_id": "example",
+                "c_exe": "/home/foo/example.exe",
+                },
+                )
+
+    def test_add(self):
+        """ depends kind of the previous tests, checks only if the database
+        entry it really done and the file is moved to the storage
+        """
+        insert = Component.add(self.component)
+        output = Component.get_exacly("example")
+        self.assertEqual(insert, output)
+        # check if component is stored.
+        import os
+        self.assertTrue(os.path.isfile(
+                os.path.join(Database.store, 'example.tgz')
+            ))
+
+    def _create_component(self):
+        """ creates a full (dummy) ctl-component for testing purpose.
+        """
+        import os
+        self.test_folder = '/tmp/ctlweb_test'
+        self.control = os.path.join(self.test_folder, 'control')
+        self.ci = os.path.join(self.test_folder, 'test.ci')
+        self.doc = os.path.join(self.test_folder, 'doc.txt')
+        os.mkdir(self.test_folder)
+        with open(self.control, "w") as f:
+            f.write("""[DEFAULT]
+            name=example
+            host=example.net
+            user=foo
+            ssh=22
+            exe=/home/foo/example.exe
+            exe_hash=uitaen2f3c2g3fnelren234234234n123rt4r
+            ci=test.ci""")
+        open(self.ci, "w").close()
+        open(self.doc, "w").close()
+        self._pack_component()
+
+    def _pack_component(self):
+        """ packs files to a component
+        """
+        import tarfile
+        self.component = '/tmp/ctlweb_test/test.tgz'
+        with tarfile.open(self.component, 'w:gz') as tf:
+            tf.add(self.control, arcname="control")
+            tf.add(self.ci, arcname="test.ci")
+            tf.add(self.ci, arcname="doc.txt")
+
 
 if __name__ == '__main__':
     unittest.main()

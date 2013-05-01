@@ -18,14 +18,18 @@ class Database:
     """
     db_file = None
     db_connection = None
+    store = None
+    """ The manifest store """
 
     def __init__(self, config_file=DEFAULT_CONFIG):
         import configparser
-        config = configparser.ConfigParser()
-        config.read(config_file)
+        reader = configparser.ConfigParser()
+        reader.read(config_file)
 
+        if Database.store is None:
+            Database.store = reader.get('Backend','Manifest_store')
         if Database.db_file is None:
-            Database.db_file = config.get('Backend','Database')
+            Database.db_file = reader.get('Backend','Database')
         try:
             Database.db_connection.execute("""SELECT name from sqlite_master
                                                  LIMIT 1""")
@@ -106,6 +110,8 @@ class Database:
         """ Creates a table for the class in which every instance object which
         starts with 'c_'. For example 'c_id'. This variable can be accessed with
         self["id"]
+
+        returns self
         """
         import re
         Log.debug("Creating Table for %s" % self.__name__)
@@ -123,6 +129,7 @@ class Database:
         sql += ");"
         cursor.execute(sql)
         self.db_connection.commit()
+        return self
 
     def drop_table(self):
         """ Should remove the tables created by the class. Every child of
@@ -203,6 +210,19 @@ class Database:
                 else:
                     repr = attr + "=" + self[attr] + ";" + repr
             return repr
+        elif isinstance(protocol, type(self)):
+            attributes = self.get_attributes()
+            repr = ""
+            first = True
+            for attr in attributes:
+                if first:
+                    repr = "{'%s': %s" % (attr, self[attr])
+                    first = False
+                else:
+                    repr = "%s, '%s': %s" % (repr, attr, self[attr])
+            else:
+                repr += "}"
+            return repr
 
     @classmethod
     def convert(cls, s):
@@ -240,6 +260,10 @@ class Database:
         """ Provides that the name of the class is callable
         """
         return self.__class__.__name__
+
+    def __str__(self):
+        attr = self.get_attributes()
+        return "%s.create(%s)" % (self.__name__, self.__conform__(self))
 
 class NoSuchTable(sqlite3.OperationalError):
     pass
