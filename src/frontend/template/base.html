@@ -32,6 +32,16 @@
 	data-spy="scroll" 
 	data-target=".navbar"
   >
+
+
+    {% comment %}
+    -----------------------------------------------------
+    Top Navigation Bar - made possible with Bootstrap 
+    ----------------------------------------------------
+    {% endcomment %}
+
+
+
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -81,8 +91,20 @@
 				  </a>
 			    </li>
 
+
+        {% comment %}
+        ------------------------------------------------------------
+        If user is authenticated, account functions (change Password / Logout) are possible
+        ------------------------------------------------------------
+        {% endcomment %}
+
+
           {% if user.is_authenticated %}
-			    <li class="dropdown">
+			    
+
+          {# Bootstrap's "dropdown" - menu funtionality #} 
+
+          <li class="dropdown">
           <a 
           href="{{ user.id }}" 
           class="dropdown-toggle" 
@@ -106,6 +128,13 @@
           
         </li>
         </ul>
+
+        {% comment %}
+        ------------------------------------------------------------
+        If user isn't authenticated, login/register is made possible
+        ------------------------------------------------------------
+        {% endcomment %}
+
           {% else %}
           <li>
 			      <a href="{% url login %}">
@@ -127,26 +156,30 @@
       </div>
     </div>
 
-    <div id="messages">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-			<a class="close" data-dismiss="alert" href="#">
-			  <!--×-->&times;
-			</a>
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    </div>
+
+        {% comment %}
+        ------------------------------------------------------------
+        Bootstrap's "container" functionality, to layout spaces of a page 
+        ------------------------------------------------------------
+        {% endcomment %}
 
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span1">
-          
-                  <!--Sidebar content-->
+            
+        {# Left space: Empty, as left side bar #}
+
+                
         </div>
         <div class="span10">
+
+        {% comment %}
+        Actual responsible space for showing the main content: 
+        External content from other templates are being integrated by Django-tags 
+        ""{% block content %}{% endblock %}""
+        {% endcomment %}
+          
+
           {% block content %}
           {% endblock %}  
         </div>
