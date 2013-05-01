@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}
-Suche
+{% trans "Suche" %}
 {% endblock title %}
 {% block headextra %}
 {{ addform.media }}
@@ -87,18 +88,18 @@ Suche
 		  {% endfor %}
 		  <td>
 			<a href="javascript:void(0)"  class="btn btn-inverse delete-row">
-			  Suchfeld löschen
+			  {% trans "Suchfeld löschen" %}
 			</a>
 		  </td>
 		</tr>
 	  {% endfor %}
 	</table>
 	<a href="javascript:void(0)"  class="btn btn-inverse add-row">
-	  Weiteres Suchfeld
+	  {% trans "Weiteres Suchfeld" %}
 	</a>
 
 	<button class="btn btn-inverse">
-	  Suche starten
+	  {% trans "Suche starten" %}
 	</button>
   </form>
 </div>

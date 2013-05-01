@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}
 Component {{ component.name }}
 {% endblock title %}
@@ -13,7 +14,11 @@ Component {{ component.name }}
 </div> 
   <dl class="dl-horizontal">
 	<dt>
-	  Interface
+	  {% blocktrans count counter=interfaces|length %}
+		Interface:
+	  {% plural %}
+		Interfaces:
+	  {% endblocktrans %}
 	</dt>
 	<dd>
 	  {% for i in interfaces %}
@@ -22,13 +27,16 @@ Component {{ component.name }}
 	</dd>
 
 	<dt>
-	  Ersteller:
-	  {# {% trans "Ersteller" %} #}
+	  {% blocktrans count counter=programmer|length %}
+		Ersteller:
+	  {% plural %}
+		Ersteller:
+	  {% endblocktrans %}
 	</dt>
 	<dd> 
 	  {% for p in programmer %}
 		{% if p in users.email %} 
-		  {# url noch nicht vorhanden #}
+		  {# url(-Algorithmus) nicht vorhanden #}
 		  <a href="{% url user u.pk %}">
 			{{ p.email }}
 		  </a>{% else %}{{ p.email }}{% endif %}{% if not forloop.last %},
@@ -38,15 +46,14 @@ Component {{ component.name }}
 	</dd>
 	
 	<dt>
-	  Version:
+	  {% trans "Version:" %}
 	</dt>
 	<dd>
 	  {{ component.version }}
 	</dd>
   	
   	<dt>
-  	  Datum: 
-	  {# {% trans "Datum" %} #}
+	  {% trans "Datum:" %}
 	</dt>
 	<dd> 
 	  {{ component.date }} 
@@ -54,7 +61,11 @@ Component {{ component.name }}
 
   {% if see_homeserver %}
 	<dt> 
-	  Homeserver 
+	  {% blocktrans count counter=homeserver|length %}
+		Homeserver 
+	  {% plural %}
+		Homeserver
+	  {% endblocktrans %}
 	</dt>
 	<dd> 
 	  {% for hs in homeserver %}
@@ -76,7 +87,7 @@ Component {{ component.name }}
 		data-parent="#accordion2" 
 		href="#description"
 	  >
-		Beschreibung
+		{% trans "Beschreibung" %}
 	  </a>
 	</div>
   <div id="description" class="accordion-body collapse">
@@ -95,7 +106,11 @@ Component {{ component.name }}
 </div>
 
 {% if see_homecluster %}
-Cluster:
+{% blocktrans count counter=homecluster|length %}
+  Cluster:
+{% plural %}
+  Cluster:
+{% endblocktrans %}
 <div class="accordion" id="accordion1">
   <div class="accordion-group">
 	{% for hc in homecluster %}
@@ -121,7 +136,7 @@ Cluster:
 				{% if user.is_authenticated %}
 				  <tr>
 				    <td>
-					CTL-Befehl:
+					  {% trans "CTL-Befehl:" %}
 				    </td>
 				    <td>
 					{{ h.ctl }}
@@ -131,7 +146,7 @@ Cluster:
 				{% if see_path %}
 				  <tr>
 					<td> 
-					  Pfad: 
+					  {% trans "Pfad:" %} 
 					</td>
 					<td> 
 					  {{ h.path }} 
@@ -141,7 +156,7 @@ Cluster:
 				{% if see_code %}
 				  <tr>
 					<td> 
-					  Code: 
+					  {% trans "Code:" %}
 					</td>
 					<td> 
 					  {{ h.code }} 
