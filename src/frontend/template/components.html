@@ -91,7 +91,7 @@ Component list
   }
 
   function loadXMLDoc(element) {
-	{# use ajax to dynamically reload th page content #}
+	{# use ajax to dynamically reload the page content #}
 	var get_url;
 	if(element == "load") {
 	  get_url = "" + getModifiedUrlByGet("ajax", true);
@@ -132,7 +132,7 @@ Component list
 		  var cookies = document.cookie.split(';');
 		  for (var i = 0; i < cookies.length; i++) {
 			var cookie = jQuery.trim(cookies[i]);
-			// Does this cookie string begin with the name we want?
+			{# Does this cookie string begin with the name we want? #}
 			if(cookie.substring(0, name.length + 1) == (name + '=')) {
 			  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
 			  break;
@@ -142,7 +142,7 @@ Component list
 		return cookieValue;
 	  }
 	  if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-		// Only send the token to relative URLs i.e. locally.
+		{# Only send the token to relative URLs i.e. locally. #}
 		xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 	  }
 	};
@@ -157,8 +157,9 @@ Component list
 	param = "{{ post_data }}&csrfmiddlewaretoken={{ csrf_token }}";
 	xmlhttp.open("POST", get_url, true);
 	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	//xmlhttp.setRequestHeader("Content-length", param.length);
-	//xmlhttp.setRequestHeader("Connection", "close");
+	{# deprecated: #}
+	{#  xmlhttp.setRequestHeader("Content-length", param.length); #}
+	{#  xmlhttp.setRequestHeader("Connection", "close"); #}
 	xmlhttp.send(param);
 	get_url = "" + getModifiedUrl(get_url, "ajax", "");
 	window.history.pushState("object or string", "new Title", get_url);
