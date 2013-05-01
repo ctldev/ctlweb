@@ -734,6 +734,10 @@ cite {
   color: #999999;
 }
 
+.white {
+  color: #ffffff;
+}
+
 a.muted:hover {
   color: #808080;
 }
