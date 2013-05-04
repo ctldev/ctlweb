@@ -3,8 +3,6 @@ import sqlite3
 import os
 import sys
 from os.path import dirname,abspath
-lib_path = dirname(abspath(__file__)) + "/../"
-sys.path.append(lib_path)
 from util import Log
 from util.settings import DEFAULT_CONFIG
 

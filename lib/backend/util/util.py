@@ -1,12 +1,10 @@
 import sys
 import os
 from os.path import dirname,abspath
-lib_path = dirname(abspath(__file__)) + "/../lib/backend"
-sys.path.append(lib_path)
-from database.database import Database
-from database.user import User
-from database.web import Web
-from util.settings import DEFAULT_CONFIG
+from database import Database
+from database import User
+from database import Web
+from settings import DEFAULT_CONFIG
  
 def hash_file(file, block_size=512):
     import hashlib

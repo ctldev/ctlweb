@@ -2,24 +2,23 @@
 import os
 import sys
 import getopt
-lib_path = os.getcwd() + "/../lib/backend/util"
+lib_path = os.getcwd() + "/../lib/backend/"
 sys.path.append( lib_path )
-from log import Log
+from util import Log
 
-opt = "m:"
-long_opt = ["module="]
 max_output_level = 2
 
 def usage():
-    print("Usage:", sys.argv[0], """[-m <modul>| --module=<module>]""")
+    print("Usage:", sys.argv[0], """<component> [ <component args> ]""")
 
 
 def main():
     Log.streamoutput()
     opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
     for o, a in opts:
-        if o in ("-m", "--module"):
-            print("module "+a+" wird gestartet")
+        pass
+    Database()
+
 
 if __name__ == "__main__":      
     main()
