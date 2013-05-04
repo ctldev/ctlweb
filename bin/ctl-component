@@ -46,63 +46,32 @@ def main():
     
     for o, a in opts:
         if o in ("-a", "--add"):
-            if mode == None:
-                mode = MODE['add']
-            else:
-                Log.critical("Can't handle more than one function!")
-                exit(1)
+            mode = MODE['add']
             if os.path.isfile(a):
                 component = a
             else:
                 Log.critical("File %s not found" % a)
         elif o in ("-r", "--remove"):
-            if mode == None:
-                mode = MODE['remove']
-            else:
-                Log.critical("Can't handle more than one function!")
-                exit(1)
+            mode = MODE['remove']
             component = a
         elif o == "-v":
             Log.increase_verbosity()
         elif o in ("-c", "--config"):
-            if os.path.isfile(a):
-                try:
-                    Database(a)
-                    config = a
-                except DatabaseNotFound:
-                    Log.critical("Unable to find or create database on %s." \
-                            % Database.db_file)
-                    exit(1)
-            else:
-                Log.critical("File %s not found" % a)
-                exit(1)
+            Database(a)
+            config = a
     if mode == None:
         usage()
         exit(1)
     if not Database.db_connection:
         Log.debug("Using default config to initialize database.")
-        try:
-            Database()
-        except KeyError:
-            Log.critical("Couldn't find config file")
-            exit(1)
-        except DatabaseNotFound:
-            Log.critical("Unable to find or create database on %s." \
-                    % Database.db_file)
-            exit(1)
+        Database()
     if mode == MODE['add']:
-        try:
-            Log.debug("Adding component to database and manifest store")
-#            add_component(component, config=config)
-        except KeyError as e:
-            Log.critical("Unable to add component.")
-            exit(1)
+        Log.debug("Adding component to database and manifest store")
+        Component.add(component)
     elif mode == MODE['remove']:
-        try:
-            Log.debug("Removing component from database and manifest store")
-#            remove_component(component, config=config)
-        except KeyError as e:
-            Log.critical("Unable to remove component.")
+        Log.debug("Removing component from database and manifest store")
+        if not Component.remove(component):
+            Log.critical("Unable to remove %s" % component)
             exit(1)
 
 if __name__ == "__main__":

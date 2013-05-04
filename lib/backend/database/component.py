@@ -22,6 +22,21 @@ class Component(Database):
         """
         return cls(attr["c_id"], attr["c_exe"])
 
+    def remove(self):
+        """ Remove component with given name.
+        
+        Returns True if the component successfully removed.
+        """
+        Log.debug("Component.remove(): removing")
+        super().remove()
+        import os
+        try:
+            os.remove( os.path.join(Database.store, "%s.tgz" % self.c_id) )
+        except IOError:
+            Log.error("Component.remove(): unable to remove component file.")
+            return False
+        return True
+
     @classmethod
     def add(cls, component):
         """ A given package will be added to the local database.
@@ -29,11 +44,9 @@ class Component(Database):
         A package has to be in the ctlweb-format which can be found in our
         docmuentation.
 
-        returns new object
+        returns newly created object
         """
-        import configparser
         from os import path
-        parser = configparser.ConfigParser()
         Log.debug("add(package): adding package to local database")
         # Create Database entry
         data = Component._unpack(component)

@@ -36,6 +36,9 @@ class Database:
         if Database.db_file is None:
             try:
                 Database.db_file = reader.get('Backend','Database')
+#                if not os.path.isdir( Database.db_file ): 
+#               TODO! Log + exit(1)
+
             except configparser.Error:
                 Log.critical("""Your Config-File seems to be malformated! Check
                 your Config-File and try again!""")

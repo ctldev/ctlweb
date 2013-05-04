@@ -108,7 +108,11 @@ class TestComponent(unittest.TestCase):
     def test_remove(self):
         self.comp.create_table()
         self.comp.save()
-        self.comp.remove()
+        try:
+            self.comp.remove()
+        except OSError:
+            pass # The error that is risen because of the missing component
+                 # file. This test will be repeated in class TestComponentAdd
         self.cursor.execute("""SELECT * FROM Component
                             WHERE c_id = 'name';""")
         self.assertTrue(self.cursor.fetchone() == None, 
@@ -203,9 +207,24 @@ class TestComponentAdd(unittest.TestCase):
         self.assertEqual(insert, output)
         # check if component is stored.
         import os
-        self.assertTrue(os.path.isfile(
+        self.assertTrue( os.path.isfile(
                 os.path.join(Database.store, 'example.tgz')
             ))
+
+    def test_remove(self):
+        """ This Test is a complete test for the removal function. It tests the
+        removal of a database entry as well as the correlated file in the store
+        """
+        component = Component.add(self.component)
+        component.remove()
+        cursor = Database.db_connection.cursor()
+        cursor.execute("""SELECT * FROM Component
+                            WHERE c_id = 'name';""")
+        self.assertTrue(cursor.fetchone() == None, 
+                "Removing Entries has failed")
+        import os
+        component_file = os.path.join( Database.store, "example.tgz" )
+        self.assertFalse( os.path.isfile( component_file ) )
 
     def _create_component(self):
         """ creates a full (dummy) ctl-component for testing purpose.
