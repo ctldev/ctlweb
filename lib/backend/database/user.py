@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
-from .database import Database
 import sqlite3
+from .access import Access
 
-class User(Database):
+class User(Access):
     """ An registered user
     """
-
-    def __init__(self, name, pubkey):
-        super().__init__()
-        self.c_id = name
-        self.c_pubkey = pubkey
 
     @classmethod
     def create(cls, attr):

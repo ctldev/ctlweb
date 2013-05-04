@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 import sqlite3
-from .database import Database
+from .access import Access
 
-class Web(Database):
+class Web(Access):
     """ An registerd ctlweb instance
     """
-
-    def __init__(self, url, pubkey):
-        super().__init__()
-        self.c_id = url
-        self.c_pubkey = pubkey
 
     @classmethod
     def create(cls, attr):

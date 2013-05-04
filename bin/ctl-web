@@ -7,11 +7,9 @@ import getopt
 lib_path = os.getcwd() + "/../lib/backend"
 sys.path.append( lib_path )
 from util import Log
-from util.util import add
-from util.util import remove
 from util.util import overview
-from database.database import Database
-from database.web import Web
+from database import Database
+from database import Web
  
 
 opt = "c:a:k:r:ov"
@@ -89,9 +87,13 @@ def main():
             Log.error("no valid id or pubkey specified")
         else:
             if(add_set == True):
-                add(reg_id,reg_pubkey,database)
+                Web.add({
+                    "c_id": reg_id,
+                    "c_pubkey": reg_pubkey,
+                    })
             else:
-                remove(reg_id,reg_pubkey,database)
+                to_remove = Web.get_exacly(reg_id)
+                to_remove.remove()
     else:
         Log.info("no add xor remove")
 if __name__ == "__main__":
