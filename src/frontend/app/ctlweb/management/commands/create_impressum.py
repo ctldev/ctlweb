@@ -50,7 +50,6 @@ class Command(BaseCommand):
             + "Tel.: " + org_tel + "</br> \n" + "Fax: " + org_fax + \
             "</br> </p> \n \n"  + "<p><h4>Zuständiger Bearbeiter</h4> \n" \
             + admin_name + "</br> \n" + admin_tel + "</br> \n" + admin_mail \
-#Rechtliche Hinweise immer gleich.
             + "</p> <br/> <br/> \
             <p><strong>Haftung für Inhalte</strong></p> \
             Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. \
