@@ -6,8 +6,6 @@ import sys
 import getopt
 import requests
 
-lib_path = dirname(abspath(__file__)) + "/../lib/backend"
-sys.path.append(lib_path)
 from util import Log
 from util.settings import DEFAULT_CONFIG
 from database.component import Component

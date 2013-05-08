@@ -19,10 +19,12 @@ class TestWeb(unittest.TestCase):
                         User = foo
                         SSH-Port = 22
                         Database = test.db
-                        Manifest_store = /dev/null""")
+                        Manifest_store = /dev/null
+                        authorized_keys = auth_keys""")
         return conffile
 
     def setUp(self):
+        Database.db_file = None # else runtime destroys testing framework
         Database(self.gentest_config())
         self.web = Web("url", "pubkey")
         self.web.create_table()
@@ -111,8 +113,6 @@ class TestWeb(unittest.TestCase):
         self.assertTrue(self.cursor.fetchone() == None, 
                 "Removing Entries has failed")
 
-
-
     def test_get(self):
         self.web.save()
         webs = Web.get()
@@ -126,6 +126,26 @@ class TestWeb(unittest.TestCase):
         self.web.save()
         web = Web.get_exacly(self.web.c_id)
         self.assertEqual(web, self.web, "Could not deserialize data")
+
+
+class TestAddWeb(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_add_key(self):
+        pass
+
+    def test_remove_key(self):
+        pass
+
+    def test_add(self):
+        pass
+
+    def test_remove(self):
+        pass
 
 
 if __name__ == '__main__':

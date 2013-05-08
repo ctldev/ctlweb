@@ -17,12 +17,14 @@ class Database:
     db_file = None
     db_connection = None
     store = None
+    config = None
     """ The manifest store """
 
     def __init__(self, config_file=DEFAULT_CONFIG):
         import configparser
         reader = configparser.ConfigParser()
         reader.read(config_file)
+        Database.config = config_file # share config file with others
 
         if Database.store is None:
             try:
@@ -34,14 +36,16 @@ class Database:
         if Database.db_file is None:
             try:
                 Database.db_file = reader.get('Backend','Database')
-#                if not os.path.isdir( Database.db_file ): 
-#               TODO! Log + exit(1)
+                import os
+                if os.path.isdir( Database.db_file ):
+                    Log.critical("Database(): Database is directory!")
+                    sys.exit(1)
 
             except configparser.Error:
                 Log.critical("""Your Config-File seems to be malformated! Check
                 your Config-File and try again!""")
                 sys.exit(1)
-        try:
+        try: # Check if connection is active
             Database.db_connection.execute("""SELECT name from sqlite_master
                                                  LIMIT 1""")
             Database.db_connection.fetchone()
@@ -49,7 +53,6 @@ class Database:
             Database.db_connection = sqlite3.connect(Database.db_file)
         # Creationtime of object
         c_creation = None
-
 
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
@@ -239,8 +242,6 @@ class Database:
     def convert(cls, s):
         """ Returns an object built out of the string s. This function is used
         by sqlite3
-         TODO: registration in sqlite3
-         TODO: escaping the strings
         """
         Log.debug("Building %s object" % cls.__name__)
         attribute_box = {}

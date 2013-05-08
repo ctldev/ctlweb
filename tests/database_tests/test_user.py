@@ -22,10 +22,12 @@ class UserTest(unittest.TestCase):
                         User = foo
                         SSH-Port = 22
                         Database = test.db
-                        Manifest_store = /dev/null""")
+                        Manifest_store = /dev/null
+                        authorized_keys = auth_keys""")
         return conffile
 
     def setUp(self):
+        Database.db_file = None # else the runtime destroys testsing framework
         Database(self.gentest_config())
         self.user = User("Douglas", "pubkey")
         self.connection = Database.db_connection
@@ -128,6 +130,23 @@ class UserTest(unittest.TestCase):
         user = User.get_exacly(self.user.c_id)
         self.assertEqual(user, self.user, "Could not deserialize data")
 
+class TestAddUser(unittest.TestCase):
+    def setUp(self):
+        pass
 
+    def tearDown(self):
+        pass
+
+    def test_add_key(self):
+        pass
+
+    def test_remove_key(self):
+        pass
+
+    def test_add(self):
+        pass
+
+    def test_remove(self):
+        pass
 if __name__ == "__main__":
     unittest.main()

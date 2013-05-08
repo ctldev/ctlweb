@@ -4,17 +4,26 @@ import sys
 import os
 import sqlite3
 
-test_root = os.getcwd() + "/../.."
-sys.path.append( test_root + "/lib/backend/")
 from database.database import Database
 from database.web import Web
 from database.user import User
 
 class DatabaseTest(unittest.TestCase):
 
+    def _gentest_config(self):
+        conffile = "test.conf"
+        with open(conffile, "w") as file:
+            file.write("""[Backend]
+                        Hostname = localhost
+                        User = foo
+                        SSH-Port = 22
+                        Database = test.db
+                        Manifest_store = /dev/null""")
+        return conffile
+
     def setUp(self):
         Database.db_file = ":memory:"
-        self.db = Database(test_root+"/etc/ctlweb.conf")
+        self.db = Database(self._gentest_config())
 
     def test_creation(self):
         """ Basic test for creating Database object

@@ -2,8 +2,6 @@
 import os
 import sys
 import getopt
-lib_path = os.getcwd() + "/../lib/backend/"
-sys.path.append( lib_path )
 from util import Log
 
 max_output_level = 2

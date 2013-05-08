@@ -13,3 +13,6 @@ class User(Access):
             * c_pubkey
         """
         return cls(attr['c_id'],attr['c_pubkey'])
+
+    def _keyline():
+        return 'command="bash -c ctl-init" %s' % c_pubkey
