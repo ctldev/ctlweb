@@ -7,6 +7,7 @@ import datetime
 import os
 import zipfile
 import tarfile
+import re
 from ConfigParser import SafeConfigParser
 from ctlweb.models import Cluster
 from ctlweb.models import Components
@@ -28,12 +29,16 @@ from django.template import RequestContext
 class CTLMissingHostKeyPolicy(paramiko.MissingHostKeyPolicy):
     """Accepting those Keys that are placed in the Database"""
     def missing_host_key(self, client, hostname, key):
-        q_query = (Q(ip__exact=hostname)|Q(domain__exact=hostname))
+        host = hostname
+        m = re.match('\[(\S+)\]:\d+$', hostname)
+        if m:
+            host = m.group(1)
+        q_query = (Q(ip__exact=host)|Q(domain__exact=host))
         query = Cluster.objects.filter(q_query)
         if query.exists():
             client._host_keys.add(hostname, key.get_name(), key)
             return
-        raise SSHException('Unknown server %s' % hostname)
+        raise paramiko.SSHException('Unknown server %s' % hostname)
 
 def _gen_sec_token(domain):
     """generate a secure Token to not let everybody contribute fake Modules"""
@@ -42,45 +47,129 @@ def _gen_sec_token(domain):
     token = hashlib.sha256(secret + domain + hextime).hexdigest()
     return token
 
+def send_user(user, cluster=None, ssh=True, pretend=False):
+    if cluster is None:
+        cluster = Cluster.objects.all()
+    if not isinstance(cluster, list):
+        cluster = [cluster,]
+    for c in cluster:
+        port = c.port
+        if not c.port:
+            port = 22
+        ssh = paramiko.SSHClient()
+        ssh_file = settings.SSH_KEY_FILE
+        ssh_passwd = settings.SSH_KEY_PASSWORD
+        ssh_user = c.username
+        sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
+        ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
+        domain = c.ip
+        if domain is None:
+            domain = "" + c.domain
+        if ssh:
+            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
+                    key_filename=ssh_file, look_for_keys=False)
+            shell = ssh.invoke_shell(term="vt220")
+            response = ""
+            if pretend:
+                response += _send_message(shell, "s")
+            response += _send_message(shell, "2")
+            response += _send_message(shell, user.username)
+            for key in user.userkey_set:
+                response += send_message(shell, key.key)
+            response += _send_message(shell, "q")
+            print response
+            ssh.close
+
+def remove_user(user, cluster=None, ssh=True, pretend=False):
+    if cluster is None:
+        cluster = Cluster.objects.all()
+    if not isinstance(cluster, list):
+        cluster = [cluster,]
+    for c in cluster:
+        port = c.port
+        if not c.port:
+            port = 22
+        ssh = paramiko.SSHClient()
+        ssh_file = settings.SSH_KEY_FILE
+        ssh_passwd = settings.SSH_KEY_PASSWORD
+        ssh_user = c.username
+        sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
+        ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
+        domain = c.ip
+        if domain is None:
+            domain = "" + c.domain
+        if ssh:
+            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
+                    key_filename=ssh_file, look_for_keys=False)
+            shell = ssh.invoke_shell(term="vt220")
+            response = ""
+            if pretend:
+                response += _send_message(shell, "s")
+            response += _send_message(shell, "3")
+            response += _send_message(shell, user.username)
+            response += _send_message(shell, "q")
+            print response
+            ssh.close
+
 def request_modules(ssh=True, pretend=False):
     """request all Modules of all Clusters of the Database"""
     ssh = paramiko.SSHClient()
     cluster = Cluster.objects.all()
 
     for c in cluster:
+        port = c.port
+        if not c.port:
+            port = 22
         #paramiko-based commands
-        sshkey = paramiko.PKey(data=c.key)
+        ssh_file = settings.SSH_KEY_FILE
+        ssh_passwd = settings.SSH_KEY_PASSWORD
+        ssh_user = c.username
+        sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
         ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.domain
+        domain = c.ip
         if domain is None:
-            domain = "" + c.ip
+            domain = "" + c.domain
         date = Components.objects.all().aggregate(Max('date_creation'))
         date = date['date_creation__max']
+        # generate secure Token and append to url
         url_token = _gen_sec_token(domain)
         url = reverse('component_receive', args=[url_token])
-        command = "./ctl-getcomponent -a "
-        #append --pretend for testing
-        if pretend:
-            command += " --pretend"
-        # append date if database is not empty to get only latest results
-        if date is not None:
-            command += "-u %s -k %s -t %s" % (url, c.key, date)
-        else:
-            command += "-u %s -k %s" % (url, c.key)
         # use ssh for testing if enabled, ssh is also used normally
         if ssh:
-            ssh.connect(c.domain, pkey=sshkey, port=c.port)
-            stdin, stdout, stderr = ssh.exec_command(command)
-            error_messages = stderr.readlines()
-            if error_messages:
-                message = 'An error occured while running command over SSH:\n'
-                for line in error_messages:
-                    message += line
-                raise ValueError(message)
-            print stdout.readlines(), stderr.readlines()
-#if no error TODO needed?
+            print domain, ssh_file, ssh_user
+            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
+                    key_filename=ssh_file, look_for_keys=False)
+            shell = ssh.invoke_shell(term="vt220")
+            response = ""
+            if pretend:
+                response += _send_message(shell, "s")
+            response += _send_message(shell, "1")
+            if date is None:
+                response += _send_message(shell, "y")
+            else:
+                response += _send_message(shell, "n")
+                response += _send_message(shell, "%s" % date.date())
+            response += _send_message(shell, url)
+            response += _send_message(shell, "q")
+            print response
+            #if no error TODO needed?
             ModuleTokenValidation.create_token(url_token, c)
             ssh.close()
+
+def _send_message(shell, message, end='\n', wait=0.01):
+    response = _receive_response(shell, wait)
+    message = message + end
+    shell.sendall(message)
+    response += _receive_response(shell, wait)
+    return response
+
+def _receive_response(shell, wait=0.01):
+    time.sleep(wait)
+    response = ''
+    while shell.recv_ready():
+        response += response + shell.recv(10)
+        time.sleep(wait)
+    return response
 
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', )

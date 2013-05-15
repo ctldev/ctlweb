@@ -39,6 +39,9 @@ PAGINATION_PAGE_RANGE_INTERFACES = 5
 PAGINATION_PAGE_RANGE_COMPONENTS = 5
 PAGINATION_BUTTON_RANGE = 3
 
+SSH_KEY_FILE = normpath(join(SITE_ROOT, 'settings', 'id_rsa_ctl'))
+SSH_KEY_PASSWORD = ''
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error.

@@ -11,7 +11,7 @@ class ClusterAdmin(admin.ModelAdmin):
     """
     fieldsets = (
             (None, {'fields': ('domain',)}),
-            (_('Informations'), {'fields': ('ip', 'port')}),
+            (_('Informations'), {'fields': ('ip', 'username', 'port')}),
             (_('Key'), {'fields': ('key',)}),
             )
     list_display = ['domain', 'ip', 'port']

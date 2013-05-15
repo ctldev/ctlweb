@@ -34,6 +34,7 @@ def component_detail(request, comp_id):
     see_code = v_user.has_perm('ctlweb.can_see_code')
     see_homecluster = v_user.has_perm('ctlweb.can_see_homecluster')
     see_homeserver = v_user.has_perm('ctlweb.can_see_homeserver')
+    see_ssh_data = v_user.has_perm('ctlweb.can_see_ssh_data')
     dict_response = dict()
     dict_response["user"] = v_user
     dict_response["component"] = comp
@@ -48,5 +49,6 @@ def component_detail(request, comp_id):
     dict_response["see_code"] = see_code
     dict_response["see_homecluster"] = see_homecluster
     dict_response["see_homeserver"] = see_homeserver
+    dict_response["see_ssh_data"] = see_ssh_data
     context = RequestContext(request, dict_response)
     return render_to_response("comp_detail.html", context_instance=context)
