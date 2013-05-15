@@ -20,7 +20,7 @@ long_opt = ["version", "verbose=", "timestamp=", "all", "url=", "key=",
 max_output_level = 2
 
 def usage():
-    print("Usage:", sys.argv[0], """[-t <timestamp>|--timestamp=<timestamp>]
+    print("Usage:", sys.argv[0], """[-t <YYYY-MM-DD>|--timestamp=<YYYY-MM-DD>]
          \t [-a|--all]
          \t [-u <push-url>|--url=<push-url>]
          \t [-k <pub-key>|--key=<pub-key>]

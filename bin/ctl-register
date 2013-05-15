@@ -32,81 +32,54 @@ def main():
         usage()
         sys.exit(2)
     output = None
-    ss_port = 22
     database = None
     reg_id = "" #will be set during argument parsing
     pubkey = "" #will be set during argument parsing
     required = 0  #checks if all required arguments are give
-    add_set = False
-    remove_set = False
-    overview_set = False
+    is_add = False
+    is_remove = False
+    is_overview = False
 
     #o = options, a = arguments
     for o, a in opts:
         if o in ("-c", "--config"):
-            import configparser
-            config = configparser.Configparser()
-            config.read(a)
-            database = Database(config.get('Backend','Database'))
+            database = Database(a)
         elif o in ("-a", "--add"):
-            add_set = True
-            if a == None:
-                Log.critical("No valid ID specified, Aborting")
-                exit(1)
-            else:
-                Log.debug("Adding ID to cluster")
-                required += 1
-                reg_id = a
-        elif o in ("-k", "--key"):
-            if a == None:
-                Log.critical("""No valid public key has been specified,
-                        Aborting""")
-                exit(1)
-            else:
-                Log.debug("Setting Public Key")
-                required += 1
-                pubkey = a
-
+            is_add = True
+            required += 1
+            reg_id = a
         elif o in ("-r", "--remove"):
             remove_set = True
-            if a == None:
-                Log.critical("No ID specified, Aborting")
-                exit(1)
-            else:
-                Log.debug("Removing Entry with the specified ID")
-                required += 1
-                reg_id = a
-            print("removing",o,a)
-
+            Log.debug("Removing Entry with the specified ID")
+            required += 1
+            reg_id = a
         elif o in ("-o", "--overview"):
             overview_set = True
-            print("overview",o,a)
-
+        elif o in ("-k", "--key"):
+            required += 1
+            pubkey = a
         elif o in ("-v", "--verbose"):
             Log.increase_verbosity()
         elif o == "version":
             usage()
 
-    if add_set and required == 2:
+    if (is_add and is_remove) or        \
+        (is_remove and is_overview) or  \
+        (is_add and is_overview):
+            print("Please choose only one operation!")
+            exit(1)
+    if is_add and reg_id and pubkey:
         Log.debug("Switching to add context")
         Log.debug(reg_id+ "," +pubkey)
         User.add({
             "c_id": reg_id,
             "c_pubkey": pubkey,
             })
-    elif remove_set and required == 2:
+    elif is_remove and reg_id:
         Log.debug("Switching to remove context")
         to_remove = User.get_exacly(reg_id)
         to_remove.remove()
-    elif add_set and remove_set and required == 2:
-        Log.critical("""It is not possible to add AND remove at the same time,
-        Sry""")
-    elif required != 2 and required != 0:
-        Log.critical("Something went wrong with the ID or the Key")
-        usage()
-        Log.info("required is: "+str(required)+"")
-    #TODO unsicher, ob add+overview erlaubt sein soll    
-    elif required != 2 and overview_set:
+    elif is_overview: 
         Log.debug("Switching to overview context")
         overview(database)
     else:

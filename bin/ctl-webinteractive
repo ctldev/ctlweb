@@ -3,6 +3,7 @@ import sys
 import socket
 from datetime import date
 import re
+from subprocess import call
 
 USER_MODE = {
         'add': 0,
@@ -13,6 +14,7 @@ SIMULATE = False
 def main():
     """ Evaluates userinput and directs input to backend command
     """
+    global SIMULATE
     head_msg = "Welcome to the %s interace for CTL-Webfrontends" \
             % socket.gethostname()
     head_line = ''
@@ -65,22 +67,34 @@ def component_request():
         if mode == 'n':
             try:
                 time_index = _get_timeindex()
+                break
             except UserBack:
                 continue
         elif mode == 'y':
-            break;
+            break
         elif mode == 'b':
-            raise UserBack
+            raise UserBack()
         else:
             print("Unknown option, please retry.")
     while True:         # Get the private url
         print("Please enter the private url as upload path: ")
-        url = sys.stdin.readline().strip()
+        url = sys.stdin.readline().strip()  #TODO validate url
         if url == 'b':
-            raise UserBack
-        else:
-            print("Calling upload… done!") # TODO
+            raise UserBack()
+        elif url != '':
             break
+    opts = []
+    if time_index:  # User want a subset of components
+        opts.append(" -t %s-%s-%s " % time_index)
+    opts.append(" --get")
+    opts.append(" --url=%s" % url)
+    cmd = ["ctl-component"]
+    cmd.extend(opts)
+    if SIMULATE: # TODO read correct SIMULATE
+        print("SIMULATE: %s" % cmd)
+        return
+    call(cmd)
+    print("done.")
 
 
 def user(mode):
@@ -97,7 +111,7 @@ def user(mode):
         user_id = sys.stdin.readline().strip()
         if user_id == 'd':
             print("Going menu up!")
-            raise UserBack
+            raise UserBack()
         elif re.match("\w*",user_id):
             break
         else:
@@ -108,10 +122,20 @@ def user(mode):
         print("Please enter the users public key: ")
         public_key = sys.stdin.readline().strip()
         if public_key == 'b':
-            raise UserBack
+            raise UserBack()
         elif public_key != '':
             print("Done")
             break
+    cmd = ["ctl-register"]
+    if mode == USER_MODE['add']:
+        cmd.append(" --add='%s'" % user_id)
+    elif mode == USER_MODE['remove']:
+        cmd.append(" --remove='%s'" % user_id)
+        cmd.append(" --key='%s'" % user_key)
+    if SIMULATE:
+        print("SIMULATE: %s" % cmd)
+        return
+    call(cmd)
 
 
 def _get_timeindex():
@@ -131,15 +155,16 @@ def _get_timeindex():
             day = int(day)
         except AttributeError:
             if input_date == 'b':
-                raise UserBack
+                raise UserBack()
             print("Unknown format, Please try again.")
             print()
             continue
         try:
-            return date(year, month, day)
+            date(year, month, day)
         except ValueError:
             print()
             print("Invalid day. Please try again.")
+        return (year, month, day)
 
 
 class UserBack(Exception):
