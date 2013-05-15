@@ -14,15 +14,23 @@ from database import Component
 from database.database import NoSuchTable
 from database.database import DatabaseNotFound
 
-opt = "a:r:c:v"
+opt = "a:r:c:vgt:u:s"
 long_opt = ["add=", 
         "remove=", 
-        "config=" ]
+        "config=",
+        "get",
+        "timestamp=",
+        "url=",
+        "simulate"]
 
 
 def usage():
     print("Usage:", sys.argv[0], """[-a <component.tgz>|--add=<component.tgz>]
            [ -r <component> | --remove=compontent ] | 
+           [ -g | --get ]
+           [ -t <YYYY-MM-DD> | --timestamp=<YYYY-MM-DD> ]
+           [ -u <upload-url> | --url=<upload-url> ]
+           [ -s | --simulate ]
            [ -c | --config=<config file>""")
 
 
@@ -41,6 +49,8 @@ def main():
             "remove" : 2,
             }
     mode = None
+    timestamp = None
+    upload_url = None
     
     for o, a in opts:
         if o in ("-a", "--add"):
@@ -52,25 +62,45 @@ def main():
         elif o in ("-r", "--remove"):
             mode = MODE['remove']
             component = a
+        elif o in ("-g", "--get"):
+            mode = MODE['get']
+        elif o in ("-t", "--timestamp"):
+            timestamp = a
+        elif o in ("-u", "--url"):
+            upload_url = a
         elif o == "-v":
             Log.increase_verbosity()
         elif o in ("-c", "--config"):
             Database(a)
             config = a
+    # Working
     if mode == None:
         usage()
         exit(1)
+    # If the connection is established, a special config was given
     if not Database.db_connection:
         Log.debug("Using default config to initialize database.")
         Database()
-    if mode == MODE['add']:
+    if mode == MODE['add']: # Add component (local purpose)
         Log.debug("Adding component to database and manifest store")
         Component.add(component)
-    elif mode == MODE['remove']:
+    elif mode == MODE['remove']: # Remove component (local purpose)
         Log.debug("Removing component from database and manifest store")
         if not Component.remove(component):
             Log.critical("Unable to remove %s" % component)
             exit(1)
+    elif mode == MODE['get']: # Upload component (web & local purpose)
+        Log.debug("Preparing to send components")
+        if timestamp:
+            components = Component.get(timestamp)
+        else:
+            components = Component.get()
+        for comp in components:
+            if upload_url:
+                comp.upload_to_web(upload_url)
+            else:
+                print(comp)
+
 
 if __name__ == "__main__":
     main()            

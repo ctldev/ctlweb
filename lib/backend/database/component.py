@@ -37,6 +37,20 @@ class Component(Database):
             return False
         return True
 
+    def upload_to_web(url):
+        """ Upload the component to the given url
+
+        """
+        Log.debug("Uploading component to url %s" % url)
+        import requests
+        from os import path
+        manifest_file = path.join(Database.store, "%s.tgz" % self.c_id)
+        files = {'manifest': open(manifest_file, "rb")}
+        r = requests.post(url, files=files)
+        if r.status_code != requests.codes.ok:
+            Log.critical("Error %s occured while upload" % r.status_code)
+
+
     @classmethod
     def add(cls, component):
         """ A given package will be added to the local database.

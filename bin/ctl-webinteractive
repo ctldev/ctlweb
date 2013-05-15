@@ -104,15 +104,15 @@ def user(mode):
     elif mode == USER_MODE['remove']:
         print("Remove a user")
         print("-------------")
-    user_id = None
+    user_name = None
     user_key = None
     while True:
-        print("Please enter the user id: ")
-        user_id = sys.stdin.readline().strip()
-        if user_id == 'd':
+        print("Please enter the username: ")
+        user_name = sys.stdin.readline().strip()
+        if user_name == 'd':
             print("Going menu up!")
             raise UserBack()
-        elif re.match("\w*",user_id):
+        elif re.match("\w*",user_name):
             break
         else:
             print("User has to be [a-zA-Z_0-9] only. Please retry")
@@ -128,10 +128,10 @@ def user(mode):
             break
     cmd = ["ctl-register"]
     if mode == USER_MODE['add']:
-        cmd.append(" --add='%s'" % user_id)
-    elif mode == USER_MODE['remove']:
-        cmd.append(" --remove='%s'" % user_id)
+        cmd.append(" --add='%s'" % user_name)
         cmd.append(" --key='%s'" % user_key)
+    elif mode == USER_MODE['remove']:
+        cmd.append(" --remove='%s'" % user_name)
     if SIMULATE:
         print("SIMULATE: %s" % cmd)
         return
