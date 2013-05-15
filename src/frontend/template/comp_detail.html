@@ -121,7 +121,7 @@ Component {{ component.name }}
 		  data-parent="#accordion1" 
 		  href="#{{ hc.id }}"
 		>
-		  {{ hc.name }} {{ hc.domain }}
+		{{ hc.domain }}
 		</a>
 	  </div>
 	  {% if forloop.first %}
@@ -160,6 +160,24 @@ Component {{ component.name }}
 					</td>
 					<td> 
 					  {{ h.code }} 
+					</td>
+				  </tr>
+				{% endif %}
+				{% if see_ssh_data %}
+				  <tr>
+					<td>
+					  {% trans "SSH-Benutzer:" %}
+					</td>
+					<td>
+					  {{ hc.username }}
+					</td>
+				  </tr>
+				  <tr>
+					<td>
+					  {% trans "SSH-Port:" %}
+					</td>
+					<td>
+					  {{ hc.port|default:22 }}
 					</td>
 				  </tr>
 				{% endif %}
