@@ -161,10 +161,10 @@ def _get_timeindex():
             continue
         try:
             date(year, month, day)
+            return (year, month, day)
         except ValueError:
             print()
             print("Invalid day. Please try again.")
-        return (year, month, day)
 
 
 class UserBack(Exception):
