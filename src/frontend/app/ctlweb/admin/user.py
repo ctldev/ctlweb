@@ -5,51 +5,43 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 from ctlweb.models import Userkeys
+from ctlweb.models import UserMethods
 
 def set_active(modeladmin, request, queryset):
-    queryset.update(is_active=True) 
+    for q in queryset :
+        q.is_active = True
+        q.save(request)
     set_active.short_description = _("Benutzer aktivieren")
                    
 def set_inactive(modeladmin, request, queryset):
-    active = User.objects.filter(is_active=True).count()
-    if active > queryset.count():
-        if User.objects.filter(is_superuser=True).count()>queryset.count():
-            set_non_superuser(modeladmin, request, queryset)
-            if User.objects.filter(is_staff=True).count()>queryset.count():
-                set_non_staff(modeladmin, request, queryset)
-                queryset.update(is_active=False)
-        else :
-            if User.objects.filter(is_staff=True).count()>queryset.count():
-                set_non_staff(modeladmin, request, queryset)
-                queryset.update(is_active=False)
-            else :
-                 queryset.filter(is_superuser=False, is_staff=False).update(is_active=False)
+    for q in queryset :
+        q.is_active = False     
+        q.save(request)
     set_inactive.short_description = _("Benutzer deaktivieren")
                           
 def set_staff(modeladmin, request, queryset):
-    queryset.update(is_staff=True, is_active=True)
+    for q in queryset :
+        q.is_staff = True
+        q.save(request)
     set_staff.short_description = _("Benutzer Redakteurrechte geben")
 
 def set_non_staff(modeladmin, request, queryset):
-    staff = User.objects.filter(is_staff=True).count()
-    if staff > queryset.count():
-        if User.objects.filter(is_superuser=True).count()>queryset.count():
-            set_non_superuser(modeladmin, request, queryset)
-        else :
-            queryset.filter(is_superuser=False).update(is_staff=False)
+    for q in queryset :
+        q.is_staff = False
+        q.save(request)
     set_non_staff.short_description = _("Benutzer "+\
             "Redakteurrechte entziehen")
 
 def set_superuser(modeladmin, request, queryset):
-    if request.user.is_superuser:
-        queryset.update(is_superuser=True, is_staff=True, is_active=True)
+    for q in queryset :
+        q.is_superuser = True
+        q.save(request)
     set_superuser.short_description = _("Benutzer Adminrechte geben")
 
 def set_non_superuser(modeladmin, request, queryset):
-    if request.user.is_superuser:
-        admins = User.objects.filter(is_superuser=True).count()
-        if admins > queryset.count():
-            queryset.update(is_superuser=False)
+    for q in queryset :
+        q.is_superuser = False
+        q.save(request)
     set_non_superuser.short_description = _("Benutzer Adminrechte entziehen")
 
 class CtlwebUserAdmin(UserAdmin):
@@ -72,10 +64,7 @@ class CtlwebUserAdmin(UserAdmin):
                 set_non_superuser,
               ]
     def save_model(self, request, obj, form, change):
-        if obj == request.user :
-            pass
-        else :
-            obj.save()
+        obj.save(request)
 
 admin.site.unregister(User)
-admin.site.register(User, CtlwebUserAdmin)
+admin.site.register(UserMethods, CtlwebUserAdmin)
