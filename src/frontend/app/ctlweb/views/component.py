@@ -24,8 +24,7 @@ def component_detail(request, comp_id):
     homeserver = comp.homeserver.all().order_by('name')
     homecluster = comp.homecluster.all().order_by('domain')
     interface = Interfaces.objects.filter(components = comp)
-    emails = Programmer.objects.filter(component = comp).\
-            distinct('email')
+    emails = Programmer.objects.filter(component = comp)
     userlist = User.objects.filter(email__in=emails.values_list('email'))
 
     can_change = v_user.has_perm('ctlweb.change_components')
