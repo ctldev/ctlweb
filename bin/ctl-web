@@ -11,14 +11,27 @@ from database import Web
  
 
 opt = "c:a:k:r:ov"
-long_opt = ["config=","id=", "public key=", "reg_id=", "overview", "verbose" ]
+#specifies a config-file
+long_opt = ["config="]
+#specifies the id, under which new web-sites are saved
+long_opt.append("id=")
+#specifies the public key needed for saving a web-site
+long_opt.append("public_key=")
+#removes a web-site from a cluster
+long_opt.append("remove=")
+#the registered id used for removing a entry
+long_opt.append("reg_id=")
+#gives an overview over all registered web-sites
+long_opt.append("overview")
+#increases/decreases the talkativeness
+long_opt.append("verbose") 
 max_output_level = 2
 
 def usage():
     print("Usage:", sys.argv[0], """[-c <database>| --config=<database>]
          \t [-a <id>| --a=<id>] 
          \t [-v | --verbose]  
-         \t [-k <public key> --key=<public key>]
+         \t [-k <public_key> --key=<public_key>]
          \t [-r <reg_id> | --remove=<reg_id>]
          \t [-o | --overview] """)
 

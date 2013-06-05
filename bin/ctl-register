@@ -12,10 +12,22 @@ from database.user import User
 # Fügt den Benutzer dabei der DB hinzu und schreibt die .authorized_keys neu
 
 opt = "a:k:r:ov"
-long_opt = [ "add=", "key=", "remove=", "overview", "verbose", "version" ]
+#adds a user to a cluster
+long_opt = ["add="]
+#the key which is saved with the user
+long_opt.append("key=")
+#removes a user from a cluster
+long_opt.append("remove=")
+#overview over all registered user
+long_opt.append("overview")
+#increases/decreases the talkativeness
+long_opt.append("verbose")
+#shows the version of the command
+long_opt.append("version") 
+
 max_output_level = 2
 
-def usage():
+def usage():#
     print("Usage:", sys.argv[0], """[-a <id>|--add=<id> -k <key>|--key=<key>]
     \t [-r <id>|--remove=<id>] 
     \t [-o|--overview]

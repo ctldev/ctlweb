@@ -8,15 +8,24 @@ from util.util import hash_file
 
 #generiert ein Manifest für Compontent
 opt = "n:c:i:vh:p:u:"
-long_opt = ["name=", 
-        "ci=", 
-        "impl=", 
-        "documentation=", 
-        "verbose", 
-        "version", 
-        "hostname=",
-        "port=",
-        "user="]
+#name of the manifest-file
+long_opt = ["name="]
+#the used ci-interface
+long_opt.append("ci=")
+#the implemented component
+long_opt.append("impl=")
+#name of the generated document
+long_opt.append("documentation=")
+#increases/decreases the talkativeness
+long_opt.append("verbose")
+#shows version of the command
+long_opt.append("version")
+#gives the command a hostname manually
+long_opt.append("hostname=")
+#gives the command a port manually
+long_opt.append("port=")
+#specifies the user
+long_opt.append("user=")
 
 def usage():
     print("Usage:", sys.argv[0], """[ -n | --name=name ]
