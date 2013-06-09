@@ -118,7 +118,10 @@ class Database:
                 % (cls.__name__, name))
         Log.debug("Database.get_exacly(): executing query: " + sql)
         cursor.execute(sql, (name, ))
-        return cls.convert(cursor.fetchone()[0])
+        try:
+            return cls.convert(cursor.fetchone()[0])
+        except TypeError: # Object was not in database
+            return None
 
     def create_table(self):
         """ Creates a table for the class in which every instance object which
@@ -159,6 +162,7 @@ class Database:
     def remove(self):
         """ Removes rows on the basis of the id 
         """
+        Log.debug('Removing object from database.')
         cursor = Database.db_connection.cursor()
         table = self.__name__
         sql = "DELETE FROM " +table+ """
@@ -171,6 +175,7 @@ class Database:
     def save(self):
         """ Saves object into database
         """
+        Log.debug('Saving object to database')
         cursor = Database.db_connection.cursor()
         attributes = self.get_attributes()
         table = self.__name__
