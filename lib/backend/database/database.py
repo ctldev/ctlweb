@@ -74,7 +74,7 @@ class Database:
         return attributes
 
     @classmethod
-    def get(cls, time_since='all'):
+    def get(cls, time_since=None):
         """ Returns a tuple of objects stored in the database.
         
         Optional Parameter time_since is instance of datetime.datetime and
@@ -86,7 +86,7 @@ class Database:
         sql = "SELECT adapter FROM " + cls.__name__ + """
                 WHERE date >= ?"""
         values = []
-        if type(time_since) == str:
+        if not time_since:
             Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
             sql = "SELECT adapter FROM " + cls.__name__
         elif isinstance(time_since, datetime):
@@ -102,6 +102,8 @@ class Database:
             cursor.execute(sql, values)
         except sqlite3.IntegrityError:
             return None
+        except sqlite3.OperationalError:
+            raise NoSuchTable()
         result_set = []
         for row in cursor.fetchall():
             result_set.append(cls.convert(row[0]))
@@ -117,7 +119,10 @@ class Database:
         Log.debug("Database.get_exacly(): Requesting %s with c_id = %s" \
                 % (cls.__name__, name))
         Log.debug("Database.get_exacly(): executing query: " + sql)
-        cursor.execute(sql, (name, ))
+        try:
+            cursor.execute(sql, (name, ))
+        except sqlite3.OperationalError:
+            raise NoSuchTable()
         try:
             return cls.convert(cursor.fetchone()[0])
         except TypeError: # Object was not in database
