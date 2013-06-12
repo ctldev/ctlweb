@@ -24,7 +24,7 @@ class Components(models.Model):
     date = models.DateTimeField(_("Datum"), auto_now=True)
     date_creation = models.DateTimeField(_("Erstellungsdatum"), auto_now_add=True)
     is_active = models.BooleanField(_("Freigeschaltet"))
-    version = models.CharField(_("Versionsnummer"), max_length=10)
+    version = models.CharField(_("Versionsnummer"), max_length=100)
     class Meta:
         app_label = 'ctlweb'
         verbose_name = _("Component")
