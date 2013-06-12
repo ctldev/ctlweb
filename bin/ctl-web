@@ -8,6 +8,9 @@ from database import Database
 from database.database import NoSuchTable
 from database import Web
 
+# NICE TO HAVE: The first time a frontend connects, its IP is stored in tha
+# database and used as a postfix for it's usernames
+
 
 def commit_settings(args):
     """ Sets the verbosity level & if nessesary it sets the user selected

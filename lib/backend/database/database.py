@@ -110,15 +110,17 @@ class Database:
         return result_set
 
     @classmethod
-    def get_exacly(cls, name):
+    def get_exactly(cls, name):
         """ Returns exactly one object with the given (unique) name.
+        If no object with the given name was found, a InstanceNotFoundError is
+        raised.
         """
         sql = "SELECT adapter FROM " + cls.__name__ + """
                 WHERE c_id = ?"""
         cursor = Database.db_connection.cursor()
-        Log.debug("Database.get_exacly(): Requesting %s with c_id = %s" \
+        Log.debug("Database.get_exactly(): Requesting %s with c_id = %s" \
                 % (cls.__name__, name))
-        Log.debug("Database.get_exacly(): executing query: " + sql)
+        Log.debug("Database.get_exactly(): executing query: " + sql)
         try:
             cursor.execute(sql, (name, ))
         except sqlite3.OperationalError:
@@ -126,7 +128,7 @@ class Database:
         try:
             return cls.convert(cursor.fetchone()[0])
         except TypeError: # Object was not in database
-            return None
+            raise InstanceNotFoundError()
 
     def create_table(self):
         """ Creates a table for the class in which every instance object which
@@ -286,6 +288,9 @@ class Database:
     def __str__(self):
         attr = self.get_attributes()
         return "%s.create(%s)" % (self.__name__, self.__conform__(self))
+
+class InstanceNotFoundError(ValueError):
+    pass
 
 class NoSuchTable(sqlite3.OperationalError):
     pass
