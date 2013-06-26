@@ -1,42 +1,69 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH ctl-web 1 "January 2013" Linux "User Manuals"
+.TH ctl-web 1 "June 2013" Linux "User Manuals"
 .SH NAME
-ctl-web \- enables the ctl-webinterface to add users to specific clusters  
+ctl-web \- Grants or revokes access for ctlweb frontends on clusters  
 .SH SYNOPSIS
 .br
-.B ctl-web
+.\" ctl-web section
+.B ctl-web 
+.RB [\| \-h \|]
+{add,remove,overview}
+.br
+.\" ctl-web add section
+.B ctl-web add
+.RB [\| \-h \|]
 .RB [\| \-c
-.IR configfile \|]
-.RB [\| \-a 
-.IR id \|
-\||\|
+.IR CONFIG \|]
+.RB [\| \-v \|]
+.RB \| \-u \|
+.IR URL \|
 .RB \| \-k 
-.IR publickey \|]
-.RB [\| \-r
-.IR id \|]
-.RB [\| \-o \|]
+.IR KEY \|
+.br
+.\" ctl-web remove section
+.B ctl-web remove
+.RB [\| \-h \|]
+.RB [\| \-c
+.IR CONFIG \|]
+.RB [\| \-v \|]
+.RB \| \-u \|
+.IR URL \|
+.br
+.\" ctl-web overview section
+.B ctl-web overview
+.RB [\| \-h \|]
+.RB [\| \-c 
+.IR CONFIG \|] 
+.RB [\| \-v \|]
+.RB [\| \-t
+.IR TIMESTAMP \|]
+
 .SH DESCRIPTION
 .B ctl-web
-does register URLs to a cluster. Of course this command also offers the
-deletion of them.
+does add ctlweb frontends to a cluster. This command also offers the
+deletion of them and can provide an entire overview over all registered
+frontends on a specific cluster.
 .SH OPTIONS
 .TP
-.BI \-c\ configfile \fR,\ \fB\-\-config-file\fR=\fIconfigfile
-If this option is not given, a default config file will be used.
+.BR \-h ", " \-\-help
+Prints a help message with all required/optional arguments and their meanings
 .TP
-.BI \-a\  id \fR,\ \fB\-\-add= id
-Adds the specified URL to the cluster.
+.BI \-c\ \fICONFIG \fR,\ \fB\-\-config\ \fICONFIG
+If this option is not given, a default config file will be used
 .TP
-.BI \-k\  publickey \fR,\ \fB\-\-key= publickey
+.BR \-v ", " \-\-verbose
+Increases verbosity
+.TP
+.BI \-u\  URL \fR,\ \fB\-\-url\ \fIURL
+Specifies the URL to be added/removed
+.TP
+.BI \-k\  KEY \fR,\ \fB\-\-key\ \fIKEY
 Adds the specified Public Key to a cluster.
 .TP
-.BI \-r\  id \fR,\ \fB\-\-remove= id
-Removes the URL with the specified ID.
-.TP
-.BR \-o ", " \-\-overview
-Provides an overview over all registered URLS on a cluster
+.BI \-t\  TIMESTAMP \fR,\ \fB\-\-timestamp\ \fITIMESTAMP
+Shows only ctlweb frontends newer than the timestamp
 
 
 .\" .SH FILES
@@ -52,6 +79,3 @@ Jörn Hameyer <>
 .SH "SEE ALSO"
 .BR ctl (1),
 .BR ctl-register (1)
-
-
-
