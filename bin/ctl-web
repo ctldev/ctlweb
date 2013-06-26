@@ -4,10 +4,12 @@ import sys
 import argparse
 
 from util import Log
-from util.util import overview
 from database import Database
 from database.database import NoSuchTable
 from database import Web
+
+# NICE TO HAVE: The first time a frontend connects, its IP is stored in tha
+# database and used as a postfix for it's usernames
 
 
 def commit_settings(args):
@@ -22,7 +24,7 @@ def commit_settings(args):
 
 
 def add(args):
-    """ Adds a ctl-web frontend to the Database and gives it access to
+    """ Adds a ctl-web frontend to the Database and grants it access to
         * ctl-webinteractive
     """
     web = Web.add({ 'c_id': args.url, 
@@ -35,7 +37,10 @@ def add(args):
 
 
 def remove(args):
-    web = Web.get_exacly(args.url)
+    try:
+        web = Web.get_exacly(args.url)
+    except NoSuchTable:
+        web = None
     if web:
         web.remove()
     else:
@@ -44,17 +49,17 @@ def remove(args):
 
 def overview(args):
     webs = []
-    if args.timestamp:
-        webs = Web.get(timestamp)
-    else:
-        webs = Web.get()
+    try:
+        webs = Web.get(args.timestamp)
+    except NoSuchTable:
+        users = []
     print()
     print('    Registred ctlweb frondends')
     print('--==============================--')
     print()
     if webs:
         print('%-35s | %-35s' % ('URL','Key'))
-        print('%s' % ''.join( '-' for i in range(73)))
+        print('-' * 73)
     elif args.timestamp:
         print('No ctlweb frondends in timerange added')
     else:
@@ -72,7 +77,7 @@ def main():
     parent_parser.add_argument('--verbose','-v', 
             default=1,
             action='count',
-            help='Increase verbosity')
+            help='Increase output level')
 
     parser = argparse.ArgumentParser(
             description='Manages access for ctlweb frontends')
@@ -84,7 +89,8 @@ def main():
             parents=[parent_parser],
             help='Grant access for ctlweb frontend. This command can also be'
             + ' used to change a ctlweb frontend.')
-    add_parser.add_argument('--url','-u', required=True,
+    add_parser.add_argument('url',
+            metavar='URL',
             help='Url of the ctlweb frontend')
     add_parser.add_argument('--key','-k', required=True,
             help='Public key of the ctlweb frontend')
@@ -95,13 +101,14 @@ def main():
     remove_parser = subparser.add_parser('remove',
             parents=[parent_parser],
             help='Revoke access for ctlweb frontend')
-    remove_parser.add_argument('--url','-u', required=True,
+    remove_parser.add_argument('url',
+            metavar='URL',
             help='Url of the ctlweb frontend')
     remove_parser.set_defaults(func=remove)
       ####################
      # ctl-web overview #
     ####################
-    overview_parser= subparser.add_parser('overview',
+    overview_parser = subparser.add_parser('overview',
             parents=[parent_parser],
             help='View registered ctlweb frontends')
     overview_parser.add_argument('--timestamp','-t',
@@ -115,7 +122,6 @@ def main():
     args = parser.parse_args()
     commit_settings(args)
     args.func(args)
-
 
    
 if __name__ == '__main__':

@@ -120,3 +120,21 @@ class Component(Database):
                 "c_exe": exe,
                 }
 
+    def execute(self, args=None):
+        """ Executes the component with the given argument string
+        """
+        import subprocess
+        import re
+        import shlex
+        import sys
+        args = '%s %s' % (self.c_exe, args)
+        args = shlex.split(args)
+        try:
+            subprocess.check_call(args)
+        except subprocess.CalledProcessError:
+            print('Error occured while running ctl command.',
+                    file=sys.stderr)
+        except OSError:
+            print('CTL Command not found, please contact the administrator.',
+                    file=sys.stderr)
+
