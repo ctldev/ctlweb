@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import sqlite3
-import os
 import sys
-from os.path import dirname,abspath
 from util import Log
 from util.settings import DEFAULT_CONFIG
+
 
 class Database:
     """ Every class derived from Database get its own table in the database.
@@ -24,7 +23,7 @@ class Database:
         import configparser
         reader = configparser.ConfigParser()
         reader.read(config_file)
-        Database.config = config_file # share config file with others
+        Database.config = config_file  # share config file with others
 
         if Database.store is None:
             try:
@@ -76,7 +75,7 @@ class Database:
     @classmethod
     def get(cls, time_since=None):
         """ Returns a tuple of objects stored in the database.
-        
+
         Optional Parameter time_since is instance of datetime.datetime and
         represents the oldest object to be found by get. Default searches for
         every object stored in the database.
@@ -90,7 +89,7 @@ class Database:
             Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
             sql = "SELECT adapter FROM " + cls.__name__
         elif isinstance(time_since, datetime):
-            Log.debug("Database.get(): Get %s newer than %s" % 
+            Log.debug("Database.get(): Get %s newer than %s" %
                     (cls.__name__, time_since))
             time_since = time_since.strftime("%s")
             values.append(time_since)
@@ -144,12 +143,12 @@ class Database:
         sql += self.__name__
         sql += """ (
                 date DATE,
-                adapter TEXT""" 
+                adapter TEXT"""
         for i in self.get_attributes():
             if re.search("^c_id$",i):
                 sql += ", "+i+" PRIMARY KEY"
             else:
-                sql += ", "+i 
+                sql += ", "+i
         sql += ");"
         cursor.execute(sql)
         self.db_connection.commit()
@@ -167,7 +166,7 @@ class Database:
         self.db_connection.commit()
 
     def remove(self):
-        """ Removes rows on the basis of the id 
+        """ Removes rows on the basis of the id
         """
         Log.debug('Removing object from database.')
         cursor = Database.db_connection.cursor()
@@ -198,14 +197,14 @@ class Database:
         try:
             sql = "INSERT INTO " + table + """
                     VALUES
-                    (strftime('%s','now'), :adapter """ +sql        
+                    (strftime('%s','now'), :adapter """ +sql
             cursor.execute(sql,values)
             Database.db_connection.commit()
         except sqlite3.IntegrityError:
             sql = ""
             for i in attributes:
                 sql += ", "+i
-                sql += " = '"+self[i]+"'"    
+                sql += " = '"+self[i]+"'"
             sql = "UPDATE " + table + """
                     SET
                     date = (strftime('%s', 'now')),
@@ -228,7 +227,7 @@ class Database:
             repr = ""
             first = True
             for attr in attributes:
-                # Works only if all attributes are simple types like 
+                # Works only if all attributes are simple types like
                 # string, int,...
                 if first:
                     repr = attr + "=" + self[attr]
@@ -278,7 +277,7 @@ class Database:
             except AttributeError:
                 return False
         return eq
-    
+
     @property
     def __name__(self):
         """ Provides that the name of the class is callable

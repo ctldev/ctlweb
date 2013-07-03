@@ -2,6 +2,7 @@
 import sqlite3
 from .access import Access
 
+
 class User(Access):
     """ An registered user
     """
