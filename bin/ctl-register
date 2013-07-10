@@ -1,102 +1,114 @@
 #!/usr/bin/env python3
-import os
-import sys
-import getopt
-from os.path import dirname,abspath
+import argparse
+
 from util import Log
-from util.util import overview
-from database.database import Database
+from util.parsing import commit_settings
+from util.parsing import parent_parser
+from database.database import NoSuchTable
 from database.user import User
 
-# registriert benutzer mit id und rsa-pub-key.
-# Fügt den Benutzer dabei der DB hinzu und schreibt die .authorized_keys neu
+# NICE TO HAVE: Overview and remove users of ctlweb frontend
+#
 
-opt = "a:k:r:ov"
-#adds a user to a cluster
-long_opt = ["add="]
-#the key which is saved with the user
-long_opt.append("key=")
-#removes a user from a cluster
-long_opt.append("remove=")
-#overview over all registered user
-long_opt.append("overview")
-#increases/decreases the talkativeness
-long_opt.append("verbose")
-#shows the version of the command
-long_opt.append("version") 
 
-max_output_level = 2
+def add(args):
+    """ Adds a ctl-web frontend user to the Database and grants it access to
+        * ctl-init
+    """
+    user = User.add({'c_id': args.user,
+                    'c_pubkey': args.key})
+    try:
+        user.save()
+    except NoSuchTable:
+        user.create_table()
+        user.save()
 
-def usage():#
-    print("Usage:", sys.argv[0], """[-a <id>|--add=<id> -k <key>|--key=<key>]
-    \t [-r <id>|--remove=<id>] 
-    \t [-o|--overview]
-    \t [-v | --verbose]
-    \t [--version]""")
+
+def remove(args):
+    try:
+        user = User.get_exacly(args.user)
+    except NoSuchTable:
+        user = None
+    if user:
+        user.remove()
+    else:
+        Log.error('%s was not found in Database' % args.user)
+
+
+def overview(args):
+    line_width = 79
+    table_template = '%-35s| %-42s'
+    heading = 'Registred ctlweb users'.center(line_width)
+    heading_sub = '--==========================--'.center(line_width)
+    users = []
+    try:
+        users = User.get(args.timestamp)
+    except NoSuchTable:
+        users = []
+    print()
+    print(heading)
+    print(heading_sub)
+    print()
+    if users:
+        print(table_template % ('Username', 'Key'))
+        print('-' * line_width)
+    elif args.timestamp:
+        print('No ctlweb users in timerange added')
+    else:
+        print('No ctlweb users registered')
+
+    for u in users:
+        print(table_template % (u.c_id, u.c_pubkey))
+
 
 def main():
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
+    parser = argparse.ArgumentParser(description='Manages access for ctlweb'
+                                     + ' users')
+    subparser = parser.add_subparsers(help='Actions that can be done')
+      ####################
+     # ctl-register add #
+    ####################
+    add_parser = subparser.add_parser('add',
+                                      parents=[parent_parser],
+                                      help='Grant access for ctlweb user.'
+                                      + ' This command can also be used to'
+                                      + ' change a ctlweb user.')
+    add_parser.add_argument('user',
+                            metavar='USER',
+                            help='Name of the ctlweb user.')
+    add_parser.add_argument('--key', '-k', required=True,
+                            help='Public key of the ctlweb user.')
+    add_parser.set_defaults(func=add)
+      #######################
+     # ctl-register remove #
+    #######################
+    remove_parser = subparser.add_parser('remove',
+                                         parents=[parent_parser],
+                                         help='Revoke access for ctlweb user.')
+    remove_parser.add_argument('user',
+                               metavar='USER',
+                               help='Name of the ctlweb user.')
+    remove_parser.set_defaults(func=remove)
+      #########################
+     # ctl-register overview #
+    #########################
+    overview_parser = subparser.add_parser('overview',
+                                           parents=[parent_parser],
+                                           help='View registered ctlweb users.'
+                                           )
+    overview_parser.add_argument('--timestamp', '-t',
+                                 help='Show only ctlweb user newer than'
+                                 + ' timestamp')
+    overview_parser.set_defaults(func=overview)
+    # Workaround for Python 3.2-3.4 Issue #9694 'optional arguments'
+    parser._optionals.title = 'options'
+    add_parser._optionals.title = 'options'
+    remove_parser._optionals.title = 'options'
 
-    except getopt.GetoptError as err:
-        # Print help and exit
-        print(err)
-        usage()
-        sys.exit(2)
-    output = None
-    database = None
-    reg_id = "" #will be set during argument parsing
-    pubkey = "" #will be set during argument parsing
-    required = 0  #checks if all required arguments are give
-    is_add = False
-    is_remove = False
-    is_overview = False
+    args = parser.parse_args()
+    commit_settings(args)
+    args.func(args)
 
-    #o = options, a = arguments
-    for o, a in opts:
-        if o in ("-c", "--config"):
-            database = Database(a)
-        elif o in ("-a", "--add"):
-            is_add = True
-            required += 1
-            reg_id = a
-        elif o in ("-r", "--remove"):
-            remove_set = True
-            Log.debug("Removing Entry with the specified ID")
-            required += 1
-            reg_id = a
-        elif o in ("-o", "--overview"):
-            overview_set = True
-        elif o in ("-k", "--key"):
-            required += 1
-            pubkey = a
-        elif o in ("-v", "--verbose"):
-            Log.increase_verbosity()
-        elif o == "version":
-            usage()
 
-    if (is_add and is_remove) or        \
-        (is_remove and is_overview) or  \
-        (is_add and is_overview):
-            print("Please choose only one operation!")
-            exit(1)
-    if is_add and reg_id and pubkey:
-        Log.debug("Switching to add context")
-        Log.debug(reg_id+ "," +pubkey)
-        User.add({
-            "c_id": reg_id,
-            "c_pubkey": pubkey,
-            })
-    elif is_remove and reg_id:
-        Log.debug("Switching to remove context")
-        to_remove = User.get_exacly(reg_id)
-        to_remove.remove()
-    elif is_overview: 
-        Log.debug("Switching to overview context")
-        overview(database)
-    else:
-        Log.debug("No option has been given, Aborting")
-        exit(1)
-        
 if __name__ == "__main__":
     main()

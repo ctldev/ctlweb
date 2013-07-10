@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import sqlite3
-import os
 import sys
-from os.path import dirname,abspath
 from util import Log
 from util.settings import DEFAULT_CONFIG
+
 
 class Database:
     """ Every class derived from Database get its own table in the database.
@@ -26,7 +25,7 @@ class Database:
         import configparser
         reader = configparser.ConfigParser()
         reader.read(config_file)
-        Database.config = config_file # share config file with others
+        Database.config = config_file  # share config file with others
 
         if Database.store is None:
             try:
@@ -78,7 +77,6 @@ class Database:
     @classmethod
     def get(cls, time_since=None):
         """ Returns a list of objects stored in the database.
-        
         Optional Parameter time_since is instance of datetime.datetime and
         represents the oldest object to be found by get. Default searches for
         every object stored in the database.
@@ -89,11 +87,11 @@ class Database:
         sql = "SELECT c_pk, adapter FROM " + cls.__name__ + """
                 WHERE date >= ?"""
         values = []
-        if time_since is None:
+        if not time_since:
             Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
             sql = "SELECT adapter FROM " + cls.__name__
         elif isinstance(time_since, datetime):
-            Log.debug("Database.get(): Get %s newer than %s" % 
+            Log.debug("Database.get(): Get %s newer than %s" %
                     (cls.__name__, time_since))
             time_since = time_since.strftime("%s")
             values.append(time_since)
@@ -105,23 +103,33 @@ class Database:
             cursor.execute(sql, values)
         except sqlite3.IntegrityError:
             return None
+        except sqlite3.OperationalError:
+            raise NoSuchTable()
         result_set = []
         for row in cursor.fetchall():
             result_set.append(cls.convert(row))
         return result_set
 
     @classmethod
-    def get_exacly(cls, name):
+    def get_exactly(cls, name):
         """ Returns exactly one object with the given (unique) name.
+        If no object with the given name was found, a InstanceNotFoundError is
+        raised.
         """
         sql = "SELECT c_pk, adapter FROM " + cls.__name__ + """
                 WHERE c_id = ?"""
         cursor = Database.db_connection.cursor()
-        Log.debug("Database.get_exacly(): Requesting %s with c_id = %s" \
+        Log.debug("Database.get_exactly(): Requesting %s with c_id = %s" \
                 % (cls.__name__, name))
-        Log.debug("Database.get_exacly(): executing query: " + sql)
-        cursor.execute(sql, (name, ))
-        return cls.convert(cursor.fetchone())
+        Log.debug("Database.get_exactly(): executing query: " + sql)
+        try:
+            cursor.execute(sql, (name, ))
+        except sqlite3.OperationalError:
+            raise NoSuchTable()
+        try:
+            return cls.convert(cursor.fetchone())
+        except TypeError: # Object was not in database
+            raise InstanceNotFoundError()
 
     def create_table(self):
         """ Creates a table for the class in which every instance object which
@@ -171,8 +179,9 @@ class Database:
         self.db_connection.commit()
 
     def remove(self):
-        """ Removes rows on the basis of the id 
+        """ Removes rows on the basis of the id
         """
+        Log.debug('Removing object from database.')
         cursor = Database.db_connection.cursor()
         table = self.__name__
         sql = "DELETE FROM " +table+ """
@@ -185,6 +194,7 @@ class Database:
     def save(self):
         """ Saves object into database
         """
+        Log.debug('Saving object to database')
         cursor = Database.db_connection.cursor()
         attributes = self.get_attributes()
         table = self.__name__
@@ -200,7 +210,7 @@ class Database:
         try:
             sql = "INSERT INTO " + table + """
                     VALUES
-                    (strftime('%s','now'), :adapter """ +sql        
+                    (strftime('%s','now'), :adapter """ +sql
             cursor.execute(sql,values)
             Database.db_connection.commit()
             self.c_pk = cursor.lastrowid
@@ -208,7 +218,7 @@ class Database:
             sql = ""
             for i in attributes:
                 sql += ", "+i
-                sql += " = '"+self[i]+"'"    
+                sql += " = '"+self[i]+"'"
             sql = "UPDATE " + table + """
                     SET
                     date = (strftime('%s', 'now')),
@@ -231,7 +241,7 @@ class Database:
             repr = ""
             first = True
             for attr in attributes:
-                # Works only if all attributes are simple types like 
+                # Works only if all attributes are simple types like
                 # string, int,...
                 if first:
                     repr = attr + "=" + self[attr]
@@ -282,7 +292,7 @@ class Database:
             except AttributeError:
                 return False
         return eq
-    
+
     @property
     def __name__(self):
         """ Provides that the name of the class is callable
@@ -292,6 +302,9 @@ class Database:
     def __str__(self):
         attr = self.get_attributes()
         return "%s.create(%s)" % (self.__name__, self.__conform__(self))
+
+class InstanceNotFoundError(ValueError):
+    pass
 
 class NoSuchTable(sqlite3.OperationalError):
     pass

@@ -1,4 +1,5 @@
 from .database import Database
+from util import Log
 
 class Access(Database):
     """ All classes that provide ssh access modification are derived from this
@@ -23,7 +24,9 @@ class Access(Database):
             * c_id
             * f_Pubkey_pubkey
         """
-        cls.create(attr)
+        Log.debug('Creating object with ssh access'
+                + ' and granting access for public key.')
+        return cls.create(attr)
 
     def remove(self):
         """ This method removes the object from database and authorized_keys.
