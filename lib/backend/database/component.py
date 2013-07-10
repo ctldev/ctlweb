@@ -82,8 +82,8 @@ class Component(Database):
 
     @staticmethod
     def _unpack(component):
-        """ Extracts importand data out of the package. They are returned as a
-        tuple that works on Compontent.create().
+        """ Extracts important data out of the package. They are returned as a
+        dictionary that works on Compontent.create().
         """
         import tarfile
         import os
