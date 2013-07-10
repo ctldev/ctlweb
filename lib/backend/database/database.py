@@ -12,6 +12,8 @@ class Database:
 
         * unicode string
         * int
+    Moreover, Foreign Keys can be stored by the prefix
+    'f_<referencedClassName>_'.
     """
     db_file = None
     db_connection = None
@@ -56,7 +58,7 @@ class Database:
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
         """
-        if not name.find("c_") == 0:
+        if not name.startswith("c_"):
             raise AttributeError()
         return self.__getattribute__(name)
 
@@ -74,15 +76,15 @@ class Database:
 
     @classmethod
     def get(cls, time_since=None):
-        """ Returns a tuple of objects stored in the database.
-
+        """ Returns a list of objects stored in the database.
         Optional Parameter time_since is instance of datetime.datetime and
         represents the oldest object to be found by get. Default searches for
         every object stored in the database.
         """
-        import re
+        # FIXME should use the get_exactly for easy maintenance; skipped due to
+        #       motivational problems
         from datetime import datetime
-        sql = "SELECT adapter FROM " + cls.__name__ + """
+        sql = "SELECT c_pk, adapter FROM " + cls.__name__ + """
                 WHERE date >= ?"""
         values = []
         if not time_since:
@@ -105,7 +107,7 @@ class Database:
             raise NoSuchTable()
         result_set = []
         for row in cursor.fetchall():
-            result_set.append(cls.convert(row[0]))
+            result_set.append(cls.convert(row))
         return result_set
 
     @classmethod
@@ -114,7 +116,7 @@ class Database:
         If no object with the given name was found, a InstanceNotFoundError is
         raised.
         """
-        sql = "SELECT adapter FROM " + cls.__name__ + """
+        sql = "SELECT c_pk, adapter FROM " + cls.__name__ + """
                 WHERE c_id = ?"""
         cursor = Database.db_connection.cursor()
         Log.debug("Database.get_exactly(): Requesting %s with c_id = %s" \
@@ -125,14 +127,14 @@ class Database:
         except sqlite3.OperationalError:
             raise NoSuchTable()
         try:
-            return cls.convert(cursor.fetchone()[0])
+            return cls.convert(cursor.fetchone())
         except TypeError: # Object was not in database
             raise InstanceNotFoundError()
 
     def create_table(self):
         """ Creates a table for the class in which every instance object which
         starts with 'c_'. For example 'c_id'. This variable can be accessed with
-        self["id"]
+        self["c_id"]
 
         returns self
         """
@@ -143,12 +145,23 @@ class Database:
         sql += self.__name__
         sql += """ (
                 date DATE,
-                adapter TEXT"""
-        for i in self.get_attributes():
-            if re.search("^c_id$",i):
-                sql += ", "+i+" PRIMARY KEY"
+                adapter TEXT""" 
+        attrs = self.get_attributes()
+        if not 'c_id' in attrs:
+            raise AttributeError('c_id not defined')
+        if not 'c_pk' in attrs:
+            raise AttributeError('c_pk not defined')
+        for i in attrs:
+            if re.search("^c_id$", i):
+                sql += ", %s UNIQUE" % i
+            elif re.search('^c_pk$', i):
+                sql += ', %s PRIMARY KEY AUTOINCREMENT' % i
+            elif re.search('^f_(?P<classname>.+?)_.+', i):
+                class_match = re.match('^f_(?P<classname>.+?)_.+', i)
+                referenced_class = class_match.groupdict()['classname']
+                sql += ', %s REFERENCES %s c_pk' % (i, referenced_class)
             else:
-                sql += ", "+i
+                sql += ", %s" % i
         sql += ");"
         cursor.execute(sql)
         self.db_connection.commit()
@@ -200,6 +213,7 @@ class Database:
                     (strftime('%s','now'), :adapter """ +sql
             cursor.execute(sql,values)
             Database.db_connection.commit()
+            self.c_pk = cursor.lastrowid
         except sqlite3.IntegrityError:
             sql = ""
             for i in attributes:
@@ -256,7 +270,8 @@ class Database:
         """
         Log.debug("Building %s object" % cls.__name__)
         attribute_box = {}
-        for attr in s.split(";"):
+        attribute_box['c_pk'] = s[0]
+        for attr in s[1].split(";"):
             key, val = attr.split("=")
             attribute_box[key] = val
         return cls.create(attribute_box)

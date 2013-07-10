@@ -11,7 +11,7 @@ class User(Access):
     def create(cls, attr):
         """ Creates User class out of an dict containing the following keys:
             * c_id
-            * c_pubkey
+            * f_Pubkey_pubkey
         """
         return cls(attr['c_id'],attr['c_pubkey'])
 
