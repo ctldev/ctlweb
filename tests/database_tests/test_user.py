@@ -61,7 +61,7 @@ class UserTest(unittest.TestCase):
     def test_getitem(self):
         self.user.create_table()
         self.assertEqual(self.user["c_id"], "Douglas")
-        self.assertEqual(self.user["c_pubkey"], "pubkey")
+#        self.assertEqual(self.user["c_pubkey"], "pubkey")
         try:
             self.user["db_file"]
             self.assertTrue(False, "Was able to caught wrong attribute")
@@ -85,14 +85,18 @@ class UserTest(unittest.TestCase):
         Database()
 #       Try to read original data
         self.cursor = Database.db_connection.cursor()
+#       First, try to get data
+        self.cursor.execute("""SELECT * FROM User""")
+        result = self.cursor.fetchall()
+        self.assertEqual(len(result), 1, "too much or too less objects")
         self.cursor.execute("""SELECT * FROM User
                 WHERE c_id = 'Douglas';""")
         result = self.cursor.fetchone()
         self.assertIsNotNone(result,
                 "Couldn't read data from database")
         result = tuple(result)
-        self.assertEqual(result[2], 'Douglas')
-        self.assertEqual(result[3], 'pubkey')
+        self.assertEqual(result[3], 'Douglas')
+        self.assertEqual(result[4], 'pubkey')
         #updatecheck
         self.user.c_pubkey = "newpubkey"
         self.user.save()
@@ -100,9 +104,9 @@ class UserTest(unittest.TestCase):
                         WHERE c_id = 'Douglas';""")
         res = self.cursor.fetchone()
         res = tuple(res)
-        self.assertEqual(res[3], "newpubkey", 
+        self.assertEqual(res[4], "newpubkey", 
                 "Seems not to be updated correctly")
-        self.assertEqual(res[2], "Douglas",
+        self.assertEqual(res[3], "Douglas",
                 "Seems not to be updated correctly")
 
     def test_remove(self):
@@ -124,10 +128,10 @@ class UserTest(unittest.TestCase):
         results = User.get(d)
         self.assertEqual(self.user, results[0], "Unable to get new data")
 
-    def test_get_exacly(self):
+    def test_get_exactly(self):
         self.user.create_table()
         self.user.save()
-        user = User.get_exacly(self.user.c_id)
+        user = User.get_exactly(self.user.c_id)
         self.assertEqual(user, self.user, "Could not deserialize data")
 
 class TestAddUser(unittest.TestCase):

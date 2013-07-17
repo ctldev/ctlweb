@@ -25,7 +25,9 @@ class Database:
         import configparser
         reader = configparser.ConfigParser()
         reader.read(config_file)
-        Database.config = config_file  # share config file with others
+        self.c_pk = -1
+        if not Database.config:
+            Database.config = config_file  # share config file with others
 
         if Database.store is None:
             try:
@@ -89,7 +91,7 @@ class Database:
         values = []
         if not time_since:
             Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
-            sql = "SELECT adapter FROM " + cls.__name__
+            sql = "SELECT c_pk, adapter FROM " + cls.__name__
         elif isinstance(time_since, datetime):
             Log.debug("Database.get(): Get %s newer than %s" %
                     (cls.__name__, time_since))
@@ -144,18 +146,17 @@ class Database:
         sql = "CREATE TABLE "
         sql += self.__name__
         sql += """ (
+                c_pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 date DATE,
                 adapter TEXT""" 
         attrs = self.get_attributes()
         if not 'c_id' in attrs:
             raise AttributeError('c_id not defined')
-        if not 'c_pk' in attrs:
-            raise AttributeError('c_pk not defined')
         for i in attrs:
-            if re.search("^c_id$", i):
+            if i == 'c_pk':
+                continue
+            if i == "c_id":
                 sql += ", %s UNIQUE" % i
-            elif re.search('^c_pk$', i):
-                sql += ', %s PRIMARY KEY AUTOINCREMENT' % i
             elif re.search('^f_(?P<classname>.+?)_.+', i):
                 class_match = re.match('^f_(?P<classname>.+?)_.+', i)
                 referenced_class = class_match.groupdict()['classname']
@@ -198,32 +199,41 @@ class Database:
         cursor = Database.db_connection.cursor()
         attributes = self.get_attributes()
         table = self.__name__
-        sql = ""
+        row_patterns = ""
+        header = ' (date, adapter'
         values = {
                 'adapter' : self,
                 }
         for i in attributes:
-            sql += ", :"+i
+            if i == 'c_pk':
+                continue
+            header += ', ' + i
+            row_patterns += ", :" + i
             values[i] = self[i]
         else:
-            sql += ")"
+            row_patterns += ")"
+            header += ')'
         try:
-            sql = "INSERT INTO " + table + """
+            sql = "INSERT INTO " + table + header + """
                     VALUES
-                    (strftime('%s','now'), :adapter """ +sql
+                    (strftime('%s','now'), :adapter """ + row_patterns
             cursor.execute(sql,values)
             Database.db_connection.commit()
             self.c_pk = cursor.lastrowid
         except sqlite3.IntegrityError:
             sql = ""
             for i in attributes:
+                if i == 'c_pk':
+                    continue
                 sql += ", "+i
-                sql += " = '"+self[i]+"'"
+                sql += " = '"+str(self[i])+"'"
             sql = "UPDATE " + table + """
                     SET
                     date = (strftime('%s', 'now')),
                     adapter = :adapter """ +sql+ """
                     WHERE c_id = :c_id """
+            Log.debug("Database.save(): %s as update query with %s as dict" %
+                      (sql, values))
             cursor.execute(sql,values)
             Database.db_connection.commit()
         except sqlite3.OperationalError:
@@ -241,13 +251,15 @@ class Database:
             repr = ""
             first = True
             for attr in attributes:
+                if attr == 'c_pk':
+                    continue
                 # Works only if all attributes are simple types like
                 # string, int,...
                 if first:
-                    repr = attr + "=" + self[attr]
+                    repr = attr + "=" + str(self[attr])
                     first = False
                 else:
-                    repr = attr + "=" + self[attr] + ";" + repr
+                    repr = attr + "=" + str(self[attr]) + ";" + repr
             return repr
         elif isinstance(protocol, type(self)):
             attributes = self.get_attributes()
@@ -274,7 +286,9 @@ class Database:
         for attr in s[1].split(";"):
             key, val = attr.split("=")
             attribute_box[key] = val
-        return cls.create(attribute_box)
+        instance = cls.create(attribute_box)
+        instance.c_pk = s[0]
+        return instance
 
     def __eq__(self, db):
         """ Objects are equal if attributes of get_attribute() are equal.

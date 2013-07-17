@@ -94,15 +94,15 @@ class TestWeb(unittest.TestCase):
         res = cursor.fetchone()
         self.assertIsNotNone(res, "Could not read test data from db.")
         res = tuple(res)
-        self.assertEqual(res[2], "url", "Got unexpected data")
-        self.assertEqual(res[3], "pubkey", "Got unexpected data")
+        self.assertEqual(res[3], "url", "Got unexpected data")
+        self.assertEqual(res[4], "pubkey", "Got unexpected data")
         #updatecheck
         self.web.c_pubkey = "newpubkey"
         self.web.save()
         cursor.execute("SELECT * FROM Web;")
         res = cursor.fetchone()
         res = tuple(res)
-        self.assertEqual(res[3], "newpubkey", 
+        self.assertEqual(res[4], "newpubkey", 
         "Seems not to be updated correctly")
 
     def test_remove(self):
@@ -122,9 +122,9 @@ class TestWeb(unittest.TestCase):
         webs = Web.get(d)
         self.assertEqual(webs[0], self.web, "Unable to get new data")
 
-    def test_get_exacly(self):
+    def test_get_exactly(self):
         self.web.save()
-        web = Web.get_exacly(self.web.c_id)
+        web = Web.get_exactly(self.web.c_id)
         self.assertEqual(web, self.web, "Could not deserialize data")
 
 

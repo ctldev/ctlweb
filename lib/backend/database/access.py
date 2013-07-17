@@ -1,4 +1,5 @@
 from .database import Database
+from .pubkey import Pubkey
 from util import Log
 
 class Access(Database):
