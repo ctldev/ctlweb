@@ -12,8 +12,8 @@ class TestBasicComponent(unittest.TestCase):
 
     def test_call_program(self):
         from subprocess import call
-        exit_code = call(['ctl-component', '-v'])
-        self.assertEqual(exit_code, 0)
+        exit_code = call(['ctl-component'])
+        self.assertEqual(exit_code, 1)
 
 if __name__ == '__main__':
     unittest.main()
