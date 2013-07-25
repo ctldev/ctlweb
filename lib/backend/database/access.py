@@ -10,10 +10,9 @@ class Access(Database):
     *remove()* functions.
     """
 
-    def __init__(self, id, pubkey):
+    def __init__(self, id):
         super().__init__()
         self.c_id = id
-        self.c_pubkey = pubkey
 
     @classmethod
     def add(cls, attr):
@@ -28,6 +27,9 @@ class Access(Database):
         Log.debug('Creating object with ssh access'
                 + ' and granting access for public key.')
         return cls.create(attr)
+
+    def add_key(self, pubkey):
+        Pubkey.add(pubkey, self)
 
     def remove(self):
         """ This method removes the object from database and authorized_keys.
@@ -44,4 +46,7 @@ class Access(Database):
         """ Removes all Pubkey-Objects referencing this Access-Instance
         """
         for key in self.get_keys():
-            self.remove_key(key)
+            key.remove()
+
+    def remove_key(self, pubkey):
+        pubkey.remove()

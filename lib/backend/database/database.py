@@ -60,7 +60,11 @@ class Database:
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
         """
-        if not name.startswith("c_"):
+        import re
+        format_foreign_key = 'f_(?P<classname>.+?)_.+'
+        format_column = 'c_'
+        if not re.search('^(%s|%s)' % (format_foreign_key, format_column),
+                         name):
             raise AttributeError()
         return self.__getattribute__(name)
 
@@ -113,16 +117,16 @@ class Database:
         return result_set
 
     @classmethod
-    def get_exactly(cls, name):
+    def get_exactly(cls, name, field='c_id'):
         """ Returns exactly one object with the given (unique) name.
         If no object with the given name was found, a InstanceNotFoundError is
         raised.
         """
-        sql = "SELECT c_pk, adapter FROM " + cls.__name__ + """
-                WHERE c_id = ?"""
+        sql = 'SELECT c_pk, adapter FROM ' + cls.__name__ + ' WHERE '
+        sql += '%s = ?' % field
         cursor = Database.db_connection.cursor()
-        Log.debug("Database.get_exactly(): Requesting %s with c_id = %s" \
-                % (cls.__name__, name))
+        Log.debug("Database.get_exactly(): Requesting %s with %s = %s" \
+                % (cls.__name__, field, name))
         Log.debug("Database.get_exactly(): executing query: " + sql)
         try:
             cursor.execute(sql, (name, ))
@@ -160,10 +164,11 @@ class Database:
             elif re.search('^f_(?P<classname>.+?)_.+', i):
                 class_match = re.match('^f_(?P<classname>.+?)_.+', i)
                 referenced_class = class_match.groupdict()['classname']
-                sql += ', %s REFERENCES %s c_pk' % (i, referenced_class)
+                sql += ', %s REFERENCES %s (c_pk)' % (i, referenced_class)
             else:
                 sql += ", %s" % i
         sql += ");"
+        Log.debug('Creating table, executing query: ' + sql)
         cursor.execute(sql)
         self.db_connection.commit()
         return self
@@ -214,9 +219,13 @@ class Database:
             row_patterns += ")"
             header += ')'
         try:
+            if not self.c_pk == -1:
+                raise sqlite3.IntegrityError()
             sql = "INSERT INTO " + table + header + """
                     VALUES
                     (strftime('%s','now'), :adapter """ + row_patterns
+            Log.debug("Database.save(): %s as insert with %s as dict" %
+                      (sql, values))
             cursor.execute(sql,values)
             Database.db_connection.commit()
             self.c_pk = cursor.lastrowid
@@ -227,11 +236,13 @@ class Database:
                     continue
                 sql += ", "+i
                 sql += " = '"+str(self[i])+"'"
+            values['c_pk'] = self.c_pk
             sql = "UPDATE " + table + """
                     SET
                     date = (strftime('%s', 'now')),
+                    c_id = :c_id,
                     adapter = :adapter """ +sql+ """
-                    WHERE c_id = :c_id """
+                    WHERE c_pk = :c_pk """
             Log.debug("Database.save(): %s as update query with %s as dict" %
                       (sql, values))
             cursor.execute(sql,values)
@@ -283,9 +294,18 @@ class Database:
         Log.debug("Building %s object" % cls.__name__)
         attribute_box = {}
         attribute_box['c_pk'] = s[0]
-        for attr in s[1].split(";"):
+        import re
+        attrs = s[1].split(';')
+        for attr in sorted(attrs):
             key, val = attr.split("=")
+            if re.search('^f_(?P<classname>.+?)_.+', key):
+                class_name = attribute_box['c_referenced_class']
+                exec('from .%s import %s' % (class_name.lower(), class_name))
+                exec('attribute_box[key] = ' + class_name \
+                     + ".get_exactly(val, 'c_pk')")
+                continue
             attribute_box[key] = val
+        Log.debug('Got following attributes: ' + str(attribute_box))
         instance = cls.create(attribute_box)
         instance.c_pk = s[0]
         return instance
@@ -324,4 +344,7 @@ class NoSuchTable(sqlite3.OperationalError):
     pass
 
 class DatabaseNotFound(sqlite3.OperationalError):
+    pass
+
+class GeneralDatabaseError(sqlite3.OperationalError):
     pass

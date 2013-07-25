@@ -26,7 +26,7 @@ class TestWeb(unittest.TestCase):
     def setUp(self):
         Database.db_file = None # else runtime destroys testing framework
         Database(self.gentest_config())
-        self.web = Web("url", "pubkey")
+        self.web = Web("url")
         self.web.create_table()
         self.cursor = self.web.db_connection.cursor()
 
@@ -61,7 +61,6 @@ class TestWeb(unittest.TestCase):
         possible. Errors or Fails need to be fixed in class Database.
         """
         self.assertEqual(self.web["c_id"], "url" )
-        self.assertEqual(self.web["c_pubkey"], "pubkey" )
         try:
             self.web["db_file"]
             self.assertTrue(false, "Got access to wrong variable")
@@ -76,8 +75,6 @@ class TestWeb(unittest.TestCase):
         self.assertTrue(attrs, msg="Got no attributes")
         self.assertTrue("c_id" in attrs , 
                 msg="Caught the following attributes: %s"%attrs)
-        self.assertTrue("c_pubkey" in attrs ,
-                msg="Caught the following attributes: %s" % attrs)
         self.assertFalse("__doc__" in attrs,
                 msg="Caught __doc__ attribute which is wrong")
 
@@ -95,15 +92,6 @@ class TestWeb(unittest.TestCase):
         self.assertIsNotNone(res, "Could not read test data from db.")
         res = tuple(res)
         self.assertEqual(res[3], "url", "Got unexpected data")
-        self.assertEqual(res[4], "pubkey", "Got unexpected data")
-        #updatecheck
-        self.web.c_pubkey = "newpubkey"
-        self.web.save()
-        cursor.execute("SELECT * FROM Web;")
-        res = cursor.fetchone()
-        res = tuple(res)
-        self.assertEqual(res[4], "newpubkey", 
-        "Seems not to be updated correctly")
 
     def test_remove(self):
         self.web.save()

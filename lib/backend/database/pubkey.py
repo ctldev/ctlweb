@@ -14,7 +14,9 @@ class Pubkey(Database):
         """
         super().__init__()
         self.c_key = key
-        self.f_Access_access = access.pk
+        self.f_Access_access = int(access.c_pk)
+        self.c_id = -1
+        self.c_referenced_class = access.__class__.__name__
 
         import configparser
         from os import path
@@ -31,7 +33,9 @@ class Pubkey(Database):
 
     def save(self):
         super().save()
-        self.c_id = self.c_pk
+        if not self.c_id == self.c_pk:
+            self.c_id = self.c_pk
+            self.save()
 
     @classmethod
     def create(cls, attr):
@@ -41,7 +45,6 @@ class Pubkey(Database):
             * c_key: the userkey
         """
         key = cls(attr["c_key"], attr['f_Access_access'])
-        key.c_pk = attr['c_pk']
         key._write_key()
         return key
 
@@ -56,7 +59,7 @@ class Pubkey(Database):
         return True
 
     @classmethod
-    def add(cls, key):
+    def add(cls, key, access):
         """ A given key will be added to the local database, referencing the
         given Access-Instance.
 
@@ -77,14 +80,30 @@ class Pubkey(Database):
     def get_access_keys(access):
         """ returns all keys referencing the specified Access-Instance
         """
-# TODO
         data = []
+        sql = 'SELECT c_pk, adapter FROM Pubkey WHERE f_Access_access = ?'
+        cursor = Database.db_connection.cursor()
+        Log.debug('Pubkey.get_access_keys(): '\
+                  + 'Requesting Pubkeys with access c_pk = %s' % access.c_pk)
+        Log.debug('Pubkey.get_access_keys(): executing query: ' + sql)
+        try:
+            cursor.execute(sql, (str(access.c_pk),))
+            for key in cursor.fetchall():
+                data.append(Pubkey.convert(key))
+        except sqlite3.OperationalError:
+            cursor.execute("""SELECT name FROM sqlite_master
+                              WHERE name = 'Pubkey';""")
+            result = cursor.fetchone()
+            if result:
+                raise Database.GeneralDatabaseError()
+            Pubkey('', access).create_table()
+        Log.debug('Pubkey.get_access_keys(): found %s elements' % len(data))
         return data
 
     def _keyline(self):
         """Return an authorized_keys compatible line with access definitions.
         """
-        pass
+        return ''
 
     def _write_key(self):
         """ Adds the own access with the _keyine() to authorized_keys
