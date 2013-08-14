@@ -1,7 +1,4 @@
-.\" Process this file with
-.\" groff -man -Tascii foo.1
-.\"
-.TH ctl-web 1 "June 2013" Linux "User Manuals"
+.TH ctl-web 1 "August 2013" Linux "User Manuals"
 .SH NAME
 ctl-web \- Grants or revokes access for ctlweb frontends on clusters  
 .SH SYNOPSIS
@@ -17,10 +14,9 @@ ctl-web \- Grants or revokes access for ctlweb frontends on clusters
 .RB [\| \-c
 .IR CONFIG \|]
 .RB [\| \-v \|]
-.RB \| \-u \|
-.IR URL \|
 .RB \| \-k 
 .IR KEY \|
+.IR URL \|
 .br
 .\" ctl-web remove section
 .B ctl-web remove
@@ -28,7 +24,6 @@ ctl-web \- Grants or revokes access for ctlweb frontends on clusters
 .RB [\| \-c
 .IR CONFIG \|]
 .RB [\| \-v \|]
-.RB \| \-u \|
 .IR URL \|
 .br
 .\" ctl-web overview section
@@ -55,9 +50,6 @@ If this option is not given, a default config file will be used
 .TP
 .BR \-v ", " \-\-verbose
 Increases verbosity
-.TP
-.BI \-u\  URL \fR,\ \fB\-\-url\ \fIURL
-Specifies the URL to be added/removed
 .TP
 .BI \-k\  KEY \fR,\ \fB\-\-key\ \fIKEY
 Adds the specified Public Key to a cluster.
