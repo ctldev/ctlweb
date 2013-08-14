@@ -88,9 +88,9 @@ def component_request():
         opts.append(" -t %s-%s-%s " % time_index)
     opts.append(" --get")
     opts.append(" --url=%s" % url)
-    cmd = ["ctl-component"]
+    cmd = ["ctl-component", "push"]
     cmd.extend(opts)
-    if SIMULATE: # TODO read correct SIMULATE
+    if SIMULATE:  # TODO read correct SIMULATE
         print("SIMULATE: %s" % cmd)
         return
     call(cmd)
@@ -128,9 +128,11 @@ def user(mode):
             break
     cmd = ["ctl-register"]
     if mode == USER_MODE['add']:
-        cmd.append(" --add='%s'" % user_name)
-        cmd.append(" --key='%s'" % user_key)
+        cmd.append('add')
+        cmd.append("--key='%s'" % user_key)
+        cmd.append("%s" % user_name)
     elif mode == USER_MODE['remove']:
+        cmd.append('remove')
         cmd.append(" --remove='%s'" % user_name)
     if SIMULATE:
         print("SIMULATE: %s" % cmd)
@@ -140,7 +142,7 @@ def user(mode):
 
 def _get_timeindex():
     """ Validates the user given date format.
-    
+
     Returns date if date is valid
     """
     while True:

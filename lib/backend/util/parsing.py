@@ -4,8 +4,8 @@ from database import Database
 
 parent_parser = argparse.ArgumentParser(add_help=False)
 parent_parser.add_argument('--config', '-c', help='Own config file to be used')
-parent_parser.add_argument('--verbose','-v', default=1, action='count',
-        help='Increase output level')
+parent_parser.add_argument('--verbose', '-v', default=1, action='count',
+                           help='Increase output level')
 
 
 def commit_settings(args):

@@ -63,8 +63,9 @@ def overview(args):
 
 def main():
     # General parsing
-    parser = argparse.ArgumentParser(
-        description='Manages access for ctlweb frontends')
+    parser = argparse.ArgumentParser(description='Manages access for ctlweb'
+                                                 + ' frontends',
+                                     parents=[parent_parser])
     subparser = parser.add_subparsers(help='Actions that can be done')
       ###############
      # ctl-web add #
@@ -109,7 +110,10 @@ def main():
 
     args = parser.parse_args()
     commit_settings(args)
-    args.func(args)
+    if 'func' in args:
+        args.func(args)
+    else:
+        parser.print_help()
 
 
 if __name__ == '__main__':
