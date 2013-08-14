@@ -4,29 +4,19 @@ import sys
 import argparse
 
 from util import Log
+from util.parsing import commit_settings
+from util.parsing import parent_parser
 from database import Database
 from database import Component
 from database.database import NoSuchTable, InstanceNotFoundError
 
-def commit_settings(args):
-    Log.set_verbosity(args.verbose)
-    if args.config:
-        Database(args.config)
-    else:
-        Database()
-
 
 def main():
     parser = argparse.ArgumentParser(
+            parents=[parent_parser],
             description='Loads a ctl component by reading the enviroment'
                     + 'variable SSH_ORIGINAL_COMMAND')
-    parser.add_argument('--verbose', '-v',
-            default=1,
-            action='count',
-            help='Increase output level.')
-    parser.add_argument('--config', '-c',
-            help='Own config file to be used')
-            
+
     args = parser.parse_args()
     commit_settings(args)
 
@@ -43,5 +33,5 @@ def main():
     comp.execute(ctl_call)
 
 
-if __name__ == "__main__":      
+if __name__ == "__main__":
     main()

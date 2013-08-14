@@ -2,6 +2,7 @@
 import sqlite3
 from .access import Access
 
+
 class User(Access):
     """ An registered user
     """
@@ -10,9 +11,12 @@ class User(Access):
     def create(cls, attr):
         """ Creates User class out of an dict containing the following keys:
             * c_id
-            * c_pubkey
+            * f_Pubkey_pubkey
         """
-        return cls(attr['c_id'],attr['c_pubkey'])
+        user = cls(attr['c_id'])
+        if 'f_Pubkey_pubkey' in attr and attr['f_Pubkey_pubkey']:
+            user.add_key(attr['f_Pubkey_pubkey'])
+        return user
 
     def _keyline():
         return 'command="bash -c ctl-init" %s' % c_pubkey

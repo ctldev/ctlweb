@@ -10,6 +10,7 @@ sys.path.append( lib_path )
 from database.user import User
 from database.database import Database
 from database.database import NoSuchTable
+from util import Log
 
 class UserTest(unittest.TestCase):
     """ Tests for user.py
@@ -29,7 +30,7 @@ class UserTest(unittest.TestCase):
     def setUp(self):
         Database.db_file = None # else the runtime destroys testsing framework
         Database(self.gentest_config())
-        self.user = User("Douglas", "pubkey")
+        self.user = User("Douglas")
         self.connection = Database.db_connection
         self.cursor = self.connection.cursor()
 
@@ -61,7 +62,7 @@ class UserTest(unittest.TestCase):
     def test_getitem(self):
         self.user.create_table()
         self.assertEqual(self.user["c_id"], "Douglas")
-        self.assertEqual(self.user["c_pubkey"], "pubkey")
+#        self.assertEqual(self.user["c_pubkey"], "pubkey")
         try:
             self.user["db_file"]
             self.assertTrue(False, "Was able to caught wrong attribute")
@@ -72,7 +73,7 @@ class UserTest(unittest.TestCase):
         self.user.create_table()
         attrs = self.user.get_attributes()
         self.assertTrue("c_id" in attrs)
-        self.assertTrue("c_pubkey" in attrs)
+#        self.assertTrue("c_pubkey" in attrs)
         self.assertFalse("__doc__" in attrs)
         
     def test_save(self):
@@ -85,29 +86,23 @@ class UserTest(unittest.TestCase):
         Database()
 #       Try to read original data
         self.cursor = Database.db_connection.cursor()
+#       First, try to get data
+        self.cursor.execute("""SELECT * FROM User""")
+        result = self.cursor.fetchall()
+        self.assertEqual(len(result), 1, "too much or too less objects")
         self.cursor.execute("""SELECT * FROM User
                 WHERE c_id = 'Douglas';""")
         result = self.cursor.fetchone()
         self.assertIsNotNone(result,
                 "Couldn't read data from database")
         result = tuple(result)
-        self.assertEqual(result[2], 'Douglas')
-        self.assertEqual(result[3], 'pubkey')
-        #updatecheck
-        self.user.c_pubkey = "newpubkey"
-        self.user.save()
-        self.cursor.execute("""SELECT * FROM User
-                        WHERE c_id = 'Douglas';""")
-        res = self.cursor.fetchone()
-        res = tuple(res)
-        self.assertEqual(res[3], "newpubkey", 
-                "Seems not to be updated correctly")
-        self.assertEqual(res[2], "Douglas",
-                "Seems not to be updated correctly")
+        self.assertEqual(result[3], 'Douglas')
 
     def test_remove(self):
         self.user.create_table()
         self.user.save()
+        for key in self.user.get_keys():
+            key.save()
         self.user.remove()
         self.cursor.execute("""SELECT * FROM User
                             WHERE c_id = 'Douglas';""")
@@ -124,11 +119,26 @@ class UserTest(unittest.TestCase):
         results = User.get(d)
         self.assertEqual(self.user, results[0], "Unable to get new data")
 
-    def test_get_exacly(self):
+    def test_get_exactly(self):
         self.user.create_table()
         self.user.save()
-        user = User.get_exacly(self.user.c_id)
+        user = User.get_exactly(self.user.c_id)
         self.assertEqual(user, self.user, "Could not deserialize data")
+
+    def test_pubkeys(self):
+        from collections import Counter
+        self.user.create_table()
+        self.user.save()
+        self.user.add_key("pubkey")
+        self.user.add_key('second_pubkey')
+        self.user.add_key('third_pubkey')
+        self.assertEqual(Counter(['pubkey', 'second_pubkey', 'third_pubkey']),
+                         Counter([i.c_key for i in self.user.get_keys()]), 
+                         'did not save keys')
+        user = User.get_exactly(self.user.c_id)
+        self.assertEqual(Counter(['pubkey', 'second_pubkey', 'third_pubkey']),
+                         Counter([i.c_key for i in user.get_keys()]), 
+                         'did not load keys')
 
 class TestAddUser(unittest.TestCase):
     def setUp(self):

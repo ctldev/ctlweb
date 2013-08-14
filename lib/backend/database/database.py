@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import sqlite3
-import os
 import sys
-from os.path import dirname,abspath
 from util import Log
 from util.settings import DEFAULT_CONFIG
+
 
 class Database:
     """ Every class derived from Database get its own table in the database.
@@ -13,6 +12,8 @@ class Database:
 
         * unicode string
         * int
+    Moreover, Foreign Keys can be stored by the prefix
+    'f_<referencedClassName>_'.
     """
     db_file = None
     db_connection = None
@@ -24,7 +25,9 @@ class Database:
         import configparser
         reader = configparser.ConfigParser()
         reader.read(config_file)
-        Database.config = config_file # share config file with others
+        self.c_pk = -1
+        if not Database.config:
+            Database.config = config_file  # share config file with others
 
         if Database.store is None:
             try:
@@ -57,7 +60,11 @@ class Database:
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
         """
-        if not name.find("c_") == 0:
+        import re
+        format_foreign_key = 'f_(?P<classname>.+?)_.+'
+        format_column = 'c_'
+        if not re.search('^(%s|%s)' % (format_foreign_key, format_column),
+                         name):
             raise AttributeError()
         return self.__getattribute__(name)
 
@@ -75,22 +82,22 @@ class Database:
 
     @classmethod
     def get(cls, time_since=None):
-        """ Returns a tuple of objects stored in the database.
-        
+        """ Returns a list of objects stored in the database.
         Optional Parameter time_since is instance of datetime.datetime and
         represents the oldest object to be found by get. Default searches for
         every object stored in the database.
         """
-        import re
+        # FIXME should use the get_exactly for easy maintenance; skipped due to
+        #       motivational problems
         from datetime import datetime
-        sql = "SELECT adapter FROM " + cls.__name__ + """
+        sql = "SELECT c_pk, adapter FROM " + cls.__name__ + """
                 WHERE date >= ?"""
         values = []
         if not time_since:
             Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
-            sql = "SELECT adapter FROM " + cls.__name__
+            sql = "SELECT c_pk, adapter FROM " + cls.__name__
         elif isinstance(time_since, datetime):
-            Log.debug("Database.get(): Get %s newer than %s" % 
+            Log.debug("Database.get(): Get %s newer than %s" %
                     (cls.__name__, time_since))
             time_since = time_since.strftime("%s")
             values.append(time_since)
@@ -106,34 +113,34 @@ class Database:
             raise NoSuchTable()
         result_set = []
         for row in cursor.fetchall():
-            result_set.append(cls.convert(row[0]))
+            result_set.append(cls.convert(row))
         return result_set
 
     @classmethod
-    def get_exactly(cls, name):
+    def get_exactly(cls, name, field='c_id'):
         """ Returns exactly one object with the given (unique) name.
         If no object with the given name was found, a InstanceNotFoundError is
         raised.
         """
-        sql = "SELECT adapter FROM " + cls.__name__ + """
-                WHERE c_id = ?"""
+        sql = 'SELECT c_pk, adapter FROM ' + cls.__name__ + ' WHERE '
+        sql += '%s = ?' % field
         cursor = Database.db_connection.cursor()
-        Log.debug("Database.get_exactly(): Requesting %s with c_id = %s" \
-                % (cls.__name__, name))
+        Log.debug("Database.get_exactly(): Requesting %s with %s = %s" \
+                % (cls.__name__, field, name))
         Log.debug("Database.get_exactly(): executing query: " + sql)
         try:
             cursor.execute(sql, (name, ))
         except sqlite3.OperationalError:
             raise NoSuchTable()
         try:
-            return cls.convert(cursor.fetchone()[0])
+            return cls.convert(cursor.fetchone())
         except TypeError: # Object was not in database
             raise InstanceNotFoundError()
 
     def create_table(self):
         """ Creates a table for the class in which every instance object which
         starts with 'c_'. For example 'c_id'. This variable can be accessed with
-        self["id"]
+        self["c_id"]
 
         returns self
         """
@@ -143,14 +150,25 @@ class Database:
         sql = "CREATE TABLE "
         sql += self.__name__
         sql += """ (
+                c_pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 date DATE,
                 adapter TEXT""" 
-        for i in self.get_attributes():
-            if re.search("^c_id$",i):
-                sql += ", "+i+" PRIMARY KEY"
+        attrs = self.get_attributes()
+        if not 'c_id' in attrs:
+            raise AttributeError('c_id not defined')
+        for i in attrs:
+            if i == 'c_pk':
+                continue
+            if i == "c_id":
+                sql += ", %s UNIQUE" % i
+            elif re.search('^f_(?P<classname>.+?)_.+', i):
+                class_match = re.match('^f_(?P<classname>.+?)_.+', i)
+                referenced_class = class_match.groupdict()['classname']
+                sql += ', %s REFERENCES %s (c_pk)' % (i, referenced_class)
             else:
-                sql += ", "+i 
+                sql += ", %s" % i
         sql += ");"
+        Log.debug('Creating table, executing query: ' + sql)
         cursor.execute(sql)
         self.db_connection.commit()
         return self
@@ -167,7 +185,7 @@ class Database:
         self.db_connection.commit()
 
     def remove(self):
-        """ Removes rows on the basis of the id 
+        """ Removes rows on the basis of the id
         """
         Log.debug('Removing object from database.')
         cursor = Database.db_connection.cursor()
@@ -186,31 +204,47 @@ class Database:
         cursor = Database.db_connection.cursor()
         attributes = self.get_attributes()
         table = self.__name__
-        sql = ""
+        row_patterns = ""
+        header = ' (date, adapter'
         values = {
                 'adapter' : self,
                 }
         for i in attributes:
-            sql += ", :"+i
+            if i == 'c_pk':
+                continue
+            header += ', ' + i
+            row_patterns += ", :" + i
             values[i] = self[i]
         else:
-            sql += ")"
+            row_patterns += ")"
+            header += ')'
         try:
-            sql = "INSERT INTO " + table + """
+            if not self.c_pk == -1:
+                raise sqlite3.IntegrityError()
+            sql = "INSERT INTO " + table + header + """
                     VALUES
-                    (strftime('%s','now'), :adapter """ +sql        
+                    (strftime('%s','now'), :adapter """ + row_patterns
+            Log.debug("Database.save(): %s as insert with %s as dict" %
+                      (sql, values))
             cursor.execute(sql,values)
             Database.db_connection.commit()
+            self.c_pk = cursor.lastrowid
         except sqlite3.IntegrityError:
             sql = ""
             for i in attributes:
+                if i == 'c_pk':
+                    continue
                 sql += ", "+i
-                sql += " = '"+self[i]+"'"    
+                sql += " = '"+str(self[i])+"'"
+            values['c_pk'] = self.c_pk
             sql = "UPDATE " + table + """
                     SET
                     date = (strftime('%s', 'now')),
+                    c_id = :c_id,
                     adapter = :adapter """ +sql+ """
-                    WHERE c_id = :c_id """
+                    WHERE c_pk = :c_pk """
+            Log.debug("Database.save(): %s as update query with %s as dict" %
+                      (sql, values))
             cursor.execute(sql,values)
             Database.db_connection.commit()
         except sqlite3.OperationalError:
@@ -228,13 +262,15 @@ class Database:
             repr = ""
             first = True
             for attr in attributes:
-                # Works only if all attributes are simple types like 
+                if attr == 'c_pk':
+                    continue
+                # Works only if all attributes are simple types like
                 # string, int,...
                 if first:
-                    repr = attr + "=" + self[attr]
+                    repr = attr + "=" + str(self[attr])
                     first = False
                 else:
-                    repr = attr + "=" + self[attr] + ";" + repr
+                    repr = attr + "=" + str(self[attr]) + ";" + repr
             return repr
         elif isinstance(protocol, type(self)):
             attributes = self.get_attributes()
@@ -257,10 +293,22 @@ class Database:
         """
         Log.debug("Building %s object" % cls.__name__)
         attribute_box = {}
-        for attr in s.split(";"):
+        attribute_box['c_pk'] = s[0]
+        import re
+        attrs = s[1].split(';')
+        for attr in sorted(attrs):
             key, val = attr.split("=")
+            if re.search('^f_(?P<classname>.+?)_.+', key):
+                class_name = attribute_box['c_referenced_class']
+                exec('from .%s import %s' % (class_name.lower(), class_name))
+                exec('attribute_box[key] = ' + class_name \
+                     + ".get_exactly(val, 'c_pk')")
+                continue
             attribute_box[key] = val
-        return cls.create(attribute_box)
+        Log.debug('Got following attributes: ' + str(attribute_box))
+        instance = cls.create(attribute_box)
+        instance.c_pk = s[0]
+        return instance
 
     def __eq__(self, db):
         """ Objects are equal if attributes of get_attribute() are equal.
@@ -278,7 +326,7 @@ class Database:
             except AttributeError:
                 return False
         return eq
-    
+
     @property
     def __name__(self):
         """ Provides that the name of the class is callable
@@ -296,4 +344,7 @@ class NoSuchTable(sqlite3.OperationalError):
     pass
 
 class DatabaseNotFound(sqlite3.OperationalError):
+    pass
+
+class GeneralDatabaseError(sqlite3.OperationalError):
     pass

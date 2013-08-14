@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-import os
-import sys
 import argparse
 
 from util import Log
-from database import Database
+from util.parsing import commit_settings
+from util.parsing import parent_parser
 from database.database import NoSuchTable
 from database.user import User
 
@@ -12,23 +11,12 @@ from database.user import User
 #
 
 
-def commit_settings(args):
-    """ Sets the verbosity level & if nessesary it sets the user selected
-    config file.
-    """
-    Log.set_verbosity(args.verbose)
-    if args.config:
-        Database(args.config)
-    else:
-        Database()
-
-
 def add(args):
     """ Adds a ctl-web frontend user to the Database and grants it access to
         * ctl-init
     """
-    user = User.add({ 'c_id': args.user,
-            'c_pubkey': args.key})
+    user = User.add({'c_id': args.user,
+                    'c_pubkey': args.key})
     try:
         user.save()
     except NoSuchTable:
@@ -48,72 +36,72 @@ def remove(args):
 
 
 def overview(args):
+    line_width = 79
+    table_template = '%-35s| %-42s'
+    heading = 'Registred ctlweb users'.center(line_width)
+    heading_sub = '--==========================--'.center(line_width)
     users = []
     try:
         users = User.get(args.timestamp)
     except NoSuchTable:
         users = []
     print()
-    print('      Registred ctlweb users')
-    print('--==============================--')
+    print(heading)
+    print(heading_sub)
     print()
-    if users: 
-        print('%-35s | %-35s' % ('Username','Key'))
-        print('-' * 73)
+    if users:
+        print(table_template % ('Username', 'Key'))
+        print('-' * line_width)
     elif args.timestamp:
         print('No ctlweb users in timerange added')
     else:
         print('No ctlweb users registered')
 
     for u in users:
-        print('%-35s | %-35s' % (u.c_id, u.c_pubkey))
+        print(table_template % (u.c_id, u.c_pubkey))
+
 
 def main():
-    parent_parser = argparse.ArgumentParser(add_help=False)
-    parent_parser.add_argument('--config', '-c',
-            help='Own configfile to be used')
-    parent_parser.add_argument('--verbose', '-v',
-            default=1,
-            action='count',
-            help='Increase output level')
-
-    parser = argparse.ArgumentParser(
-            description='Manages access for ctlweb users')
+    parser = argparse.ArgumentParser(description='Manages access for ctlweb'
+                                     + ' users')
     subparser = parser.add_subparsers(help='Actions that can be done')
       ####################
      # ctl-register add #
     ####################
     add_parser = subparser.add_parser('add',
-            parents=[parent_parser],
-            help='Grant access for ctlweb user. This command can also be'
-            + ' used t ochange a ctlweb user.')
+                                      parents=[parent_parser],
+                                      help='Grant access for ctlweb user.'
+                                      + ' This command can also be used to'
+                                      + ' change a ctlweb user.')
     add_parser.add_argument('user',
-            metavar='USER',
-            help='Name of the ctlweb user.')
+                            metavar='USER',
+                            help='Name of the ctlweb user.')
     add_parser.add_argument('--key', '-k', required=True,
-            help='Public key of the ctlweb user.')
+                            help='Public key of the ctlweb user.')
     add_parser.set_defaults(func=add)
       #######################
      # ctl-register remove #
     #######################
     remove_parser = subparser.add_parser('remove',
-            parents=[parent_parser],
-            help='Revoke access for ctlweb user.')
+                                         parents=[parent_parser],
+                                         help='Revoke access for ctlweb user.')
     remove_parser.add_argument('user',
-            metavar='USER',
-            help='Name of the ctlweb user.')
+                               metavar='USER',
+                               help='Name of the ctlweb user.')
     remove_parser.set_defaults(func=remove)
       #########################
      # ctl-register overview #
     #########################
-    overview_parser =  subparser.add_parser('overview',
-            parents=[parent_parser],
-            help='View registered ctlweb users.')
+    overview_parser = subparser.add_parser('overview',
+                                           parents=[parent_parser],
+                                           help='View registered ctlweb users.'
+                                           )
     overview_parser.add_argument('--timestamp', '-t',
-            help='Show only ctlweb user newer than timestamp')
+                                 help='Show only ctlweb user newer than'
+                                 + ' timestamp')
     overview_parser.set_defaults(func=overview)
     # Workaround for Python 3.2-3.4 Issue #9694 'optional arguments'
-    parser._optionals.title = 'options' 
+    parser._optionals.title = 'options'
     add_parser._optionals.title = 'options'
     remove_parser._optionals.title = 'options'
 
@@ -121,7 +109,6 @@ def main():
     commit_settings(args)
     args.func(args)
 
-        
+
 if __name__ == "__main__":
     main()
-
