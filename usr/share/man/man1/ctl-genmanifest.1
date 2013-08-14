@@ -1,7 +1,4 @@
-.\" Process this file with
-.\" groff -man -Tascii foo.1
-.\"
-.TH ctl-genmanifest "January 2013" Linux "User Manuals"
+.TH ctl-genmanifest 1  "August 2013" Linux "User Manuals"
 
 .\"**********************************************************************
 
@@ -17,7 +14,14 @@ ctl-genmanifest \- builds manifest data from components
 .IR component \|]
 .RB [\| \-\-doc=
 .IR documentfile \|] 
-
+.RB [\| \-h
+.IR hostname \|]
+.RB [\| \-p
+.IR port \|]
+.RB [\| \-u
+.IR user \|]
+.RB [\| \-v \|]
+.RB [\| \-\-version \|]
 .\" **********************************************************************
 
 .SH DESCRIPTION
@@ -38,6 +42,21 @@ Specifies the actual component
 .TP
 .BI \fB\-\-doc=\fIdocument
 Optional to give a name to your generated document. Defaults to "Component.txt"
+.TP
+.BI \-h\ \fIhostname \fR,\ \fB\-\-hostname=\fIhostname
+Specifies the hostname of the component
+.TP
+.BI \-p\ \fIport \fR,\ \fB\-\-port=\fIport
+Specifies the port
+.TP
+.BI \-u\ \fIuser \fR,\ \fB\-\-user=\fIuser
+Specifies the user to be included in the manifest
+.TP
+.BR \-v ", " \-\-verbose
+Increases verbosity
+.TP
+.BI \-\-version
+Prints the installed version of this command
 
 .\".SH FILES
 
