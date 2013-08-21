@@ -7,7 +7,6 @@ SEARCH_CATEGORY_CHOICES = (
         ('name', _('Name')),
         ('author', _('Autor')),
         ('keywords', _(u'Schlüsselwort')),
-        ('homeserver', _('Server')),
         ('date', _('Datum')),)
 
 class SearchAreaForm(forms.Form):

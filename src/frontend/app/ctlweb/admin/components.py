@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from ctlweb.models import Components, \
                           Interfaces_Components, \
                           Components_Cluster, \
-                          Webserver, \
                           Programmer
 
 def set_active(modeladmin, request, queryset):
@@ -38,7 +37,6 @@ class ComponentsAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('name', 'version', 'is_active')}),
         (_('Description'), {'fields': ('brief_description', 'description')}),
-        (_('Connection'), {'fields': ('homeserver',)}),
         (_('Dates'), {'fields': ('date', 'date_creation')}),
 #        (_('Interfaces'), {'fields': ('interfaces',)}),
         )
@@ -47,7 +45,6 @@ class ComponentsAdmin(admin.ModelAdmin):
     search_fields = ('name', 
                      'version', 
                      'is_active', 
-                     'homeserver',
                      'homecluster')
     readonly_fields=('date', 'date_creation')
     actions = [ set_active,

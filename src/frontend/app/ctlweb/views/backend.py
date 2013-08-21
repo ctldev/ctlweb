@@ -14,7 +14,6 @@ from ctlweb.models import Components
 from ctlweb.models import Components_Cluster
 from ctlweb.models import Interfaces
 from ctlweb.models import Interfaces_Components
-from ctlweb.models import Webserver
 from ctlweb.models import ModuleTokenValidation
 from ctlweb.forms import ComponentRequestForm
 from ctlweb.forms import InterfaceRequestForm
@@ -261,7 +260,6 @@ def _import_manifest(filename, cluster):
         ci = ci_file.read()
         ci_file.close()
         domain = settings.SITE_DOMAIN
-        localhost, created = Webserver.objects.get_or_create(domain=domain)
         exe_name = parser.get("DEFAULT", "name")
         exe_hash = parser.get("DEFAULT", "exe_hash")
         path = parser.get('DEFAULT', 'exe')
@@ -271,7 +269,6 @@ def _import_manifest(filename, cluster):
         component = Components(name=exe_name, brief_description=desc, 
                 description=ci, is_active=True, version=version)
         component.save()
-        component.homeserver.add(localhost)
         comp_cluster = Components_Cluster(component=component,
                 cluster=cluster, path=path, code=ci)
         comp_cluster.save()
