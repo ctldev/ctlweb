@@ -1,107 +1,130 @@
 #!/usr/bin/env python3
-#ermöglicht es Module der Datenbank hinzuzufügen
-
-import sys
-import getopt
-import os
+import argparse
 
 from util.log import Log
-from util.util import hash_file
-#from util.util import add_component
-from util.settings import DEFAULT_CONFIG
-from database import Database
-from database import Component
+from util.parsing import commit_settings
+from util.parsing import parent_parser
 from database.database import NoSuchTable
-from database.database import DatabaseNotFound
-
-opt = "a:r:c:vgt:u:s"
-long_opt = ["add=", 
-        "remove=", 
-        "config=",
-        "get",
-        "timestamp=",
-        "url=",
-        "simulate"]
+from database import Component
 
 
-def usage():
-    print("Usage:", sys.argv[0], """[-a <component.tgz>|--add=<component.tgz>]
-           [ -r <component> | --remove=compontent ] | 
-           [ -g | --get ]
-           [ -t <YYYY-MM-DD> | --timestamp=<YYYY-MM-DD> ]
-           [ -u <upload-url> | --url=<upload-url> ]
-           [ -s | --simulate ]
-           [ -c | --config=<config file>""")
+def add(args):
+    comp = Component.add(args.package)
+    try:
+        comp.save()
+    except NoSuchTable:
+        comp.create_table()
+        comp.save()
+
+
+def remove(args):
+    try:
+        comp = Component.get_exactly(args.component)
+    except NoSuchTable:
+        comp = None
+    if comp:
+        comp.remove()
+    else:
+        Log.error('%s was not found in Database' % args.component)
+
+
+def overview(args):
+    line_width = 79
+    table_template = '%-25s| %-52s'
+    heading = 'Registered ctl components'.center(line_width)
+    heading_sub = '--=============================--'.center(line_width)
+    components = []
+    try:
+        components = Component.get(args.timestamp)
+    except NoSuchTable:
+        components = []
+    print()
+    print(heading)
+    print(heading_sub)
+    print()
+    if components:
+        print(table_template % ('Name', 'exe'))
+        print('-' * line_width)
+    elif args.timestamp:
+        print('No ctl components where added in timerange.')
+    else:
+        print('No ctl components are registered.')
+
+    for c in components:
+        print(table_template % (c.c_id, c.c_exe))
+
+
+def push(args):
+    components = []
+    try:
+        components = Component.get(args.timestamp)
+    except NoSuchTable:
+        components = []
+    if components:
+        for c in components:
+            Log.info('Uploading %s to %s' % (c.c_id, args.url))
+            c.upload_to_url(args.url)
+    else:
+        Log.error('No components to upload')
 
 
 def main():
-    Log.streamoutput()
-    try:
-         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
-    except getopt.GetoptError as err:
-        print(err)
-        usage()
-        sys.exit(2)
+    parser = argparse.ArgumentParser(description='Manage ctl components.')
+    subparser = parser.add_subparsers(help='Actions that can be done')
+      #####################
+     # ctl-component add #
+    #####################
+    add_parser = subparser.add_parser('add',
+                                      parents=[parent_parser],
+                                      help='Add a ctl component to database'
+                                           + ' and storage.')
+    add_parser.add_argument('package',
+                            metavar='PACKAGE',
+                            help='Ctl component package')
+    add_parser.set_defaults(func=add)
+      ########################
+     # ctl-component remove #
+    ########################
+    remove_parser = subparser.add_parser('remove',
+                                         parents=[parent_parser],
+                                         help='Remove ctl component from'
+                                              + ' database and storage.')
+    remove_parser.add_argument('component',
+                               metavar='COMPONENT',
+                               help='Name of the registered component')
+    remove_parser.set_defaults(func=remove)
+      ##########################
+     # ctl-component overview #
+    ##########################
+    overview_parser = subparser.add_parser('overview',
+                                           parents=[parent_parser],
+                                           help='View registered ctlweb'
+                                                + ' users.')
+    overview_parser.add_argument('--timestamp', '-t',
+                                 help='Show only ctlweb components newer than'
+                                      + ' timestamp')
+    overview_parser.set_defaults(func=overview)
+      ######################
+     # ctl-component push #
+    ######################
+    push_parser = subparser.add_parser('push',
+                                       parents=[parent_parser],
+                                       help='Push ctl component to ctlweb'
+                                            + ' frontend.')
+    push_parser.add_argument('url',
+                             metavar='URL',
+                             help='Upload url')
+    push_parser.add_argument('--timestamp', '-t',
+                             help='Get only ctlweb components newer than'
+                                  + ' timestamp')
+    push_parser.set_defaults(func=push)
+    # Workaround for Python 3.2-3.4 Issue #9694 'optional arguments'
+    parser._optionals.title = 'options'
 
-    config = DEFAULT_CONFIG
-    MODE = {"add": 0,
-            "get" : 1,
-            "remove" : 2,
-            }
-    mode = None
-    timestamp = None
-    upload_url = None
-    
-    for o, a in opts:
-        if o in ("-a", "--add"):
-            mode = MODE['add']
-            if os.path.isfile(a):
-                component = a
-            else:
-                Log.critical("File %s not found" % a)
-        elif o in ("-r", "--remove"):
-            mode = MODE['remove']
-            component = a
-        elif o in ("-g", "--get"):
-            mode = MODE['get']
-        elif o in ("-t", "--timestamp"):
-            timestamp = a
-        elif o in ("-u", "--url"):
-            upload_url = a
-        elif o == "-v":
-            Log.increase_verbosity()
-        elif o in ("-c", "--config"):
-            Database(a)
-            config = a
-    # Working
-    if mode == None:
-        usage()
-        exit(1)
-    # If the connection is established, a special config was given
-    if not Database.db_connection:
-        Log.debug("Using default config to initialize database.")
-        Database()
-    if mode == MODE['add']: # Add component (local purpose)
-        Log.debug("Adding component to database and manifest store")
-        Component.add(component)
-    elif mode == MODE['remove']: # Remove component (local purpose)
-        Log.debug("Removing component from database and manifest store")
-        if not Component.remove(component):
-            Log.critical("Unable to remove %s" % component)
-            exit(1)
-    elif mode == MODE['get']: # Upload component (web & local purpose)
-        Log.debug("Preparing to send components")
-        if timestamp:
-            components = Component.get(timestamp)
-        else:
-            components = Component.get()
-        for comp in components:
-            if upload_url:
-                comp.upload_to_web(upload_url)
-            else:
-                print(comp)
+    args = parser.parse_args()
+    commit_settings(args)
+    args.func(args)
 
 
 if __name__ == "__main__":
-    main()            
-            
+    main()

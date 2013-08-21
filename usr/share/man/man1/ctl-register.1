@@ -1,71 +1,74 @@
-.\" Process this file with
-.\" groff -man -Tascii foo.1
-.\"
-.TH ctl-register 1 "January 2013" Linux "User Manuals"
+.TH ctl-register 1 "August 2013" Linux "User Manuals"
 .SH NAME
-ctl-register \- register a user on a cluster 
+ctl-register \- register or delete a user on/from a cluster  
 .SH SYNOPSIS
-.\" ctl-register section
 .br
-.B ctl-register
+.\" ctl-register section
+.B ctl-register 
+.RB [\| \-h \|]
+{add,remove,overview}
+.br
+.\" ctl-register add section
+.B ctl-register add
+.RB [\| \-h \|]
 .RB [\| \-c
-.IR configfile \|]
-.RB [\| \-a
-.IR id \|
-\||\|
-.RB \| \-k
-.IR publickey \|]
-.RB [\| \-r
-.IR id \|]
-.RB [\| \-o \|]
-.\" Description of ctlweb section
+.IR CONFIG \|]
+.RB [\| \-v \|]
+.RB \| \-k 
+.IR KEY \|
+.IR USER
+.br
+.\" ctl-register remove section
+.B ctl-register remove
+.RB [\| \-h \|]
+.RB [\| \-c
+.IR CONFIG \|]
+.RB [\| \-v \|]
+.IR USER
+.br
+.\" ctl-register overview section
+.B ctl-register overview
+.RB [\| \-h \|]
+.RB [\| \-c 
+.IR CONFIG \|] 
+.RB [\| \-v \|]
+.RB [\| \-t
+.IR TIMESTAMP \|]
+
 .SH DESCRIPTION
 .B ctl-register
-usually is executed by the ctlweb-system itself in order to register a user on a specific cluster. Under special circumstances, however, it can be issued by a system administrator to manually add a user.
-
+usually is executed by the ctlweb-system itself in order to register or delete
+a user on/from
+a specific cluster. Under special circumstances, however, it can be issued by a
+system administrator to manually add/remove a user.
 .SH OPTIONS
 .TP
-.BI \-c\  configfile\fR,\ \fI \-\-config-file\fR=\fIconfigfile
-If this option is not given, a default config-file will be used.
+.BR \-h ", " \-\-help
+Prints a help message with all required/optional arguments and their meanings
 .TP
-.BI \-a\  id\fR,\ \fI \-\-add\fR=\fIid
-Adds the user to a cluster
+.BI \-c\ \fICONFIG \fR,\ \fB\-\-config\ \fICONFIG
+If this option is not given, a default config file will be used
 .TP
-.BI \-k\  publickey\fR,\ \fI \-\-key\fR=\fIpublickey
-Uses the specified public key as the key for the user on that cluster
+.BR \-v ", " \-\-verbose
+Increases verbosity
 .TP
-.BI \-r\  id\fR,\ \fI \-\-remove\fR=\fIid
-Opposed to the above 
-.B add
-command, this will remove the user with the stated 
-.B id
+.BI \-k\  KEY \fR,\ \fB\-\-key\ \fIKEY
+Adds the specified Public Key of a user to a cluster.
 .TP
-.BR \-o ", " \-\-overview
-Provides an overview over all registered users
-.\"***********************************************************************
+.BI \-t\  TIMESTAMP \fR,\ \fB\-\-timestamp\ \fITIMESTAMP
+Shows only user newer than the timestamp
 
-.\".SH FILES
 
-.\"**********************************************************************
+.\" .SH FILES
 
-.\".SH ENVIRONMENT
-
-.\"**********************************************************************
+.\" .SH ENVIRONMENT
 
 .\".SH DIAGNOSTICS
-
-.\"**********************************************************************
-
-.\".SH BUGS
-
-.\"**********************************************************************
+ 
+.\" .SH BUGS
 
 .SH AUTHOR
 Jörn Hameyer <>
 .SH "SEE ALSO"
-.BR ctlweb (1),
-.BR ctl-web (1),
-.BR ssh (1) 
-
-
-
+.BR ctl (1),
+.BR ctl-register (1)

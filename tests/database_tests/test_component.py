@@ -83,8 +83,11 @@ class TestComponent(unittest.TestCase):
         """
         with self.assertRaises(NoSuchTable):
             self.comp.save()
+        self.assertEqual(self.comp.c_pk, -1, "no temporary primary key?")
         self.comp.create_table()
         self.comp.save()
+        self.assertEqual(self.comp.c_pk, 1, 
+                         "not the correct primary key for first element")
 #       connection restart
         self.connection.close()
         Database()
@@ -94,15 +97,23 @@ class TestComponent(unittest.TestCase):
         res = cursor.fetchone()
         self.assertIsNotNone(res, "Could not read test data from db.")
         res = tuple(res)
-        self.assertEqual(res[3], "name", "Got unexpected data")
-        self.assertEqual(res[2], "/path/to/exe", "Got unexpected data")
-        #updatecheck
+        self.assertEqual(res[4], "name", "Got unexpected data")
+        self.assertEqual(res[3], "/path/to/exe", "Got unexpected data")
+
+    def test_update(self):
+        """ Checks if data can be changed
+        """
+        self.comp.create_table()
+        self.comp.save()
         self.comp.c_exe = "updatedexe"
         self.comp.save()
-        cursor.execute("SELECT * FROM Component;")
-        res = cursor.fetchone()
+        self.cursor.execute("SELECT * FROM Component;")
+        result = self.cursor.fetchall()
+        self.assertEqual(len(result), 1, "too much or too less objects")
+        self.cursor.execute("SELECT * FROM Component;")
+        res = self.cursor.fetchone()
         res = tuple(res)
-        self.assertEqual(res[2], "updatedexe", 
+        self.assertEqual(res[3], "updatedexe", 
                 "Seems not to be updated correctly")
 
     def test_remove(self):
@@ -132,7 +143,7 @@ class TestComponent(unittest.TestCase):
         rebuild.
         """
         self.comp.create_table()
-        repr =  "c_id=name;c_exe=/path/to/exe"
+        repr = (-1, "c_id=name;c_exe=/path/to/exe",)
         comp = Component.convert(repr)
         self.assertEqual(comp, self.comp)
 
@@ -143,16 +154,17 @@ class TestComponent(unittest.TestCase):
         self.comp.save()
         # Test get all
         comps = Component.get()
+        self.assertIsNotNone(comps, "Could not retrieve Component")
         self.assertEqual(comps[0], self.comp, "Could not deserialize data")
         time_since = datetime.today() - timedelta(minutes=10)
         comps = Component.get(time_since)
         Log.debug("test_get(): comps: "+ str(comps))
         self.assertEqual(comps[0], self.comp, "Could not deserialize data")
 
-    def test_get_exacly(self):
+    def test_get_exactly(self):
         self.comp.create_table()
         self.comp.save()
-        comp = Component.get_exacly(self.comp.c_id)
+        comp = Component.get_exactly(self.comp.c_id)
         self.assertEqual(comp, self.comp, "Could not deserialize data")
 
 class TestComponentAdd(unittest.TestCase):
@@ -203,7 +215,7 @@ class TestComponentAdd(unittest.TestCase):
         entry it really done and the file is moved to the storage
         """
         insert = Component.add(self.component)
-        output = Component.get_exacly("example")
+        output = Component.get_exactly("example")
         self.assertEqual(insert, output)
         # check if component is stored.
         import os

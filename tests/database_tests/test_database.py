@@ -36,10 +36,10 @@ class DatabaseTest(unittest.TestCase):
     def test_eq(self):
         """ Equals method
         """
-        web1 = Web("test","test")
-        web2 = Web("test","test")
-        web3 = Web("na","ne")
-        user = User("test","test")
+        web1 = Web("test")
+        web2 = Web("test")
+        web3 = Web("na")
+        user = User("test")
         self.assertEqual(web1, web2)
         self.assertNotEqual(web1, web3)
         self.assertNotEqual(web1, user)

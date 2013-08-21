@@ -4,7 +4,9 @@ from database.database import NoSuchTable
 import sqlite3
 from util import Log
 
+
 class Component(Database):
+
     """ Is an component in the CTL-Database
     """
     def __init__(self, name, exe):
@@ -24,20 +26,20 @@ class Component(Database):
 
     def remove(self):
         """ Remove component with given name.
-        
+
         Returns True if the component successfully removed.
         """
         Log.debug("Component.remove(): removing")
         super().remove()
         import os
         try:
-            os.remove( os.path.join(Database.store, "%s.tgz" % self.c_id) )
+            os.remove(os.path.join(Database.store, "%s.tgz" % self.c_id))
         except IOError:
             Log.error("Component.remove(): unable to remove component file.")
             return False
         return True
 
-    def upload_to_web(url):
+    def upload_to_web(self, url):
         """ Upload the component to the given url
 
         """
@@ -49,7 +51,6 @@ class Component(Database):
         r = requests.post(url, files=files)
         if r.status_code != requests.codes.ok:
             Log.critical("Error %s occured while upload" % r.status_code)
-
 
     @classmethod
     def add(cls, component):
@@ -75,15 +76,15 @@ class Component(Database):
             target_name = path.join(Database.store, "%s.tgz" % data["c_id"])
             shutil.copy(component, target_name)
         except IOError:
-            Log.critical("Unable to save component to Manifest store in %s" \
-                    % store)
+            Log.critical("Unable to save component to Manifest store in %s"
+                         % store)
             exit(1)
         return comp
 
     @staticmethod
     def _unpack(component):
-        """ Extracts importand data out of the package. They are returned as a
-        tuple that works on Compontent.create().
+        """ Extracts important data out of the package. They are returned as a
+        dictionary that works on Compontent.create().
         """
         import tarfile
         import os
@@ -91,7 +92,7 @@ class Component(Database):
         control_path = '/tmp/ctlcontrol-%s' % datetime.now().strftime('%s')
         control_file = control_path + "/control"
         with tarfile.open(component, 'r:gz') as comp:
-            comp.extract("control", control_path, set_attrs = False)
+            comp.extract("control", control_path, set_attrs=False)
         data = Component._read_control(control_file)
         os.remove(control_file)
         os.rmdir(control_path)
@@ -116,7 +117,23 @@ class Component(Database):
         except KeyError:
             Log.critical("Found no corresponding exe in component")
             raise
-        return {"c_id": name, 
+        return {"c_id": name,
                 "c_exe": exe,
                 }
 
+    def execute(self, args=None):
+        """ Executes the component with the given argument string
+        """
+        import subprocess
+        import shlex
+        import sys
+        args = '%s %s' % (self.c_exe, args)
+        args = shlex.split(args)
+        try:
+            subprocess.check_call(args)
+        except subprocess.CalledProcessError:
+            print('Error occured while running ctl command.',
+                  file=sys.stderr)
+        except OSError:
+            print('CTL Command not found, please contact the administrator.',
+                  file=sys.stderr)

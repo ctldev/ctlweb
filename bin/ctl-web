@@ -1,103 +1,116 @@
 #!/usr/bin/env python3
-import os
-import sys
-import getopt
+import argparse
 
-#ctl-web wird von der Webinstanz auf den Cluster ausgefuehrt, um sich dort zu verifiziern
-from util import Log
-from util.util import overview
-from database import Database
 from database import Web
- 
+from database.database import NoSuchTable
+from util import Log
+from util.parsing import commit_settings
+from util.parsing import parent_parser
 
-opt = "c:a:k:r:ov"
-long_opt = ["config=","id=", "public key=", "reg_id=", "overview", "verbose" ]
-max_output_level = 2
+# NICE TO HAVE: The first time a frontend connects, its IP is stored in tha
+# database and used as a postfix for it's usernames
 
-def usage():
-    print("Usage:", sys.argv[0], """[-c <database>| --config=<database>]
-         \t [-a <id>| --a=<id>] 
-         \t [-v | --verbose]  
-         \t [-k <public key> --key=<public key>]
-         \t [-r <reg_id> | --remove=<reg_id>]
-         \t [-o | --overview] """)
+
+def add(args):
+    """ Adds a ctl-web frontend to the Database and grants it access to
+        * ctl-webinteractive
+    """
+    web = Web.add({'c_id': args.url,
+                   'c_pubkey': args.key})
+    try:
+        web.save()
+    except NoSuchTable:
+        web.create_table()
+        web.save()
+
+
+def remove(args):
+    try:
+        web = Web.get_exactly(args.url)
+    except NoSuchTable:
+        web = None
+    if web:
+        web.remove()
+    else:
+        Log.error('%s was not found in Database' % args.url)
+
+
+def overview(args):
+    line_width = 79
+    table_template = '%-35s| %42s'
+    heading = 'Registred ctlweb frondends'.center(line_width)
+    heading_sub = '--==============================--'.center(line_width)
+    webs = []
+    try:
+        webs = Web.get(args.timestamp)
+    except NoSuchTable:
+        webs = []
+    print()
+    print(heading)
+    print(heading_sub)
+    print()
+    if webs:
+        print(table_template % ('URL', 'Key'))
+        print('-' * line_width)
+    elif args.timestamp:
+        print('No ctlweb frondends in timerange added')
+    else:
+        print('No ctlweb frontends registered')
+
+    for w in webs:
+        print(table_template % (w.c_id, w.c_pubkey))
+
 
 def main():
-   
-    Log.streamoutput()
-    reg_id = None
-    reg_pubkey = None
-    required = 0
-    database = None
-    add_set = None
-    remove_set = None
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
-    except getopt.GetoptError as err:
-        print(err)
-        usage()
-        sys.exit(2)
-    output = None
-    for o, a in opts:
-        if o in ("-c", "--config"):
-            import configparser
-            config = configparser.ConfigParser()
-            config.read(a)
-            database = Database(config.get('BACKEND','Database'))
-        elif o in ("-a", "--add"):
-            add_set = True
-            if(a == None):
-                Log.error("No valid id specified, Aborting ")
-                exit(1)
-            else:
-                required += 1
-                reg_id = a
-                Log.info(" "+str(required)+" ")
-                Log.debug("id " + str(a) + " was added to cluster ")
-            print("id",o,a) 
-        elif o in ("-k", "--public key"):
-            if(a == None):  
-                Log.error("No valid pub-key specified, Aborting ")
-                exit(1)
-            else:
-                required += 1
-                reg_pubkey = a
-                Log.info(" "+str(required)+" ")
-                Log.info("public key" +  str(a) +" was added to cluster ") 
-        elif o in ("-v", "--verbose"):
-            Log.info("Verbosity increased")
-            Log.increase_verbosity()
-        elif o in ("-r", "--remove"):
-            remove_set = True
-            if(a == None):
-                Log.error(" No valid id specified, Aborting ")
-                exit(1)
-            else:
-                required += 1
-                reg_id = a
-                print("pub_id",o,a)
-                Log.info(str(a) + "wir als id geloescht")
-        elif o in ("-o","--overview"):
-            overview(a)
-    if(add_set != remove_set ):            
-        if(required != 2 ):
-            Log.info(" " +str(required)+ " ")
-            Log.error("no valid id or pubkey specified")
-        else:
-            if(add_set == True):
-                Web.add({
-                    "c_id": reg_id,
-                    "c_pubkey": reg_pubkey,
-                    })
-            else:
-                to_remove = Web.get_exacly(reg_id)
-                to_remove.remove()
-    else:
-        Log.info("no add xor remove")
-if __name__ == "__main__":
-    main()            
-           
+    # General parsing
+    parser = argparse.ArgumentParser(
+        description='Manages access for ctlweb frontends')
+    subparser = parser.add_subparsers(help='Actions that can be done')
+      ###############
+     # ctl-web add #
+    ###############
+    add_parser = subparser.add_parser('add',
+                                      parents=[parent_parser],
+                                      help='Grant access for ctlweb frontend.'
+                                           + ' This command can also be used'
+                                           + ' to change a ctlweb frontend.')
+    add_parser.add_argument('url',
+                            metavar='URL',
+                            help='Url of the ctlweb frontend')
+    add_parser.add_argument('--key', '-k', required=True,
+                            help='Public key of the ctlweb frontend')
+    add_parser.set_defaults(func=add)
+      ##################
+     # ctl-web remove #
+    ##################
+    remove_parser = subparser.add_parser('remove',
+                                         parents=[parent_parser],
+                                         help='Revoke access for ctlweb'
+                                              + ' frontend')
+    remove_parser.add_argument('url',
+                               metavar='URL',
+                               help='Url of the ctlweb frontend')
+    remove_parser.set_defaults(func=remove)
+      ####################
+     # ctl-web overview #
+    ####################
+    overview_parser = subparser.add_parser('overview',
+                                           parents=[parent_parser],
+                                           help='View registered ctlweb'
+                                                + ' frontends')
+    overview_parser.add_argument('--timestamp', '-t',
+                                 help='Show only ctlweb frontends newer than'
+                                      + ' timestamp')
+    overview_parser.set_defaults(func=overview)
+    # Workaround for Python 3.2-3.4 Issue #9694 'optional arguments'
+    parser._optionals.title = 'options'
+    add_parser._optionals.title = 'options'
+    remove_parser._optionals.title = 'options'
+
+    args = parser.parse_args()
+    commit_settings(args)
+    args.func(args)
 
 
-
-
+if __name__ == '__main__':
+    main()

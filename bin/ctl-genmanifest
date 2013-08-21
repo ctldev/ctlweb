@@ -6,17 +6,27 @@ import os
 from util import Log
 from util.util import hash_file
 
-#generiert ein Manifest für Compontent
+# generiert ein Manifest für Compontent
 opt = "n:c:i:vh:p:u:"
-long_opt = ["name=", 
-        "ci=", 
-        "impl=", 
-        "documentation=", 
-        "verbose", 
-        "version", 
-        "hostname=",
-        "port=",
-        "user="]
+# name of the manifest-file
+long_opt = ["name="]
+# the used ci-interface
+long_opt.append("ci=")
+# the implemented component
+long_opt.append("impl=")
+# name of the generated document
+long_opt.append("documentation=")
+# increases/decreases the talkativeness
+long_opt.append("verbose")
+# shows version of the command
+long_opt.append("version")
+# gives the command a hostname manually
+long_opt.append("hostname=")
+# gives the command a port manually
+long_opt.append("port=")
+# specifies the user
+long_opt.append("user=")
+
 
 def usage():
     print("Usage:", sys.argv[0], """[ -n | --name=name ]
@@ -30,8 +40,8 @@ def usage():
          \t [--version]  """)
 
 
-def generate_control(name, host, user, ssh_port, 
-            exe_path, exe_hash, ci_name):
+def generate_control(name, host, user, ssh_port,
+                     exe_path, exe_hash, ci_name):
     """ Generates the config file of an ctl-package
     """
     from datetime import datetime
@@ -47,6 +57,7 @@ def generate_control(name, host, user, ssh_port,
         f.write('ci=%s\n' % ci_name)
     return filename
 
+
 def generate_package(name, control, doc, ci):
     """ Generates ctl-manifest-package
     """
@@ -60,25 +71,25 @@ def generate_package(name, control, doc, ci):
         package.add(ci)
     return tar_file
 
+
 def main():
-    import datetime
     Log.streamoutput()
     try:
-         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
-    except getopt.GetoptError as err:
+        opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
+    except getopt.GetoptError:
         usage()
         sys.exit(2)
     required = 0
     # package variables
-    name = "" # will be set later
+    name = ""  # will be set later
     import subprocess
     host = subprocess.check_output(["hostname", "--fqdn"]).strip()
     user = subprocess.check_output(["whoami"]).strip().decode('utf8')
     doc = None
     ssh_port = 22
-    exe_path = "" #  will be set during argument parsing
-    exe_hash = "" # I'll explain later (The Doctor)
-    ci_name = "" # will be set during argument parsing
+    exe_path = ""  # will be set during argument parsing
+    exe_hash = ""  # I'll explain later (The Doctor)
+    ci_name = ""  # will be set during argument parsing
 
     for o, a in opts:
         if o in ("-n", "--name"):
@@ -91,7 +102,7 @@ def main():
                 with open(a, "r"):
                     pass
             except IOError:
-                Log.critical("File %s doesn't exists."%a)
+                Log.critical("File %s doesn't exists." % a)
                 exit(1)
 
             ci_name = a
@@ -105,19 +116,17 @@ def main():
             Log.debug("setting implementation")
         elif o == "--doc":
             try:
-                with open(a,"r") as f:
+                with open(a, "r"):
                     pass
             except IOError:
-                Log.critical("File %s doesn't exists."%a)
+                Log.critical("File %s doesn't exists." % a)
                 exit(1)
             doc = a
             Log.debug("setting documentation")
         elif o in ("-h", "--hostname"):
-            some_set = True
             host = a
             Log.debug("setting manually given hostname")
         elif o in ("-p", "--port"):
-            some_set = True
             port = a
             Log.debug("setting manually given port")
         elif o in ("-v", "--verbose"):
@@ -130,7 +139,7 @@ def main():
         exit(1)
     # Hostname check
     Log.debug("Setting base informations")
-    if host == "localhost" or host == None:
+    if host == "localhost" or host is None:
         Log.critical("No external hostname found. Try -h option?")
         exit(1)
     # Port/Hostname check
@@ -145,7 +154,7 @@ def main():
     exe_hash = hash_file(exe_path)
     # generate control file
     control = generate_control(name, host, user, ssh_port, exe_path,
-            exe_hash, ci_name)
+                               exe_hash, ci_name)
     manifest_package = generate_package(name, control, doc, ci_name)
     os.remove(control)
     if not os.path.isfile(manifest_package):
@@ -155,4 +164,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()            
+    main()
