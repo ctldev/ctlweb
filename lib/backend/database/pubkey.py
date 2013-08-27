@@ -13,6 +13,8 @@ class Pubkey(Database):
     def __init__(self, key, access):
         """ Should not be used, use Component.create() instead.
         """
+        if access.c_pk == -1:
+            access.save()
         super().__init__()
         self.c_key = key
         self.f_Access_access = int(access.c_pk)
