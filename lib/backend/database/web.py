@@ -17,5 +17,5 @@ class Web(Access):
             web.add_key(attr['f_Pubkey_pubkey'])
         return web
 
-    def _keyline():
-        return 'command="bash -c ctl-register" %s' % c_pubkey
+    def _keyline(self):
+        return 'command="bash -c ctl-register" {0}'

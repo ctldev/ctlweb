@@ -16,7 +16,7 @@ def add(args):
         * ctl-init
     """
     user = User.add({'c_id': args.user,
-                    'c_pubkey': args.key})
+                    'f_Pubkey_pubkey': args.key})
     try:
         user.save()
     except NoSuchTable:
@@ -58,7 +58,7 @@ def overview(args):
         print('No ctlweb users registered')
 
     for u in users:
-        print(table_template % (u.c_id, u.c_pubkey))
+        print(table_template % (u.c_id, ', '.join(u.get_keys())))
 
 
 def main():
@@ -108,7 +108,7 @@ def main():
 
     args = parser.parse_args()
     commit_settings(args)
-    if 'func' in args.func:
+    if 'func' in args:
         args.func(args)
     else:
         parser.print_help()

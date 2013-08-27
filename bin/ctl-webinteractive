@@ -86,8 +86,7 @@ def component_request():
     opts = []
     if time_index:  # User want a subset of components
         opts.append(" -t %s-%s-%s " % time_index)
-    opts.append(" --get")
-    opts.append(" --url=%s" % url)
+    opts.append("%s" % url)
     cmd = ["ctl-component", "push"]
     cmd.extend(opts)
     if SIMULATE:  # TODO read correct SIMULATE
