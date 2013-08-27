@@ -4,7 +4,6 @@ from datetime import timedelta
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from ctlweb.models.webserver import *
 from ctlweb.models.cluster import *
 
 class Components(models.Model):
@@ -14,8 +13,6 @@ class Components(models.Model):
 
     """
     name = models.CharField(_("Name"), max_length=100, unique="True")
-    homeserver = models.ManyToManyField(Webserver, 
-                                        verbose_name=_("Ursprungsserver"))
     homecluster = models.ManyToManyField(Cluster,
                                          through='Components_Cluster',
                                          verbose_name=_("Ursprungscluster"))
@@ -32,7 +29,6 @@ class Components(models.Model):
         permissions = (
 		        ("can_see_description", "Can read descriptions"),
 		        ("can_see_homecluster", "Can see corresponding cluster"),
-     		    ("can_see_homeserver", "Can see corresponding server"),
                 ("can_set_active", "Can set active"),)
     
     def set_active(self, User):

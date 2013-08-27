@@ -11,22 +11,12 @@ class Command(BaseCommand):
     help = u"""Mit diesem Kommando kann eine Demo-Instanz erzeugt werden"""
 
     def handle(self, *args, **options):
-        self.import_webserver()
         self.import_cluster()
         self.import_interfaces()
         self.import_user()
         self.import_user_rights()
         self.import_components()
         self.import_connections()
-
-    def import_webserver(self):
-        self.w1 = Webserver(name="Web1", domain="http://www.web1.de")
-        self.w2 = Webserver(name="Web2", domain="https://www.web2.com")
-        self.w3 = Webserver(name="Web3", domain="http://www.web3.en")
-
-        self.w1.save()
-        self.w2.save()
-        self.w3.save()
 
     def import_cluster(self):
         self.cl1 = Cluster(domain="https://www.c1.de")
@@ -93,7 +83,6 @@ class Command(BaseCommand):
         permissions.get(codename="can_see_description").user_set.add(self.user1)
         permissions.get(codename="can_see_description").user_set.add(self.user2)
         permissions.get(codename="can_see_homecluster").user_set.add(self.user1)
-        permissions.get(codename="can_see_homeserver").user_set.add(self.user1)
         permissions.get(codename="can_see_key").user_set.add(self.user1)
         permissions.get(codename="can_see_path").user_set.add(self.user1)
         permissions.get(codename="can_see_code").user_set.add(self.user1)
@@ -144,12 +133,6 @@ class Command(BaseCommand):
         self.ic3.save()
         self.ic4.save()
         self.ic5.save()
-
-        self.co1.homeserver.add(self.w1)
-        self.co1.homeserver.add(self.w3)
-        self.co2.homeserver.add(self.w2)
-        self.co3.homeserver.add(self.w1)
-        self.co4.homeserver.add(self.w1)
 
         self.hc1 = Components_Cluster(cluster=self.cl1,
                 component=self.co1,

@@ -16,9 +16,9 @@ class Access(Database):
 
     @classmethod
     def add(cls, attr):
-        """ This method adds a new object to database and authorized_keys. 
-        
-        attr is expected to be a dictionary. 
+        """ This method adds a new object to database and authorized_keys.
+
+        attr is expected to be a dictionary.
         The attr are at least and have to be compatible with the create()
         attributes:
             * c_id
