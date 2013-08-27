@@ -201,6 +201,13 @@ class Database:
         cursor = Database.db_connection.cursor()
         attributes = self.get_attributes()
         table = self.__name__
+        # test if object is already in database
+        try:
+            old_object = self.__class__.get_exactly(self.c_id)
+            self.c_pk = old_object.c_pk
+        except InstanceNotFoundError:
+            # just go on, nothing to do
+            pass
         row_patterns = ""
         header = ' (date, adapter'
         values = {'adapter': self,
