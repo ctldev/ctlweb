@@ -10,8 +10,6 @@ def __comp_searchset(searchtext):
     return (Q(name__icontains = searchtext)|
             Q(brief_description__icontains = searchtext)|
             Q(programmer__email__iexact = searchtext)|
-            Q(homeserver__name__icontains = searchtext)|
-            Q(homeserver__ip__icontains = searchtext)|
             Q(version__icontains = searchtext))
 
 def __interface_searchset(searchtext):

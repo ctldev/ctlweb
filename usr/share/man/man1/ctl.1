@@ -1,7 +1,4 @@
-.\" Process this file with
-.\" groff -man -Tascii foo.1
-.\"
-.TH ctl 1 "January 2013" Linux "User Manuals"
+.TH ctl 1 "August 2013" Linux "User Manuals"
 .SH NAME
 ctl \- execute commands on dedicated clusters, generate manifest data~ 
 .\".SH SYNOPSIS
@@ -11,15 +8,17 @@ ctl \- execute commands on dedicated clusters, generate manifest data~
 is a family of tools to complement the Website ctlweb.
 Further information is available at the specific manpages of each command.
 .br
-.B ctlinit
+.B ctl-init
 .br
 .B ctl-web
 .br 
-.B ctl-runcgi
-.br
+.\".B ctl-runcgi
+.\".br
 .B ctl-register
 .br  
 .B ctl-genmanifest
+.br
+.B ctl-component
 .\".SH OPTIONS
 
 .\".SH FILES
@@ -33,11 +32,12 @@ Further information is available at the specific manpages of each command.
 .SH AUTHOR
 Jörn Hameyer <>
 .SH "SEE ALSO"
-.BR ctlinit (1),
+.BR ctl-init (1),
 .BR ctl-web (1),
-.BR ctl-runcgi (1),
+.\".BR ctl-runcgi (1),
 .BR ctl-register(1),
-.BR ctl-genmanifest(1)
+.BR ctl-genmanifest(1),
+.BR ctl-component(1)
 
 
 

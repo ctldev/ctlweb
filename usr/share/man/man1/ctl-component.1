@@ -1,0 +1,78 @@
+.TH ctl-web 1 "August 2013" Linux "User Manuals"
+.SH NAME
+ctl-component \- Add/remove components to/from a cluster or provides an overview over all components 
+.SH SYNOPSIS
+.br
+.\" ctl-component section
+.B ctl-component 
+.RB [\| \-h \|]
+{add,remove,overview,push}
+.br
+.\" ctl-component add section
+.B ctl-component add
+.RB [\| \-h \|]
+.RB [\| \-c
+.IR CONFIG \|]
+.RB [\| \-v \|] 
+.IR PACKAGE \|
+.br
+.\" ctl-component remove section
+.B ctl-component remove
+.RB [\| \-h \|]
+.RB [\| \-c
+.IR CONFIG \|]
+.RB [\| \-v \|]
+.IR COMPONENT \|
+.br
+.\" ctl-component overview section
+.B ctl-component overview
+.RB [\| \-h \|]
+.RB [\| \-c 
+.IR CONFIG \|] 
+.RB [\| \-v \|]
+.RB [\| \-t
+.IR TIMESTAMP \|]
+.br
+.\" ctl-component push section
+.B ctl-component push
+.RB [\| \-h \|]
+.RB [\| \-c 
+.IR CONFIG \|]
+.RB [\| \-v \|]
+.RB [\| \-t 
+.IR TIMESTAMP \|]
+.IR URL \|
+
+.SH DESCRIPTION
+.B ctl-component
+mainly is for either adding or removing Components to/from a cluster.
+Additionally this command can provide an overview over all registered
+components on a cluster through its inbuilt overview argument.
+ctl-component can also be used to push an URL to a cluster. 
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Prints a help message with all required/optional arguments and their meanings
+.TP
+.BI \-c\ \fICONFIG \fR,\ \fB\-\-config\ \fICONFIG
+If this option is not given, a default config file will be used
+.TP
+.BR \-v ", " \-\-verbose
+Increases verbosity
+.TP
+.BI \-t\  TIMESTAMP \fR,\ \fB\-\-timestamp\ \fITIMESTAMP
+Shows only ctl components newer than the timestamp
+
+
+.\" .SH FILES
+
+.\" .SH ENVIRONMENT
+
+.\".SH DIAGNOSTICS
+ 
+.\" .SH BUGS
+
+.SH AUTHOR
+Jörn Hameyer <>
+.SH "SEE ALSO"
+.BR ctl (1)

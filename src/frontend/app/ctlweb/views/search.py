@@ -190,25 +190,15 @@ def and_search(searchtext, category, searched_comps):
     elif category == 'keywords':        
         searched_comps = searched_comps.filter(
             brief_description__icontains = searchtext)
-    elif category == 'homeserver':        
-        searched_comps = searched_comps.filter(
-            homeserver__ip__icontains = searchtext)
-        searched_comps = searched_comps.filter(
-            homeserver__name__icontains = searchtext)
     elif category == 'date':        
         searched_comps = searched_comps.filter(
             date__icontains = searchtext)
     elif category == 'all':
         searched_name = searched_comps.filter(
             name__icontains = searchtext)
-        searched_ip = searched_comps.filter(
-            homeserver__ip__icontains = searchtext)
-        searched_servername = searched_comps.filter(
-            homeserver__name__icontains = searchtext)
         searched_date = searched_comps.filter(
             date__icontains = searchtext)
-        searched_comps = searched_name | searched_ip | searched_servername |\
-        searched_date
+        searched_comps = searched_name | searched_ip | searched_date
     return searched_comps
         
 def and_not_search(searchtext, category, searched_comps):
@@ -219,11 +209,6 @@ def and_not_search(searchtext, category, searched_comps):
     if category == 'keywords' or category == 'all':        
         searched_comps = searched_comps.exclude(
             brief_description__icontains = searchtext)
-    if category == 'homeserver' or category == 'all':
-        searched_comps = searched_comps.exclude(
-            homeserver__ip__icontains = searchtext)
-        searched_comps = searched_comps.exclude(
-            homeserver__name__icontains = searchtext)
     if category == 'date' or category == 'all':        
         searched_comps = searched_comps.exclude(
             date__icontains = searchtext)
@@ -238,13 +223,6 @@ def or_search(searchtext, category, searched_comps):
     if category == 'keywords' or category == 'all':        
         search_query = Components.objects.filter(
             brief_description__icontains = searchtext)
-        searched_comps = searched_comps | search_query
-    if category == 'homeserver' or category == 'all':        
-        search_query = Components.objects.filter(
-            homeserver__ip__icontains = searchtext)
-        searched_comps = searched_comps | search_query
-        search_query = Components.objects.filter(
-            homeserver__name__icontains = searchtext)
         searched_comps = searched_comps | search_query
     if category == 'date' or category == 'all':        
         search_query = Components.objects.filter(
