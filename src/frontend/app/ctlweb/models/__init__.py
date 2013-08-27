@@ -8,3 +8,4 @@ from ctlweb.models.userkeys import *
 from ctlweb.models.programmer import *
 from ctlweb.models.other import *
 from ctlweb.models.interfaces import *
+from ctlweb.models.signal_handlers import *
