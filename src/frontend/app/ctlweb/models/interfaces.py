@@ -24,6 +24,14 @@ class Interfaces(models.Model):
     def __unicode__(self):
         return self.name
 
+    def delete(self, *args, **kwargs):
+        for comps in self.components:
+            c_interfaces = comps.interfaces_set.all()
+            c_interfaces = c_interfaces.exclude(id=self.id)
+            if len(c_interfaces)==0:
+                comps.delete()
+        super(Interfaces, self).delete(*args, **kwargs)
+
 class Interfaces_Components(models.Model):
     """
     Erstellt eine Verbindung zwischen Interfaces und Components.
