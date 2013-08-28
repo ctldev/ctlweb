@@ -25,10 +25,8 @@ class Interfaces(models.Model):
         return self.name
 
     def delete(self, *args, **kwargs):
-        for comps in self.components:
-            c_interfaces = comps.interfaces_set.all()
-            c_interfaces = c_interfaces.exclude(id=self.id)
-            if len(c_interfaces)==0:
+        for comps in self.components.all(): 
+            if len(comps.interfaces_set.exclude(key=self.key))==0:
                 comps.delete()
         super(Interfaces, self).delete(*args, **kwargs)
 

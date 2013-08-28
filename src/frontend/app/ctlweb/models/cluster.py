@@ -20,6 +20,13 @@ class Cluster(models.Model):
         permissions = (
                 ("can_see_ssh_data", 
                     "Can see port and username required for SSH"),)
-    
+
+    def delete(self, *args, **kwargs):
+        for comps in self.components_set.all():
+            print(comps.homecluster)
+            if len(comps.homecluster.exclude(id=self.id))==0:
+                comps.delete()
+        super(Cluster, self).delete(*args, **kwargs)
+
     def __unicode__(self):
         return self.domain
