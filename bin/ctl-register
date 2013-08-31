@@ -58,7 +58,8 @@ def overview(args):
         print('No ctlweb users registered')
 
     for u in users:
-        print(table_template % (u.c_id, ', '.join(u.get_keys())))
+        pubkeys = [k.c_key for k in u.get_keys()]
+        print(table_template % (u.c_id, ', '.join(pubkeys)))
 
 
 def main():

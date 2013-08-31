@@ -58,7 +58,8 @@ def overview(args):
         print('No ctlweb frontends registered')
 
     for w in webs:
-        print(table_template % (w.c_id, w.c_pubkey))
+        pubkeys = [k.c_key for k in w.get_keys()]
+        print(table_template % (w.c_id, ', '.join(pubkeys)))
 
 
 def main():

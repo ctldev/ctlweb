@@ -14,7 +14,10 @@ class Pubkey(Database):
         """ Should not be used, use Component.create() instead.
         """
         if access.c_pk == -1:
-            access.save()
+            try:
+                access.save()
+            except NoSuchTable:
+                access.create_table().save()
         super().__init__()
         self.c_key = key
         self.f_Access_access = int(access.c_pk)
