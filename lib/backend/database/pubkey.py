@@ -116,7 +116,7 @@ class Pubkey(Database):
         """ Adds the own access with the _keyine() to authorized_keys
         """
         with open(Pubkey.authorized_keys_file, 'a') as authorized_key_file:
-            authorized_key_file.write('\n%s' % self._keyline())
+            authorized_key_file.write('%s\n' % self._keyline())
 
     def _remove_key(self):
         new_authorized_keys = "%s.new" % Pubkey.authorized_keys_file
