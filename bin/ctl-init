@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 import os
-import sys
 import argparse
 
-from util import Log
 from util.parsing import commit_settings
 from util.parsing import parent_parser
-from database import Database
 from database import Component
 from database.database import NoSuchTable, InstanceNotFoundError
 
 
 def main():
-    parser = argparse.ArgumentParser(
-            parents=[parent_parser],
-            description='Loads a ctl component by reading the enviroment'
-                    + 'variable SSH_ORIGINAL_COMMAND')
+    parser = argparse.ArgumentParser(parents=[parent_parser, ],
+                                     description='Loads a ctl component by'
+                                                 + ' reading the enviroment'
+                                                 + ' variable'
+                                                 + ' SSH_ORIGINAL_COMMAND')
 
     args = parser.parse_args()
     commit_settings(args)
@@ -25,11 +23,12 @@ def main():
         print('Only ssh allowed')
         exit(1)
     ctl_cmd = ctl_call.split()[0]
-    ctl_call = ctl_call[ len(ctl_cmd): ]
+    ctl_call = ctl_call[len(ctl_cmd):]
     try:
         comp = Component.get_exactly(ctl_cmd)
     except (NoSuchTable, InstanceNotFoundError):
         print('Component not found')
+        exit(1)
     comp.execute(ctl_call)
 
 
