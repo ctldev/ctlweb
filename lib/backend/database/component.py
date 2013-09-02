@@ -132,8 +132,10 @@ class Component(Database):
         try:
             subprocess.check_call(args)
         except subprocess.CalledProcessError:
-            print('Error occured while running ctl command.',
+            print('Error occured while running ctl command.\nran: %s' %
+                  ' '.join(args),
                   file=sys.stderr)
         except OSError:
-            print('CTL Command not found, please contact the administrator.',
+            print('CTL Command not found, please contact the administrator.'
+                  + '\nran: %s' % ' '.join(args),
                   file=sys.stderr)
