@@ -16,7 +16,7 @@ def add(args):
         * ctl-webinteractive
     """
     web = Web.add({'c_id': args.url,
-                   'c_pubkey': args.key})
+                   'f_Pubkey_pubkey': args.key})
     try:
         web.save()
     except NoSuchTable:
