@@ -110,7 +110,7 @@ def main():
         elif o in ("-i", "--impl"):
             required += 1
             if os.path.isfile(a):
-                exe_path = a
+                exe_path = os.path.abspath(a)
             else:
                 Log.critical("File does not exists")
             Log.debug("setting implementation")
