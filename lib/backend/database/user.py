@@ -19,4 +19,4 @@ class User(Access):
         return user
 
     def _keyline(self):
-        return 'command="bash -c ctl-init" {0}'
+        return 'command="bash -lc ctl-init" {0}'
