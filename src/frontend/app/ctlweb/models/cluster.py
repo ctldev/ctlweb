@@ -23,7 +23,6 @@ class Cluster(models.Model):
 
     def delete(self, *args, **kwargs):
         for comps in self.components_set.all():
-            print(comps.homecluster)
             if len(comps.homecluster.exclude(id=self.id))==0:
                 comps.delete()
         super(Cluster, self).delete(*args, **kwargs)
