@@ -44,12 +44,17 @@ def set_non_superuser(modeladmin, request, queryset):
         q.save(request)
     set_non_superuser.short_description = _("Benutzer Adminrechte entziehen")
 
+class Key_Inline(admin.StackedInline):
+    model = Userkeys
+    extra = 0
+
 class CtlwebUserAdmin(UserAdmin):
     """
     Fügt dem Backend weitere Usereinstellungen hinzu
 
     """
     readonly_fields=('last_login', 'date_joined')
+    inlines = [Key_Inline, ]
     list_display = ['username', 
                     'first_name',
                     'last_name',  
