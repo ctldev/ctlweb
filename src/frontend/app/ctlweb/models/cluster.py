@@ -7,11 +7,11 @@ class Cluster(models.Model):
     Repräsentiert die Cluster
 
     """
-    ip = models.IPAddressField(_("IP"), null="True")
-    domain = models.CharField(_("Domain"), max_length=100, null="True")
-    username = models.CharField(_("Benutzer"), max_length=100, null="True")
-    port = models.IntegerField(_("Port"), null="True")
-    key = models.TextField(_(u"Schlüssel"), null="True")
+    ip = models.IPAddressField(_("IP"), blank=True, null=True)
+    domain = models.CharField(_("Domain"), max_length=100, blank=True, null=True)
+    username = models.CharField(_("Benutzer"), max_length=100, blank=True, null=True)
+    port = models.IntegerField(_("Port"), blank=True, null=True)
+    key = models.TextField(_(u"Schlüssel"), blank=True, null=True)
     class Meta:
         unique_together = ('ip', 'domain')
         app_label = 'ctlweb'
