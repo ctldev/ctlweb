@@ -31,6 +31,7 @@ class ClusterAdmin(admin.ModelAdmin):
     def counter(self, obj):
         return obj.comp_count
     counter.admin_order_field = 'comp_count'
+    counter.short_description = _("Anzahl Components")
 
 admin.site.register(Cluster, ClusterAdmin)
 
