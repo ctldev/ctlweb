@@ -36,6 +36,9 @@ def main():
     cmd = shlex.split(cmd)
     if valid_ssh(cmd):
         execute(cmd)
+    else:
+        print('You are not allowed to execute this command!')
+        exit(1)
 
 
 if __name__ == '__main__':
