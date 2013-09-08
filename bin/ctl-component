@@ -63,7 +63,7 @@ def push(args):
     if components:
         for c in components:
             Log.info('Uploading %s to %s' % (c.c_id, args.url))
-            c.upload_to_url(args.url)
+            c.upload_to_web(args.url)
     else:
         Log.error('No components to upload')
 

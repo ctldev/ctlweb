@@ -18,4 +18,4 @@ class Web(Access):
         return web
 
     def _keyline(self):
-        return 'command="bash -lc ctl-webinteractive" {0}'
+        return 'command="bash -lc ctl-webinit" {0}'
