@@ -73,6 +73,7 @@ def generate_package(name, control, doc, ci):
 
 
 def main():
+    print('This programm is deprecated. Please switch to ctl-build-component')
     Log.streamoutput()
     try:
         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)

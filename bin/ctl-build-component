@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+
+DEFAULT_SSH_PORT = 22
+
+
+def file(string):
+    """ The standard file type used by the argumentparser of this programm. """
+    import argparse
+    try:
+        f = open(string, 'r', encoding='utf-8')
+    except:
+        raise argparse.ArgumentTypeError('%s is not a valid file.' % string)
+    return f
+
+
+def fqdn():
+    """ Returns the full qualified domain name of the running host. """
+    import socket
+    return socket.getfqdn()
+
+
+def generate_control(name, host, user, ssh_port,
+                     exe_path, exe_hash, ci_name):
+    """ Generates the config file of an ctl-package
+    """
+    from datetime import datetime
+    filename = 'control-%s' % datetime.now().strftime('%s')
+    with open(filename, 'w') as f:
+        f.write('[DEFAULT]\n')
+        f.write('name=%s\n' % name)
+        f.write('host=%s\n' % host)
+        f.write('user=%s\n' % user)
+        f.write('ssh=%s\n' % ssh_port)
+        f.write('exe=%s\n' % exe_path)
+        f.write('exe_hash=%s\n' % exe_hash)
+        f.write('ci=%s\n' % ci_name)
+    return filename
+
+
+def generate_package(name, control, doc, ci):
+    """ Generates ctl-manifest-package
+    """
+    import tarfile
+    from datetime import datetime
+    tar_file = '%s_%s.tgz' % (name,
+                              datetime.now().strftime('%Y-%m-%d %H.%M.%S'))
+    with tarfile.open(tar_file, 'w:gz') as package:
+        package.add(control, arcname='control')
+        package.add(doc, arcname='description.txt')
+        package.add(ci)
+    return tar_file
+
+
+def hash_file(file, block_size=512):
+    """ Hashes a file like object with md5. """
+    import hashlib
+    import base64
+    md5 = hashlib.md5()
+    file = file.name
+    with open(file, 'rb') as f:
+        while True:
+            data = f.read(block_size)
+            if not data:
+                break
+            md5.update(data)
+    return base64.b64encode(md5.digest()).decode('utf8')
+
+
+def user():
+    import getpass
+    return getpass.getuser()
+
+
+def parse_args():
+    import argparse
+    prg_desc = """This programm helps the ctl developer to build a ctlweb component.
+
+    All requirements for a valid ctlweb component are checked required and will
+    be bound together by this script which can be used without the whole ctlweb
+    backend scripts. It only uses the standard python3 api and can, because of
+    this easily ported."""
+    parser = argparse.ArgumentParser(description=prg_desc)
+    parser.add_argument('-n', '--name',
+                        required=True,
+                        help="The intended name of the ctlweb component.")
+    parser.add_argument('-c', '--ci',
+                        type=file,
+                        required=True,
+                        help="The ctl interface file.")
+    parser.add_argument('-e', '--exe',
+                        required=True,
+                        type=file,
+                        help="The real component to be called on the cluster."
+                             + " This has to implement the given ci file.")
+    parser.add_argument('-d', '--description',
+                        required=True,
+                        type=file,
+                        help="A file which contains a description.")
+    parser.add_argument('-u', '--user',
+                        default=user(),
+                        help="The user which shall be accessed."
+                             + " (default: %s)" % user())
+    parser.add_argument('--hostname',
+                        default=fqdn(),
+                        help="Hostname where the component shall be called."
+                             + " (default: %s)" % fqdn())
+    parser.add_argument('-p', '--port',
+                        default=DEFAULT_SSH_PORT,
+                        help="The port to be used for the ssh connection to"
+                             + " this component (default: %s)" % DEFAULT_SSH_PORT)
+    # Workargound for Python 3.2-3.4 Issue #9694 'optional arguments'
+    parser._optionals.title = 'options'
+    return parser.parse_args()
+
+
+def main():
+    import os
+    args = parse_args()
+    exe_hash = hash_file(args.exe)
+    # generating control file
+    control = generate_control(args.name, args.hostname, args.user, args.port,
+                               args.exe.name, exe_hash, args.ci.name)
+    # generating component
+    manifest_package = generate_package(args.name,
+                                        control,
+                                        args.description.name,
+                                        args.ci.name)
+    # cleaning up
+    os.remove(control)
+
+    # simple check
+    if not os.path.isfile(manifest_package):
+        Log.critical("Some error during generation? Please report bug.")
+        exit(2)
+
+
+if __name__ == '__main__':
+    main()
