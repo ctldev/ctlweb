@@ -116,10 +116,11 @@ def parse_args():
 def main():
     import os
     args = parse_args()
+    abspath_exe = os.path.abspath(args.exe.name)
     exe_hash = hash_file(args.exe)
     # generating control file
     control = generate_control(args.name, args.hostname, args.user, args.port,
-                               args.exe.name, exe_hash, args.ci.name)
+                               abspath_exe, exe_hash, args.ci.name)
     # generating component
     manifest_package = generate_package(args.name,
                                         control,
@@ -130,7 +131,7 @@ def main():
 
     # simple check
     if not os.path.isfile(manifest_package):
-        Log.critical("Some error during generation? Please report bug.")
+        print("Some error during generation? Please report bug.")
         exit(2)
 
 
