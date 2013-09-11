@@ -4,7 +4,7 @@ from django.db.models import Count
 
 from ctlweb.models import Cluster
 from ctlweb.models import Components_Cluster
-from ctlweb.admin.actions import delte_selected
+from ctlweb.admin.actions import delete_selected
 
 from django.utils.translation import ugettext_lazy, ugettext as _
 
