@@ -10,4 +10,4 @@ class ComponentAddForm(forms.ModelForm):
             queryset=Cluster.objects.exclude(key__exact=None), label=_("Cluster"))
     class Meta:
         model = Components
-        exclude = ('date', 'is_active')
+        exclude = ('date', 'is_active') 
