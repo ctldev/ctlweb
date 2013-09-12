@@ -31,16 +31,16 @@ class Database:
 
         if Database.store is None:
             try:
-                Database.store = reader.get('Backend','Manifest_store')
+                Database.store = reader.get('Backend', 'Manifest_store')
             except configparser.Error:
                 Log.critical("""Your Config-File seems to be malformated! Check
                 your Config-File and try again!""")
                 sys.exit(1)
         if Database.db_file is None:
             try:
-                Database.db_file = reader.get('Backend','Database')
+                Database.db_file = reader.get('Backend', 'Database')
                 import os
-                if os.path.isdir( Database.db_file ):
+                if os.path.isdir(Database.db_file):
                     Log.critical("Database(): Database is directory!")
                     sys.exit(1)
 
@@ -48,14 +48,12 @@ class Database:
                 Log.critical("""Your Config-File seems to be malformated! Check
                 your Config-File and try again!""")
                 sys.exit(1)
-        try: # Check if connection is active
+        try:  # Check if connection is active
             Database.db_connection.execute("""SELECT name from sqlite_master
                                                  LIMIT 1""")
             Database.db_connection.fetchone()
         except (sqlite3.ProgrammingError, AttributeError):
             Database.db_connection = sqlite3.connect(Database.db_file)
-        # Creationtime of object
-        c_creation = None
 
     def __getitem__(self, name):
         """ Grants access to all instance variables stored in db.
@@ -98,7 +96,7 @@ class Database:
             sql = "SELECT c_pk, adapter FROM " + cls.__name__
         elif isinstance(time_since, datetime):
             Log.debug("Database.get(): Get %s newer than %s" %
-                    (cls.__name__, time_since))
+                      (cls.__name__, time_since))
             time_since = time_since.strftime("%s")
             values.append(time_since)
         else:
@@ -125,8 +123,8 @@ class Database:
         sql = 'SELECT c_pk, adapter FROM ' + cls.__name__ + ' WHERE '
         sql += '%s = ?' % field
         cursor = Database.db_connection.cursor()
-        Log.debug("Database.get_exactly(): Requesting %s with %s = %s" \
-                % (cls.__name__, field, name))
+        Log.debug("Database.get_exactly(): Requesting %s with %s = %s"
+                  % (cls.__name__, field, name))
         Log.debug("Database.get_exactly(): executing query: " + sql)
         try:
             cursor.execute(sql, (name, ))
@@ -134,7 +132,7 @@ class Database:
             raise NoSuchTable()
         try:
             return cls.convert(cursor.fetchone())
-        except TypeError: # Object was not in database
+        except TypeError:  # Object was not in database
             raise InstanceNotFoundError()
 
     def create_table(self):
@@ -152,7 +150,7 @@ class Database:
         sql += """ (
                 c_pk INTEGER PRIMARY KEY AUTOINCREMENT,
                 date DATE,
-                adapter TEXT""" 
+                adapter TEXT"""
         attrs = self.get_attributes()
         if not 'c_id' in attrs:
             raise AttributeError('c_id not defined')
@@ -190,12 +188,11 @@ class Database:
         Log.debug('Removing object from database.')
         cursor = Database.db_connection.cursor()
         table = self.__name__
-        sql = "DELETE FROM " +table+ """
+        sql = "DELETE FROM " + table + """
                 WHERE c_id = """ "'%s'" """
                 """ % self["c_id"]
         cursor.execute(sql)
         Database.db_connection.commit()
-
 
     def save(self):
         """ Saves object into database
@@ -204,11 +201,17 @@ class Database:
         cursor = Database.db_connection.cursor()
         attributes = self.get_attributes()
         table = self.__name__
+        # test if object is already in database
+        try:
+            old_object = self.__class__.get_exactly(self.c_id)
+            self.c_pk = old_object.c_pk
+        except InstanceNotFoundError:
+            # just go on, nothing to do
+            pass
         row_patterns = ""
         header = ' (date, adapter'
-        values = {
-                'adapter' : self,
-                }
+        values = {'adapter': self,
+                  }
         for i in attributes:
             if i == 'c_pk':
                 continue
@@ -226,7 +229,7 @@ class Database:
                     (strftime('%s','now'), :adapter """ + row_patterns
             Log.debug("Database.save(): %s as insert with %s as dict" %
                       (sql, values))
-            cursor.execute(sql,values)
+            cursor.execute(sql, values)
             Database.db_connection.commit()
             self.c_pk = cursor.lastrowid
         except sqlite3.IntegrityError:
@@ -234,24 +237,23 @@ class Database:
             for i in attributes:
                 if i == 'c_pk':
                     continue
-                sql += ", "+i
-                sql += " = '"+str(self[i])+"'"
+                sql += ", " + i
+                sql += " = '" + str(self[i]) + "'"
             values['c_pk'] = self.c_pk
             sql = "UPDATE " + table + """
                     SET
                     date = (strftime('%s', 'now')),
                     c_id = :c_id,
-                    adapter = :adapter """ +sql+ """
+                    adapter = :adapter """ + sql + """
                     WHERE c_pk = :c_pk """
             Log.debug("Database.save(): %s as update query with %s as dict" %
                       (sql, values))
-            cursor.execute(sql,values)
+            cursor.execute(sql, values)
             Database.db_connection.commit()
         except sqlite3.OperationalError:
             raise NoSuchTable()
 
-
-    def __conform__(self,protocol):
+    def __conform__(self, protocol):
         """ For creating an general representation of the class. The
         representation looks like the following:
          "c_id=2;c_pubkey=publickey"
@@ -301,7 +303,7 @@ class Database:
             if re.search('^f_(?P<classname>.+?)_.+', key):
                 class_name = attribute_box['c_referenced_class']
                 exec('from .%s import %s' % (class_name.lower(), class_name))
-                exec('attribute_box[key] = ' + class_name \
+                exec('attribute_box[key] = ' + class_name
                      + ".get_exactly(val, 'c_pk')")
                 continue
             attribute_box[key] = val
@@ -334,17 +336,20 @@ class Database:
         return self.__class__.__name__
 
     def __str__(self):
-        attr = self.get_attributes()
         return "%s.create(%s)" % (self.__name__, self.__conform__(self))
+
 
 class InstanceNotFoundError(ValueError):
     pass
 
+
 class NoSuchTable(sqlite3.OperationalError):
     pass
 
+
 class DatabaseNotFound(sqlite3.OperationalError):
     pass
+
 
 class GeneralDatabaseError(sqlite3.OperationalError):
     pass

@@ -63,13 +63,14 @@ def push(args):
     if components:
         for c in components:
             Log.info('Uploading %s to %s' % (c.c_id, args.url))
-            c.upload_to_url(args.url)
+            c.upload_to_web(args.url)
     else:
         Log.error('No components to upload')
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Manage ctl components.')
+    parser = argparse.ArgumentParser(description='Manage ctl components.',
+                                     parents=[parent_parser])
     subparser = parser.add_subparsers(help='Actions that can be done')
       #####################
      # ctl-component add #
@@ -123,7 +124,10 @@ def main():
 
     args = parser.parse_args()
     commit_settings(args)
-    args.func(args)
+    if 'func' in args:
+        args.func(args)
+    else:
+        parser.print_help()
 
 
 if __name__ == "__main__":

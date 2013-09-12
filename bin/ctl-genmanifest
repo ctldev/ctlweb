@@ -73,6 +73,7 @@ def generate_package(name, control, doc, ci):
 
 
 def main():
+    print('This programm is deprecated. Please switch to ctl-build-component')
     Log.streamoutput()
     try:
         opts, args = getopt.getopt(sys.argv[1:], opt, long_opt)
@@ -110,7 +111,7 @@ def main():
         elif o in ("-i", "--impl"):
             required += 1
             if os.path.isfile(a):
-                exe_path = a
+                exe_path = os.path.abspath(a)
             else:
                 Log.critical("File does not exists")
             Log.debug("setting implementation")

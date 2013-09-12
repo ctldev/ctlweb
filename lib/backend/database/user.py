@@ -18,5 +18,5 @@ class User(Access):
             user.add_key(attr['f_Pubkey_pubkey'])
         return user
 
-    def _keyline():
-        return 'command="bash -c ctl-init" %s' % c_pubkey
+    def _keyline(self):
+        return 'command="bash -lc ctl-init" {0}'

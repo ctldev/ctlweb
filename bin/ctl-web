@@ -16,7 +16,7 @@ def add(args):
         * ctl-webinteractive
     """
     web = Web.add({'c_id': args.url,
-                   'c_pubkey': args.key})
+                   'f_Pubkey_pubkey': args.key})
     try:
         web.save()
     except NoSuchTable:
@@ -58,13 +58,15 @@ def overview(args):
         print('No ctlweb frontends registered')
 
     for w in webs:
-        print(table_template % (w.c_id, w.c_pubkey))
+        pubkeys = [k.c_key for k in w.get_keys()]
+        print(table_template % (w.c_id, ', '.join(pubkeys)))
 
 
 def main():
     # General parsing
-    parser = argparse.ArgumentParser(
-        description='Manages access for ctlweb frontends')
+    parser = argparse.ArgumentParser(description='Manages access for ctlweb'
+                                                 + ' frontends',
+                                     parents=[parent_parser])
     subparser = parser.add_subparsers(help='Actions that can be done')
       ###############
      # ctl-web add #
@@ -109,7 +111,10 @@ def main():
 
     args = parser.parse_args()
     commit_settings(args)
-    args.func(args)
+    if 'func' in args:
+        args.func(args)
+    else:
+        parser.print_help()
 
 
 if __name__ == '__main__':

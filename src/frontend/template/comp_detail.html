@@ -58,24 +58,6 @@ Component {{ component.name }}
 	<dd> 
 	  {{ component.date }} 
 	</dd>
-
-  {% if see_homeserver %}
-	<dt> 
-	  {% blocktrans count counter=homeserver|length %}
-		Homeserver 
-	  {% plural %}
-		Homeserver
-	  {% endblocktrans %}
-	</dt>
-	<dd> 
-	  {% for hs in homeserver %}
-		<a href="{{ hs.domain }}" target="_blank">
-		  {{ hs.name }}
-		</a> 
-		{% if not forloop.last %} <br /> {% endif %}
-	  {% endfor %}
-	</dd>
-  {% endif %}
 </dl>
 
 <div class="accordion" id="accordion2">

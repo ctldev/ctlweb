@@ -4,6 +4,7 @@ from database.database import NoSuchTable
 import sqlite3
 from util import Log
 
+
 class Pubkey(Database):
     """ Is a public userkey in the CTL-Database
     """
@@ -12,11 +13,18 @@ class Pubkey(Database):
     def __init__(self, key, access):
         """ Should not be used, use Component.create() instead.
         """
+        if access.c_pk == -1:
+            try:
+                access.save()
+            except NoSuchTable:
+                access.create_table().save()
         super().__init__()
         self.c_key = key
         self.f_Access_access = int(access.c_pk)
         self.c_id = -1
         self.c_referenced_class = access.__class__.__name__
+
+        self.access_class = access
 
         import configparser
         from os import path
@@ -50,7 +58,7 @@ class Pubkey(Database):
 
     def remove(self):
         """ Remove component with given name.
-        
+
         Returns True if the component successfully removed.
         """
         Log.debug("Pubkey.remove(): removing")
@@ -65,10 +73,9 @@ class Pubkey(Database):
 
         returns newly created object
         """
-        from os import path
         Log.debug("add(package): adding package to local database")
         # Create Database entry
-        data = {'c_key': key, 'f_Access_access': access,}
+        data = {'c_key': key, 'f_Access_access': access, }
         pubkey = cls.create(data)
         try:
             pubkey.save()
@@ -83,7 +90,7 @@ class Pubkey(Database):
         data = []
         sql = 'SELECT c_pk, adapter FROM Pubkey WHERE f_Access_access = ?'
         cursor = Database.db_connection.cursor()
-        Log.debug('Pubkey.get_access_keys(): '\
+        Log.debug('Pubkey.get_access_keys(): '
                   + 'Requesting Pubkeys with access c_pk = %s' % access.c_pk)
         Log.debug('Pubkey.get_access_keys(): executing query: ' + sql)
         try:
@@ -103,26 +110,25 @@ class Pubkey(Database):
     def _keyline(self):
         """Return an authorized_keys compatible line with access definitions.
         """
-        return ''
+        return self.access_class._keyline().format(self.c_key)
 
     def _write_key(self):
         """ Adds the own access with the _keyine() to authorized_keys
         """
         with open(Pubkey.authorized_keys_file, 'a') as authorized_key_file:
-            authorized_key_file.write(self._keyline())
+            authorized_key_file.write('%s\n' % self._keyline())
 
     def _remove_key(self):
-        removal_lins = []
         new_authorized_keys = "%s.new" % Pubkey.authorized_keys_file
         # Transfer the good lines
         with open(Pubkey.authorized_keys_file, 'r') as old_auth:
             with open(new_authorized_keys, 'w') as new_auth:
                 for line in old_auth:
-                    if line == self._keyline(): # line to be removed
+                    if line == self._keyline():  # line to be removed
                         continue
                     new_auth.write(line)
         # switch files
         import os
-        os.rename(Pubkey.authorized_keys_file, "%s~" %
-                Pubkey.authorized_keys_file)
+        os.rename(Pubkey.authorized_keys_file,
+                  "%s~" % Pubkey.authorized_keys_file)
         os.rename(new_authorized_keys, Pubkey.authorized_keys_file)

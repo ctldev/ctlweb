@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+
+AUTHORIZED_CMDS = {'ctl-register': ('add', 'remove'),
+                   'ctl-component': ('push'),
+                   }
+
+
+def valid_ssh(cmd):
+    subcommands = AUTHORIZED_CMDS.get(cmd[0])
+    if subcommands is None:
+        return False
+    return cmd[1] in subcommands
+
+
+def execute(cmd):
+    import subprocess
+    try:
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError:
+        exit(1)
+
+
+def main():
+    import argparse
+    import os
+    import shlex
+    prg_desc = 'This is a command authorization wrapper for ctlweb frontends.'
+    parser = argparse.ArgumentParser(description=prg_desc)
+    parser.parse_args()
+
+    cmd = os.getenv('SSH_ORIGINAL_COMMAND')
+    if not cmd:
+        print('Only ssh allowed')
+        exit(1)
+    cmd = shlex.split(cmd)
+    if valid_ssh(cmd):
+        execute(cmd)
+    else:
+        print('You are not allowed to execute this command!')
+        exit(1)
+
+
+if __name__ == '__main__':
+    main()
