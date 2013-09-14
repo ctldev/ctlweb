@@ -20,7 +20,8 @@ def fqdn():
 
 
 def generate_control(name, host, user, ssh_port,
-                     exe_path, exe_hash, ci_name):
+                     exe_path, exe_hash, ci_name,
+                     version=None, author=None):
     """ Generates the config file of an ctl-package
     """
     from datetime import datetime
@@ -34,6 +35,10 @@ def generate_control(name, host, user, ssh_port,
         f.write('exe=%s\n' % exe_path)
         f.write('exe_hash=%s\n' % exe_hash)
         f.write('ci=%s\n' % ci_name)
+        if version is not None:
+            f.write('version=%s\n' % version)
+        if author is not None:
+            f.write('author=%s\n' % ' '.join(author))
     return filename
 
 
@@ -80,22 +85,26 @@ def parse_args():
     backend scripts. It only uses the standard python3 api and can, because of
     this easily ported."""
     parser = argparse.ArgumentParser(description=prg_desc)
-    parser.add_argument('-n', '--name',
-                        required=True,
+    parser.add_argument('name',
                         help="The intended name of the ctlweb component.")
-    parser.add_argument('-c', '--ci',
+    parser.add_argument('ci',
                         type=file,
-                        required=True,
                         help="The ctl interface file.")
-    parser.add_argument('-e', '--exe',
-                        required=True,
+    parser.add_argument('exe',
                         type=file,
                         help="The real component to be called on the cluster."
                              + " This has to implement the given ci file.")
-    parser.add_argument('-d', '--description',
-                        required=True,
+    parser.add_argument('description',
                         type=file,
                         help="A file which contains a description.")
+    parser.add_argument('--pkgversion',
+                        default=None,
+                        help="A version of the ctl component that is served")
+    parser.add_argument('--email',
+                        default=None,
+                        nargs="+",
+                        help="Mail addresses on which the authors can be"
+                             "contacted")
     parser.add_argument('-u', '--user',
                         default=user(),
                         help="The user which shall be accessed."
@@ -108,8 +117,6 @@ def parse_args():
                         default=DEFAULT_SSH_PORT,
                         help="The port to be used for the ssh connection to"
                              + " this component (default: %s)" % DEFAULT_SSH_PORT)
-    # Workargound for Python 3.2-3.4 Issue #9694 'optional arguments'
-    parser._optionals.title = 'options'
     return parser.parse_args()
 
 
@@ -120,7 +127,8 @@ def main():
     exe_hash = hash_file(args.exe)
     # generating control file
     control = generate_control(args.name, args.hostname, args.user, args.port,
-                               abspath_exe, exe_hash, args.ci.name)
+                               abspath_exe, exe_hash, args.ci.name,
+                               args.pkgversion, args.email)
     # generating component
     manifest_package = generate_package(args.name,
                                         control,
