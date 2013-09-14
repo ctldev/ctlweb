@@ -104,19 +104,19 @@ def parse_args():
                         default=None,
                         nargs="+",
                         help="Mail addresses on which the authors can be"
-                             "contacted")
+                             " contacted")
     parser.add_argument('-u', '--user',
                         default=user(),
                         help="The user which shall be accessed."
-                             + " (default: %s)" % user())
+                             " (default: %s)" % user())
     parser.add_argument('--hostname',
                         default=fqdn(),
-                        help="Hostname where the component shall be called."
-                             + " (default: %s)" % fqdn())
+                        help="Hostname or IP-Address where the component shall"
+                             " be called. (default: %s)" % fqdn())
     parser.add_argument('-p', '--port',
                         default=DEFAULT_SSH_PORT,
                         help="The port to be used for the ssh connection to"
-                             + " this component (default: %s)" % DEFAULT_SSH_PORT)
+                             " this component (default: %s)" % DEFAULT_SSH_PORT)
     return parser.parse_args()
 
 
