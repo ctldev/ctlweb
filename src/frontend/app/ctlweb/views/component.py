@@ -20,29 +20,22 @@ def component_detail(request, comp_id):
         comp = Components.objects.get(pk=comp_id)
     except Components.DoesNotExist:
         raise Http404
-    homecluster = comp.homecluster.all().order_by('domain')
-    interface = Interfaces.objects.filter(components = comp)
-    emails = Programmer.objects.filter(component = comp)
-    userlist = User.objects.filter(email__in=emails.values_list('email'))
+    descriptionparts = comp.description.split(". ")
+    short_description = descriptionparts[0] + ". "
 
     can_change = v_user.has_perm('ctlweb.change_components')
-    see_path = v_user.has_perm('ctlweb.can_see_path')
-    see_description = v_user.has_perm('components.can_see_description')
-    see_code = v_user.has_perm('ctlweb.can_see_code')
+    see_description = v_user.has_perm('ctlweb.can_see_description')
     see_homecluster = v_user.has_perm('ctlweb.can_see_homecluster')
     see_ssh_data = v_user.has_perm('ctlweb.can_see_ssh_data')
+    see_ci = v_user.has_perm('ctlweb.can_see_ci')
     dict_response = dict()
+    dict_response["short"] = short_description
     dict_response["user"] = v_user
     dict_response["component"] = comp
-    dict_response["homecluster"] = homecluster
-    dict_response["interfaces"] = interface
-    dict_response["programmer"] = emails
-    dict_response["users"] = userlist
     dict_response["can_change"] = can_change
-    dict_response["see_path"] = see_path
     dict_response["see_description"] = see_description
-    dict_response["see_code"] = see_code
     dict_response["see_homecluster"] = see_homecluster
     dict_response["see_ssh_data"] = see_ssh_data
+    dict_response["see_ci"] = see_ci
     context = RequestContext(request, dict_response)
     return render_to_response("comp_detail.html", context_instance=context)

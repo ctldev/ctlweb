@@ -9,17 +9,19 @@ class Interfaces(models.Model):
     Repräsentiert die Interfaces
 
     """
-    name = models.CharField(_("Name"), max_length=100, unique="True")
-    description = models.TextField(_("Beschreibung"))
-    components = models.ManyToManyField(Components,
-                                        through='Interfaces_Components',
-                                        verbose_name=_("Components"))
-    key = models.CharField(_("Hash"), max_length=64, primary_key="True")
+    ci = models.TextField(_("Quellcode"))
+    name = models.CharField(_("Name"), max_length=100)
+    ci_hash = models.CharField(_("Hash"), max_length=2000, unique=True)
+    components = models.ManyToManyField(Components,\
+                                        verbose_name=_("Components"),\
+                                        through='Interfaces_Components')
+
     class Meta:
         app_label = 'ctlweb'
         verbose_name = _("Interface")
         permissions = (
-            ("can_see_key", "Can see the key"),)
+            ("can_see_key", "Can see the key"),
+            ("can_see_ci", "Can see the ci"),)
     
     def __unicode__(self):
         return self.name

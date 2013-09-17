@@ -7,13 +7,12 @@ class Cluster(models.Model):
     Repräsentiert die Cluster
 
     """
-    ip = models.IPAddressField(_("IP"), blank=True, null=True)
-    domain = models.CharField(_("Domain"), max_length=100, blank=True, null=True)
-    username = models.CharField(_("Benutzer"), max_length=100, blank=True, null=True)
-    port = models.IntegerField(_("Port"), blank=True, null=True)
-    key = models.TextField(_(u"Schlüssel"), blank=True, null=True)
+    hostname = models.CharField(_("Host/IP"), max_length=255, unique=True)
+    username = models.CharField(_("Benutzer"), max_length=100)
+    port = models.IntegerField(_("Port"))
+    key = models.FilePathField(_(u"Schlüssel"))
+
     class Meta:
-        unique_together = ('ip', 'domain')
         app_label = 'ctlweb'
         verbose_name = _("Cluster")
         verbose_name_plural = _("Cluster")
@@ -28,4 +27,4 @@ class Cluster(models.Model):
         super(Cluster, self).delete(*args, **kwargs)
 
     def __unicode__(self):
-        return self.domain
+        return self.hostname

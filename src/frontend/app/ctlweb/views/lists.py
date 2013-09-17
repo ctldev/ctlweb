@@ -28,9 +28,6 @@ def lists(request,
                 s_components, form)
     
     v_user = request.user
-    programmer = Programmer.objects.all().order_by('email')
-    emails = Programmer.objects.distinct('email').values_list('email')
-    u_programmer = User.objects.filter(email__in=emails)
     dict_response = dict()
     dict_response["user"] = v_user
     dict_response["form"] = form
@@ -50,9 +47,6 @@ def new_page(request,
     #   1 = Suche
     
     v_user = request.user
-    programmer = Programmer.objects.all().order_by('email')
-    emails = Programmer.objects.distinct('email').values_list('email')
-    u_programmer = User.objects.filter(email__in=emails)
     dict_response = dict()
     if direct_interfaces == None :
         direct_interfaces = Interfaces.objects.none()
@@ -144,8 +138,6 @@ def new_page(request,
     dict_response["interface_page_buttons"] = interfaces_page_buttons
     dict_response["s_components_page_buttons"] = s_components_page_buttons
     dict_response["post_data"] = request.POST.urlencode()
-    dict_response["programmer"] = programmer
-    dict_response["u_programmer"] = u_programmer
     dict_response["view"] = view
 
     if "search_query" in request.GET:
