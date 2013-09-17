@@ -19,22 +19,27 @@ class Command(BaseCommand):
         self.import_connections()
 
     def import_cluster(self):
-        self.cl1 = Cluster(domain="https://www.c1.de")
-        self.cl2 = Cluster(domain="https://www.c2.de")
-        self.cl3 = Cluster(domain="https://www.c3.de")
+        self.cl1 = Cluster( hostname="https://www.c1.de", \
+                            username="foobaa",\
+                            port=22)
+        self.cl2 = Cluster( hostname="https://www.c2.de", \
+                            username="foobaa",\
+                            port=22)
+        self.cl3 = Cluster( hostname="https://www.c3.de", \
+                            username="foobaa", \
+                            port=22)
 
         self.cl1.save()
         self.cl2.save()
         self.cl3.save()
 
     def import_interfaces(self):
-        self.i1 = Interfaces(name="Matrizen", key="01",
-                description="etliche Matrizenrechnungen")
-        self.i2 = Interfaces(name="Grundlagen", key="02",
-                description="Addition, Subtraktion, Multiplikation und Division"+\
-                    "von natürlichen Zahlen")
-        self.i3 = Interfaces(name="Addition", key="03",
-                description="Verschiedene Additionsverfahren")
+        self.i1 = Interfaces(name="Matrizen", ci_hash="01",
+                ci="Quellcode I1")
+        self.i2 = Interfaces(name="Grundlagen", ci_hash="02",
+                ci="Quellcode I2")
+        self.i3 = Interfaces(name="Addition", ci_hash="03",
+                ci="Quellcode I3")
         
         self.i1.save()
         self.i2.save()
@@ -79,35 +84,32 @@ class Command(BaseCommand):
         self.user3.save()
 
     def import_user_rights(self):
-        permissions = Permission.objects
-        permissions.get(codename="can_see_description").user_set.add(self.user1)
-        permissions.get(codename="can_see_description").user_set.add(self.user2)
-        permissions.get(codename="can_see_homecluster").user_set.add(self.user1)
-        permissions.get(codename="can_see_key").user_set.add(self.user1)
-        permissions.get(codename="can_see_path").user_set.add(self.user1)
-        permissions.get(codename="can_see_code").user_set.add(self.user1)
-        permissions.get(codename="can_see_code").user_set.add(self.user2)
-        permissions.get(codename="can_set_active").user_set.add(self.user1)
-        permissions.get(codename="add_group").user_set.add(self.user1)
-        permissions.get(codename="change_user").user_set.add(self.user1)
-        permissions.get(codename="change_group").user_set.add(self.user1)
-    
+        pass
+#        permissions = Permission.objects
+#        permissions.get(codename="can_see_description").user_set.add(self.user1)
+#        permissions.get(codename="can_see_description").user_set.add(self.user2)
+#        permissions.get(codename="can_see_homecluster").user_set.add(self.user1)
+#        permissions.get(codename="can_see_key").user_set.add(self.user1)
+#        permissions.get(codename="can_see_path").user_set.add(self.user1)
+#        permissions.get(codename="can_see_code").user_set.add(self.user1)
+#        permissions.get(codename="can_see_code").user_set.add(self.user2)
+#        permissions.get(codename="can_set_active").user_set.add(self.user1)
+#        permissions.get(codename="add_group").user_set.add(self.user1)
+#        permissions.get(codename="change_user").user_set.add(self.user1)
+#        permissions.get(codename="change_group").user_set.add(self.user1)
+#    
     def import_components(self):
-        self.co1 = Components(name="LU-Zerlegung",
-                brief_description="LU-Zerlegung nach Gauß",
+        self.co1 = Components(exe_hash="foo",
                 description="Diese Komponente berechnet die LU-Zerlegung "+\
                     "mittels Gauß-Algorithmus",
                 version="1.001.0001")
-        self.co2 = Components(name="Matrix-Addition",
-                brief_description="Addition von zwei Matrizen",
+        self.co2 = Components(exe_hash="bar",
                 description="Diese Komponente addiert zwei Matrizen",
                 version="10001a")
-        self.co3 = Components(name="Addition",
-                brief_description="Addiert zwei Zahlen",
+        self.co3 = Components(exe_hash="foobar",
                 description="Diese Komponente addiert zwei Zahlen miteinander.",
                 version="10000000001")
-        self.co4 = Components(name="komplexe Zahlen",
-                brief_description="Addiert zwei komplexe Zahlen",
+        self.co4 = Components(exe_hash="barfoo",
                 description="Diese Komponente addiert zwei komplexe Zahlen",
                 version="10001.a")
 
@@ -136,32 +138,25 @@ class Command(BaseCommand):
 
         self.hc1 = Components_Cluster(cluster=self.cl1,
                 component=self.co1,
-                path="/path/on/cl1",
-                code="Implementierungscode von co1 auf cl1")
+                name="LU-Zerlegung")
         self.hc2 = Components_Cluster(cluster=self.cl2,
                 component=self.co1,
-                path="/path/on/cl2",
-                code="Implementierungscode von co1 auf cl2")
+                name="Gauß-LU-Zerlegung")
         self.hc3 = Components_Cluster(cluster=self.cl3,
                 component=self.co1,
-                path="/path/on/cl3",
-                code="Implementierungscode von co1 auf cl3")
+                name="LU-Zerlegung")
         self.hc4 = Components_Cluster(cluster=self.cl3,
                 component=self.co2,
-                path="/path/on/cl3",
-                code="Implementierungscode von co2 auf cl3")
+                name="Matrixaddition")
         self.hc5 = Components_Cluster(cluster=self.cl1,
                 component=self.co3,
-                path="/path/on/cl1",
-                code="Implementierungscode von co3 auf cl1")
+                name="Addition")
         self.hc6 = Components_Cluster(cluster=self.cl3,
                 component=self.co3,
-                path="/path/on/cl3",
-                code="Implementierungscode von co3 auf cl3")
+                name="einfache Addition")
         self.hc7 = Components_Cluster(cluster=self.cl1,
                 component=self.co4,
-                path="/path/on/cl1",
-                code="Implementierungscode von co4 auf cl1")
+                name="KomplexAddition")
 
         self.hc1.save()
         self.hc2.save()
