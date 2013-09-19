@@ -17,7 +17,7 @@ from ctlweb.models import Interfaces_Components
 from ctlweb.models import ModuleTokenValidation
 from ctlweb.models import Programmer
 from ctlweb.forms import ComponentRequestForm
-from ctlweb.forms import InterfaceRequestForm
+from ctlweb.forms import ComponentDeleteForm
 from django.db.models import Max
 from django.db.models import Q
 from django.conf import settings
@@ -112,7 +112,7 @@ def remove_user(user, cluster=None, ssh=True, pretend=False):
             print response
             ssh.close
 
-def request_modules(ssh=True, pretend=False):
+def request_modules(ssh=True, pretend=False, request_all=False):
     """request all Modules of all Clusters of the Database"""
     ssh = paramiko.SSHClient()
     cluster = Cluster.objects.all()
@@ -141,7 +141,7 @@ def request_modules(ssh=True, pretend=False):
                     key_filename=ssh_file, look_for_keys=False)
             shell = ssh.get_transport().open_session()
             cmd = "ctl-component push"
-            if date:
+            if date and not request_all:
                 cmd += " --timestamp %s" % date.date()
             cmd += " %s" % url
             if not pretend:
@@ -189,27 +189,22 @@ def receive_modules(request, token):
         print "token is not valid, continueing nonetheless"
 #    cluster = Cluster.objects.get(ip=cluster_ip)
     comp_form = ComponentRequestForm(request.POST or None, request.FILES or None)
-    interface_form = InterfaceRequestForm(request.POST or None)
+    delete_form = ComponentDeleteForm(request.POST or None)
     file_success = False
-    interface_success = False
-    #handle interface-form
-    if interface_form.is_valid():
-        clean_data = interface_form.cleaned_data
-        name = clean_data["name"]
-        description = clean_data["description"]
-        key = clean_data["hash"]
-        interface = Interface(name=name, description=description, key=key)
-        interface.save()
-        interface_success = True
-    #handle component-form
+    delete_success = False
+    #handle component-delete-form
+    if delete_form.is_valid():
+        exe_hash = delete_form.cleaned_data['exe_hash']
+        component = Components.objects.get(exe_hash=exe_hash)
+    #handle component-add-form
     if comp_form.is_valid():
         with request.FILES['manifest'] as manifest:
             file_success = _import_manifest(manifest, cluster)
     dict_response = dict()
     dict_response["component_success"] = file_success
-    dict_response["interface_success"] = interface_success
+    dict_response["delete_success"] = delete_success
     dict_response["comp_form"] = comp_form
-    dict_response["inter_form"] = interface_form
+    dict_response["delete_form"] = delete_form
     context = RequestContext(request, dict_response)
     return render_to_response('receive_components.html', context_instance=context)
 
@@ -228,6 +223,7 @@ def _import_manifest(filename, cluster):
         ci_name = parser.get('DEFAULT', 'ci')
         ci_file=myzip.extractfile(ci_name)
         ci = ci_file.read()
+        ci_hash = _hash_file(myzip.extractfile(ci_name, 'rb'))
         domain = settings.SITE_DOMAIN
         name = parser.get("DEFAULT", "name")
         exe_hash = parser.get("DEFAULT", "exe_hash")
@@ -235,15 +231,23 @@ def _import_manifest(filename, cluster):
         version = "1.0"
         if parser.has_option('DEFAULT', 'version'):
             version = parser.get("DEFAULT", "version")
-        component = Components(name=name, brief_description='', 
-                description=desc, is_active=True, version=version)
+        if Components.objects.filter(exe_hash=exe_hash):
+            component = Components.objects.get(exe_hash=exe_hash)
+            component.description = desc
+            component.version = version
+        else:
+            component = Components(description=desc, is_active=False,
+                                   version=version, exe_hash=exe_hash)
         component.save()
         comp_cluster = Components_Cluster(component=component,
-                cluster=cluster, path=path, code=ci)
+                                          cluster=cluster, name=name)
         comp_cluster.save()
-        interface, created = Interfaces.objects.get_or_create(key=exe_hash)
+        from os.path import splitext, basename
+        interface_name = splitext(basename(ci_name))[0]
+        interface, created = Interfaces.objects.get_or_create(ci_hash=ci_hash)
         if created:
-            interface.name = ci_name
+            interface.name = interface_name
+            interface.ci = ci
         interface.save()
         inter_comp = Interfaces_Components(interface=interface,
                 component=component)
@@ -255,3 +259,14 @@ def _import_manifest(filename, cluster):
                 programmer.save()
         return True
     return False
+
+def _hash_file(file_object, hashtype=None, block_size=512):
+    """ Generates a hash for a file-like object with given hashlib.<hashtype>,
+    defaults to hashlib.md5()."""
+    if not hashtype:
+        import hashlib
+        hashtype = hashlib.md5()
+    while data=f.read(block_size):
+        hashtype.update(data)
+    import base64
+    return base64.b64encode(hashtype.digest()).decode('utf8')

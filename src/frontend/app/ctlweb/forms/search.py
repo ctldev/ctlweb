@@ -21,8 +21,6 @@ SEARCH_CATEGORIES = {
         Interfaces.objects: {
             'all': 'all',
             'name': 'name',
-            'programmer': None,
-            'description': None,
         },
     }
 

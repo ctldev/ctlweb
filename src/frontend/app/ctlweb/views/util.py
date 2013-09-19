@@ -1,42 +1,5 @@
 #vim: set fileencoding=utf-8
 
-from django.db.models import Q
-from ctlweb.models import Components, Interfaces
-from lists import lists
-
-def __comp_searchset(searchtext):
-    """Stellt für jede View die durchsuchbaren Attribute der Components als
-    zur Queryset Verfügung."""
-    return (Q(name__icontains = searchtext)|
-            Q(brief_description__icontains = searchtext)|
-            Q(programmer__email__iexact = searchtext)|
-            Q(version__icontains = searchtext))
-
-def __interface_searchset(searchtext):
-    """Stellt für jede View die durchsuchbaren Attribute der Interfaces als
-    zur Queryset Verfügung."""
-    return (Q(name__icontains = searchtext)|
-            Q(description__icontains = searchtext))
-
-def simple_search(request, searchtext):
-    """Global verfügbare einfache Suche die in der Navigation angezeigt
-    wird"""
-#Verwendung vordefinierter Querysets zur Suche
-    searched_interfaces = Interfaces.objects.filter(
-            __interface_searchset(searchtext))
-    searched_components = Components.objects.filter(__comp_searchset(searchtext))
-    searched_components = searched_components.exclude(is_active=False)
-#Suche Interfaces deren Components gefunden wurden ohne selbst gefunden zu sein
-    indirect_interfaces = Interfaces.objects.none()
-    for comp in searched_components:
-        indirect_interfaces = indirect_interfaces | Interfaces.objects.all().filter(components__name__iexact = comp.name)
-#Distinct auf alle Ergebnisse. Nur auf einige führt zu Kompatibiltätsproblemen
-    searched_components = searched_components.distinct()
-    searched_interfaces = searched_interfaces.distinct()
-    indirect_interfaces = indirect_interfaces.distinct()
-    return lists(request, searched_interfaces, indirect_interfaces,
-            searched_components, 1)
-
 def generate_page_buttons(prefix, page_count, css_class, page, button_range):
     """generate buttons for pagination"""
     buttons = []

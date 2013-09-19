@@ -61,7 +61,7 @@ def new_page(request,
     if s_components == None :
         s_components = Components.objects.none()
     else :
-        s_components = s_components.order_by('name')
+        s_components = s_components.order_by('date')
     s_components = s_components.exclude(is_active=False)
     if form == 0:
         direct_interfaces = Interfaces.objects.all().order_by('name')
