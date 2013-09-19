@@ -50,11 +50,11 @@
 			  {% for di in interfaces.object_list %}
 				<li>
 				  {% if di.is_direct %}
-					<a href="#i_{{ di.key }}" data-toogle="tab" 
-					  style="color: #006600" id="i_{{ di.key }}_list">
+					<a href="#i_{{ di.pk }}" data-toogle="tab" 
+					  style="color: #006600" id="i_{{ di.pk }}_list">
 				  {% else %}
-					<a href="#i_{{ di.key }}" data-toggle="tab" 
-					  id="i_{{ di.key }}_list">
+					<a href="#i_{{ di.pk }}" data-toggle="tab" 
+					  id="i_{{ di.pk }}_list">
 				  {% endif %}
 				  <strong>{{ di.name }}</strong><br />
 					  <small>{{ di.description }}</small>
@@ -74,7 +74,7 @@
 {# -------------------- RIGHT CONTENT SIDE -------------------- #}
 			<div class="tab-content content">
 			  {% for di in interfaces.object_list %}
-				<div class="tab-pane" id="i_{{ di.key }}">
+				<div class="tab-pane" id="i_{{ di.pk }}">
 				  <center>
 					<b>
 					{% if not di.is_direct %}
@@ -136,7 +136,7 @@
 		  <script type="text/javascript">
 			$(function() {
 				{# handle request when clicking on left side #}
-				$('#interfaceList a').click(function(e) {
+        $('#interfaceList>li>a').click(function(e) {
 				{# prevent href, generate new url and get new content #}
 				e.preventDefault();
 				var value = $(this).attr('href').substr(1);
@@ -153,12 +153,6 @@
 				item += "_list";
 			  }
 			  $('#'+item).tab('show');
-			  {# preventing bug: selecting wrong item by mistake #}
-			  $('#interfaceList .pagination a').click(function(e) {
-				var value = "";
-				var url = getModifiedUrlByGet("item", value);
-				window.history.pushState({}, null, url);
-			  });
 
 			  {% if not form == 0 %}
 			  {# interfaceList or componentList, depending on selection and if #}

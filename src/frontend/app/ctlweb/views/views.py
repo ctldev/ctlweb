@@ -4,8 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext, Template 
-from ctlweb.views.util import *
 from ctlweb.views.lists import *
+from ctlweb.views import simple_search
 
 def admin_index(request): 
 	return render_to_response("admin/base_site.html", 
@@ -13,18 +13,13 @@ def admin_index(request):
 
 def index(request):
     if "search_query" in request.GET:
-        query = request.GET.get('search_query','')
-        return simple_search(request, query)
+        return simple_search(request)
     return render_to_response("home.html", 
             context_instance=RequestContext(request))
 
 def components(request): 
     return lists(request)
-
-
 	
 def impressum(request):
     return render_to_response("impressum.html",
             context_instance=RequestContext(request))
-
-
