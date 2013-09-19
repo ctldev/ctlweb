@@ -10,7 +10,7 @@ class Cluster(models.Model):
     hostname = models.CharField(_("Host/IP"), max_length=255, unique=True)
     username = models.CharField(_("Benutzer"), max_length=100)
     port = models.IntegerField(_("Port"))
-    key = models.FilePathField(_(u"Schlüssel"))
+    key = models.FilePathField(_(u"Schlüssel"), null=True, blank=True)
 
     class Meta:
         app_label = 'ctlweb'
