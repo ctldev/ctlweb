@@ -2,12 +2,14 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext, Template
 from django.forms.formsets import formset_factory
+from django.db.models import Q
 from ctlweb.forms import SearchProBaseForm
 from ctlweb.forms import SearchProExtendedForm
 from ctlweb.forms import SearchAreaForm
 from ctlweb.forms import SEARCH_CATEGORY_CHOICES
 from ctlweb.forms import SEARCH_CATEGORIES
 from ctlweb.models import Components, Interfaces
+from ctlweb.views.lists import lists
 
 def simple_search(request):
     query = request.GET.get('search_query', None)
@@ -25,14 +27,14 @@ def search(request):
     if search_base_form.is_valid() \
             and search_form.is_valid() \
             and area_form.is_valid():
-        searcharea = areadorm.cleaned_data['area']
+        searcharea = area_form.cleaned_data['area']
         cleaned_base_data = search_base_form.cleaned_data
         category = cleaned_base_data['category']
         searchtext = cleaned_base_data['searchtext']
         regex = cleaned_base_data['regex']
         components = _get_advanced_searchset(category, searchtext, regex)
         interfaces = _get_advanced_searchset(category, searchtext, regex, 
-                                             Interface.objects)
+                                             Interfaces.objects)
         for form in search_form:
             cleaned_data = form.cleaned_data
             category = cleaned_data['category']
@@ -42,7 +44,7 @@ def search(request):
             components = _combine_querys(components, category, searchtext, 
                                          regex, bind)
             interfaces = _combine_querys(interfaces, category, searchtext, 
-                                         regex, bind, Interface.objects)
+                                         regex, bind, Interfaces.objects)
         return _display_result(request, interfaces, components, searcharea)
     dict_response = {
             'baseform' : search_base_form,
@@ -54,9 +56,10 @@ def search(request):
     return render_to_response("search.html", context_instance=context)
 
 def _display_result(request, interfaces, components, searcharea='all'):
+    components = components.exclude(is_active=False)
     interfaces_indirect = Interfaces.objects.none()
     for component in components:
-        new_interfaces = component.interfaces_set
+        new_interfaces = component.interfaces_set.all()
         interfaces_indirect = interfaces_indirect | new_interfaces
     interfaces = interfaces.distinct()
     interfaces_indirect = interfaces_indirect.distinct()
@@ -90,7 +93,7 @@ def _get_advanced_searchset(category, query, regex,
                             filter_target=Components.objects):
     category = SEARCH_CATEGORIES[filter_target].get(category, None)
     if not category:
-        return filter_objects.none()
+        return filter_target.none()
     if category == 'all':
         searchset = filter_target.none()
         for cat, name in SEARCH_CATEGORY_CHOICES:
