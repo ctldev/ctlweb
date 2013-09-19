@@ -10,6 +10,8 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 class Components_Inline(admin.StackedInline):
     model = Interfaces_Components
     extra = 0
+    max_num = 0
+    can_delete = False
 
 class InterfacesAdmin(admin.ModelAdmin):
     """
@@ -38,6 +40,4 @@ class InterfacesAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
-    def has_change_permission(self, request):
-        return False
 admin.site.register(Interfaces, InterfacesAdmin)

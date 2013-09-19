@@ -20,14 +20,20 @@ def set_inactive(modeladmin, request, queryset):
 class Interfaces_Inline(admin.StackedInline):
     model = Interfaces_Components
     extra = 0
+    max_num = 0
+    can_delete = False
 
 class Cluster_Inline(admin.StackedInline):
     model = Components_Cluster
     extra = 0
+    max_num = 0
+    can_delete = False
 
 class Programmer_Inline(admin.StackedInline):
     model = Programmer
     extra = 0
+    can_delete = False
+    max_num = 0
 
 class ComponentsAdmin(admin.ModelAdmin):
     """
