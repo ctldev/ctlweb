@@ -74,14 +74,25 @@ class Command(BaseCommand):
                 is_superuser=False,
                 last_login=today,
                 date_joined=today)
+        self.user4 = User(username="superuser",
+                first_name="a",
+                last_name="b",
+                email="abc@def.de",
+                is_staff=True,
+                is_active=True,
+                is_superuser=True,
+                last_login=today,
+                date_joined=today)
 
         self.user1.set_password('teamprojekt')
         self.user2.set_password('teamprojekt')
         self.user3.set_password('teamprojekt')
+        self.user4.set_password('teamprojekt')
 
         self.user1.save()
         self.user2.save()
         self.user3.save()
+        self.user4.save()
 
     def import_user_rights(self):
         pass
@@ -117,6 +128,11 @@ class Command(BaseCommand):
         self.co2.save()
         self.co3.save()
         self.co4.save()
+
+        self.co1.set_active(self.user4)
+        self.co2.set_active(self.user4)
+        self.co3.set_active(self.user4)
+        self.co4.set_active(self.user4)
 
     def import_connections(self):
         self.ic1 = Interfaces_Components(interface=self.i1,
@@ -179,8 +195,3 @@ class Command(BaseCommand):
         self.p4.save()
         self.p5.save()
         self.p6.save()
-
-        self.co1.set_active(self.user1)
-        self.co2.set_active(self.user1)
-        self.co3.set_active(self.user1)
-        self.co4.set_active(self.user1)

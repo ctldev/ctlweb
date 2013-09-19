@@ -13,11 +13,11 @@ class Components(models.Model):
 
     """
     description = models.TextField(_("Beschreibung"))
-    date = models.DateTimeField(_("Zuletzt geändert am"), auto_now=True)
+    date = models.DateTimeField(_(u"Zuletzt geändert am"), auto_now=True)
     date_creation = models.DateTimeField(_("Erstellungsdatum"),\
                                          auto_now_add=True)
     is_active = models.BooleanField(_("Freigeschaltet"))
-    version = models.CharField(_("Versionsnummer"), max_length=255)
+    version = models.CharField(_("Version"), max_length=255)
     exe_hash = models.CharField(_("Hash"), max_length=2000, unique=True)
     homecluster = models.ManyToManyField(Cluster,\
                                          verbose_name=_("Ursprungscluster"),\
@@ -47,7 +47,10 @@ class Components(models.Model):
         super(Components, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return self.name + ' ' + self.version
+        namelist = self.components_cluster_set.values_list('name',
+                flat=True).distinct('name').order_by('name')
+        namestring = ', '.join(namelist)
+        return namestring #+ '  -  ' + self.version
 
 class Components_Cluster(models.Model):
     """

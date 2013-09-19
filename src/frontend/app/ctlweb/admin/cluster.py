@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 
 class Components_Inline(admin.StackedInline):
     model = Components_Cluster
+    readonly_fields = ('name', 'component')
     extra = 0
 
 class ClusterAdmin(admin.ModelAdmin):
@@ -18,13 +19,12 @@ class ClusterAdmin(admin.ModelAdmin):
 
     """
     fieldsets = (
-            (None, {'fields': ('domain',)}),
-            (_('Informations'), {'fields': ('ip', 'username', 'port')}),
-            (_('Key'), {'fields': ('key',)}),
+            (None, {'fields': ('hostname',)}),
+            (_('Connection'), {'fields': ('port', 'username', 'key')}),
             )
-    list_display = ['domain', 'ip', 'port', 'counter']
-    search_fields = ('domain', 'ip', 'port')
-    ordering = ['domain']
+    list_display = ['hostname', 'counter']
+    search_fields = ('hostname',)
+    ordering = ['hostname']
     inlines = [Components_Inline,]
     actions = [ delete_selected, ]
     
