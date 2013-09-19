@@ -69,7 +69,8 @@ class CtlwebUserAdmin(UserAdmin):
                 set_non_superuser,
               ]
     def save_model(self, request, obj, form, change):
+        print(obj)
         obj.save(request)
 
 admin.site.unregister(User)
-admin.site.register(UserMethods, CtlwebUserAdmin)
+admin.site.register(User, CtlwebUserAdmin)
