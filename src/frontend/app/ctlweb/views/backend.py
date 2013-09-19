@@ -196,6 +196,9 @@ def receive_modules(request, token):
     if delete_form.is_valid():
         exe_hash = delete_form.cleaned_data['exe_hash']
         component = Components.objects.get(exe_hash=exe_hash)
+        comp_cluster = Components_Cluster.objects.get(cluster=cluster,
+                                                      component=component)
+        comp_cluster.delete()
     #handle component-add-form
     if comp_form.is_valid():
         with request.FILES['manifest'] as manifest:

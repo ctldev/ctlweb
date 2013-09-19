@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext, Template 
 from ctlweb.views.lists import *
-from ctlweb.views import simple_search
+from ctlweb.views.search import simple_search
 
 def admin_index(request): 
 	return render_to_response("admin/base_site.html", 
