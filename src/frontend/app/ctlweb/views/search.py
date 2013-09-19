@@ -10,7 +10,7 @@ from ctlweb.forms import SEARCH_CATEGORIES
 from ctlweb.models import Components, Interfaces
 
 def simple_search(request):
-    query = request.GET.get'search_query', None)
+    query = request.GET.get('search_query', None)
     interfaces = _get_advanced_searchset('all', query, False, Interfaces.objects)
     components = _get_advanced_searchset('all', query, False)
     return _display_result(request, interfaces, components)

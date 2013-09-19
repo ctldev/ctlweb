@@ -269,7 +269,7 @@ def _hash_file(file_object, hashtype=None, block_size=512):
     if not hashtype:
         import hashlib
         hashtype = hashlib.md5()
-    while data=f.read(block_size):
+    for data in iter(lambda: f.read(block_size)):
         hashtype.update(data)
     import base64
     return base64.b64encode(hashtype.digest()).decode('utf8')
