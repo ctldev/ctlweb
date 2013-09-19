@@ -8,135 +8,128 @@
 {% endblock title %}
 {% block content %}
 <div class="transbox">
-<div class="page-header">
-  <h1>
-	{{ component }}
-  </h1>
-  {% if see_description %}  
-  <blockquote>
-	  <div id="short">{{ short }} [...]</div>
-	  <div id="long" class="hidden">{{ component.description }}</div>
-  </blockquote>
-  <script type="text/javascript">
-	  $(function(){
-		  $('#short').click(function(e){
-			  $('#short').attr('class', 'hidden');
-			  $('#long').attr('class', '');
-		  });
-	  });
-  </script>
-  {% else %}
-  <blockquote>
-	{{short}}
-  </blockquote>
-  {% endif %}
-</div> 
+  <div class="page-header">
+    <h1>
+	    {{ component }}
+    </h1>
+    {% if see_description %}  
+    {% if short %}
+    <blockquote id="description_short">
+      {{ short }} [...]
+    </blockquote>
+    {% endif %}
+    <blockquote id="description_long" {% if short %}class="hidden"{% endif %}>
+      {{ component.description }}
+    </blockquote>
+    <script type="text/javascript">
+	    $(function(){
+		    $('#description_short').click(function(e){
+			    $('#description_short').attr('class', 'hidden');
+			    $('#description_long').attr('class', '');
+		    });
+	    });
+    </script>
+    {% endif %}
+  </div> 
   <dl class="dl-horizontal">
-	<dt>
-	  {% blocktrans count counter=component.interfaces_set.all|length %}
-		Interface:
-	  {% plural %}
-		Interfaces:
-	  {% endblocktrans %}
-	</dt>
-	<dd>
-	{% for i in component.interfaces_set.all %}
-	  {% if see_ci %}
-	  <a href="#{{ i.id }}" data-toggle="modal">{{ i.name }}</a>{% if not forloop.last %}, {% endif %}
-	  <div id="{{i.id}}" class="modal hode fade" tabindex="-1"
-		  role="dialog" aria-labelledby="myModalLabel"
-		  aria-hidden="true">
-	    <div class="modal-header">
-		    <button type="button" class="close"
-				    data-dismiss="modal"
-				    aria-hidden="true">x</button>
-			    <h3 id="myModelLabel">{{i.name}}</h3>
-		    </div>
-		    <div class="modal-body">
-			    <pre>{{i.ci}}</pre>
-		    </div>
-		    <div class="modal-footer">
-			    <button class="btn" data-dismiss="modal"
-				    aria-hidden="true">{% trans "Schließen" %}</button>
-		    </div>
+    <dt>
+      {% blocktrans count counter=component.interfaces_set.all|length %}
+      Interface:
+      {% plural %}
+      Interfaces:
+      {% endblocktrans %}
+    </dt>
+    <dd>
+    {% for i in component.interfaces_set.all %}
+      {% if see_ci %}
+      <a href="#id_ifc_{{ i.id }}" data-toggle="modal">{{ i.name }}</a>{% if not forloop.last %}, {% endif %}
+      <div id="id_ifc_{{ i.id }}" class="modal hode fade" tabindex="-1"
+          role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close"
+              data-dismiss="modal"
+              aria-hidden="true">
+              x
+          </button>
+          <h3 id="myModelLabel">{{i.name}}</h3>
+        </div>
+        <div class="modal-body">
+          <pre>{{i.ci}}</pre>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" data-dismiss="modal"
+              aria-hidden="true">
+            {% trans "Schließen" %}
+          </button>
+        </div>
+      </div>
+      {% else %}
+      {{ i.name }}
+      {% endif %}
+    {% endfor %}
+    </dd>
+    <dt>
+      {% blocktrans count counter=component.programmer_set.all|length %}
+      Ersteller:
+      {% plural %}
+      Ersteller:
+      {% endblocktrans %}
+    </dt>
+    <dd>
+      {% for p in component.programmer_set.all %}
+        {{ p.email }} {% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </dd>
+    
+    <dt>
+      {% trans "Version:" %}
+    </dt>
+    <dd>
+      {{ component.version }}
+    </dd>
+      
+    <dt>
+      {% trans "Datum:" %}
+    </dt>
+    <dd> 
+      {{ component.date }} 
+    </dd>
+  </dl>
+
+  {% if see_homecluster %}
+  {% blocktrans count counter=component.homecluster|length %}
+    Cluster:
+  {% plural %}
+    Cluster:
+  {% endblocktrans %}
+  <div class="accordion" id="accordion1">
+    <div class="accordion-group">
+	  {% for hc in component.components_cluster_set.all %}
+	    <div class="accordion-heading">
+		    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#id_cl_{{ hc.id }}">
+		      {{ hc.cluster.hostname }}
+		    </a>
 	    </div>
-	    {% else %}
-	    {{ i.name }}
-	    {% endif %}
-	  {% endfor %}
-	</dd>
-
-	<dt>
-	  {% blocktrans count counter=component.programmer_set.all|length %}
-		Ersteller:
-	  {% plural %}
-		Ersteller:
-	  {% endblocktrans %}
-	</dt>
-	<dd>
-	  {% for p in component.programmer_set.all %}
-	    {{ p.email }} {% if not forloop.last %}, {% endif %}
-	  {% endfor %}
-	</dd>
-	
-	<dt>
-	  {% trans "Version:" %}
-	</dt>
-	<dd>
-	  {{ component.version }}
-	</dd>
-  	
-  	<dt>
-	  {% trans "Datum:" %}
-	</dt>
-	<dd> 
-	  {{ component.date }} 
-	</dd>
-</dl>
-
-{% if see_homecluster %}
-{% blocktrans count counter=component.homecluster|length %}
-  Cluster:
-{% plural %}
-  Cluster:
-{% endblocktrans %}
-<div class="accordion" id="accordion1">
-  <div class="accordion-group">
-	{% for hc in component.components_cluster_set.all %}
-	  <div class="accordion-heading">
-		<a 
-		  class="accordion-toggle" 
-		  data-toggle="collapse"
-		  data-parent="#accordion1" 
-		  href="#{{ hc.id }}"
-		>
-		{{ hc.cluster.hostname }}
-		</a>
-	  </div>
-	  {% if forloop.first %}
-		<div id="{{ hc.id }}" class="accordion-body collapse in">
-	  {% else %}
-		<div id="{{ hc.id }}" class="accordion-body collapse">
-	  {% endif %}
-	  	<div class="accordion-inner">
-			{% if see_ssh_data %}
-			<table>
+		  <div id="id_cl_{{ hc.id }}" class="accordion-body collapse {% if forloop.first %}in{% endif %}">
+        <div class="accordion-inner">
+			  {% if see_ssh_data %}
+			  <table>
 				<tr>
 					<td>
 						{% trans "CTL-Befehl:" %}
 					</td>
 				</tr>
 				<tr>
-					<td> <pre>{{hc.cluster.username}}@{{hc.cluster.hostname}}:{{hc.name}} -l pipe -c -p {{hc.cluster.port}}</pre>
+					<td> 
+            <pre>{{ hc.cluster.username }}@{{ hc.cluster.hostname }}:{{ hc.name }} -l pipe -c -p {{ hc.cluster.port }}</pre>
 					</td>
 				</tr>
-			</table>
-			{% endif %}
-		</div>
+			  </table>
+			  {% endif %}
+		  </div>
 	  </div>
 	{% endfor %}
   </div>
-</div>
 {% endif %}
 </div>
 {% endblock content %}			
