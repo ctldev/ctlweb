@@ -60,7 +60,7 @@ class ComponentsAdmin(admin.ModelAdmin):
 
     def names(self, obj):
         namelist = obj.components_cluster_set.values_list('name',
-                flat=True).distinct('name').order_by('name')
+                flat=True).order_by('name').distinct()
         namestring = ', '.join(namelist)
         return namestring
     names.admin_order_field = 'components_cluster__name'

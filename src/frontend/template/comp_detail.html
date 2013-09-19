@@ -10,9 +10,7 @@
 <div class="transbox">
 <div class="page-header">
   <h1>
-  {% for name in component.components_cluster_set.all.distinct %}
-    {{ name }} {% if not forloop.last %}, {% endif %}
-  {% endfor %}
+	{{ component }}
   </h1>
   {% if see_description %}  
   <blockquote>
@@ -31,6 +29,7 @@
   <blockquote>
 	{{short}}
   </blockquote>
+  {% endif %}
 </div> 
   <dl class="dl-horizontal">
 	<dt>
@@ -58,8 +57,7 @@
 		    </div>
 		    <div class="modal-footer">
 			    <button class="btn" data-dismiss="modal"
-				    aria-hidden="true">{% trans Schließen
-				    %}</button>
+				    aria-hidden="true">{% trans "Schließen" %}</button>
 		    </div>
 	    </div>
 	    {% else %}
@@ -125,12 +123,11 @@
 			<table>
 				<tr>
 					<td>
-						{% trans CTL-Befehl: %}
+						{% trans "CTL-Befehl:" %}
 					</td>
-					<td>
-						{{hc.cluster.username}}@{{hc.cluster.hostname}}:{{hc.name}}
-						-l pipe -c -p
-						{{hc.cluster.port}}
+				</tr>
+				<tr>
+					<td> <pre>{{hc.cluster.username}}@{{hc.cluster.hostname}}:{{hc.name}} -l pipe -c -p {{hc.cluster.port}}</pre>
 					</td>
 				</tr>
 			</table>
