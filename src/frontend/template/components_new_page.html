@@ -104,17 +104,8 @@
 							  Programmierer:
 							{% endblocktrans %}
 						  </u> 
-						  {% for pro in programmer %}
-							{% if pro.component == c %}
-							  {% if pro.email in u_programmer.email %}
-							  {# TODO Userprofillink einfügen #}
-								<a href="javascript:void(0)"> 
-								  {{ pro.email }}
-								</a>
-							  {% else %}
+						  {% for pro in c.programmer_set %}
 								{{ pro.email }}
-							  {% endif %}
-							{% endif %}
 							{% endfor %}{# programmer #}
 						  </small>
 						</blockquote>
