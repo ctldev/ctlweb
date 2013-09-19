@@ -104,7 +104,7 @@
 							  Programmierer:
 							{% endblocktrans %}
 						  </u> 
-						  {% for pro in c.programmer_set %}
+						  {% for pro in c.programmer_set.all %}
 								{{ pro.email }}
 							{% endfor %}{# programmer #}
 						  </small>

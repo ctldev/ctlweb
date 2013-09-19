@@ -48,7 +48,7 @@ class Components(models.Model):
 
     def __unicode__(self):
         namelist = self.components_cluster_set.values_list('name',
-                flat=True).distinct('name').order_by('name')
+                flat=True).distinct().order_by('name')
         namestring = ', '.join(namelist)
         return namestring #+ '  -  ' + self.version
 
