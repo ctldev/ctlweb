@@ -11,6 +11,8 @@ class Components_Inline(admin.StackedInline):
     model = Interfaces_Components
     extra = 0
     readonly_fields=('component',)
+    max_num = 0
+    can_delete = False
 
 class InterfacesAdmin(admin.ModelAdmin):
     """
@@ -36,4 +38,8 @@ class InterfacesAdmin(admin.ModelAdmin):
         return obj.comp_count
     counter.admin_order_field = 'comp_count'
     counter.short_description = _("Anzahl Components")
+
+    def has_add_permission(self, request):
+        return False
+
 admin.site.register(Interfaces, InterfacesAdmin)
