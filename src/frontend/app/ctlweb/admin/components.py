@@ -39,7 +39,7 @@ class ComponentsAdmin(admin.ModelAdmin):
 
     """
     fieldsets = (
-        (None, {'fields': ('description', 'version', 'is_active',)}),
+        (None, {'fields': ('names', 'description', 'version', 'is_active',)}),
         (_('Dates'), {'fields': ('date', 'date_creation',)}),
         (_('Hash'), {'fields': ('exe_hash',)}),
         )
@@ -48,28 +48,13 @@ class ComponentsAdmin(admin.ModelAdmin):
                     'version', 
                     'is_active',
                     'date']
-    ordering = ['components_cluster__name']
-    search_fields = ('components_cluster__name',
+    ordering = ['names']
+    search_fields = ('names',
                      'version', 
                      'is_active', 
                      'date')
-    readonly_fields=('date', 'date_creation', 'version', 'exe_hash', 'description')
+    readonly_fields=('names', 'date', 'date_creation', 'version', 'exe_hash', 'description')
     actions = [ set_active,
                 set_inactive ]
-
-
-    def names(self, obj):
-        namelist = obj.components_cluster_set.values_list('name',
-                flat=True).order_by('name').distinct()
-        namestring = ', '.join(namelist)
-        return namestring
-    names.admin_order_field = 'components_cluster__name'
-    names.short_description =_("Namen")
-
-    def queryset(self,request):
-        qs = super(ComponentsAdmin, self).queryset(request)
-        ids = qs.values('pk')
-        qs = Components.objects.filter(pk__in=ids).distinct()
-        return qs
 
 admin.site.register(Components, ComponentsAdmin)

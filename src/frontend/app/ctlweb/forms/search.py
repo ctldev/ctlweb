@@ -14,7 +14,7 @@ SEARCH_CATEGORY_CHOICES = (
 SEARCH_CATEGORIES = {
         Components.objects: {
             'all': 'all',
-            'name': 'components_cluster__name',
+            'name': 'names',
             'programmer': 'programmer__email',
             'description': 'description',
         },

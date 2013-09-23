@@ -26,6 +26,7 @@
 	{% endif %}
   </blockquote>
 </div>
+{% endif %}
 	<div class="tabbable">
 	  <ul class="nav nav-tabs" id="viewSelection">
 		<li class="active">
@@ -41,7 +42,7 @@
 	  </ul>
 	  <div class="tab-content">
 		<div class="tab-pane active" id="interface">
-{% endif %}
+{# {% endif %} #}
 {# --------------- LEFT CONTENT SIDE --------------------------- #}
 <div class="tabbable tabs-left"> 
   {# Only required for left/right tabs #}
@@ -76,12 +77,34 @@
 			  {% for di in interfaces.object_list %}
 				<div class="tab-pane" id="i_{{ di.pk }}">
 				  <center>
+					<h3> {{ di.name }} </h3>
+				  </center>
+				  <a href="#i_d_{{di.pk}}" role="button" class="btn" data-toggle="modal">Details</a>
+				  <div id="i_d_{{di.pk}}" class="modal hode fade" tabindex="-1"
+					role="dialog" aria-labelledby="i_d_{{di.pk}}_modal"
+					  aria-hidden="true">
+					<div class="modal-header">
+					  <button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true"> x </button>
+					  <h3 id="i_d_{{di.pk}}_modal">{{di.name}}</h3>
+					</div>
+					<div class="modal-body">
+					  <pre> {{di.ci}} </pre>
+					</div>
+					<div class="modal-footer">
+					  <button class="btn" data-dismiss="modal"
+						aria-hidden="true">
+						{% trans "Schließen" %}
+					  </button>
+					</div>
+				  </div>
+				  <center>
 					<b>
 					{% if not di.is_direct %}
 					  {% trans "Gefundene" %}
 					{% endif %}
-					  {% blocktrans with name=di.name %} 
-						Komponenten von {{ name }} 
+					  {% blocktrans %} 
+						Komponenten  
 					  {% endblocktrans %}
 					</b>
 				  </center>
@@ -170,7 +193,7 @@
 
 			});
 		  </script>
-{% if not form == 0 %}		
+{# {% if not form == 0 %} #}
 		</div>
 		<div class="tab-pane" id="component">
 			{% for sc in paged_components.object_list %}
@@ -179,7 +202,7 @@
 				<blockquote>
 					  <strong>
 						<a href="{% url component sc.id %}">
-						{{sc.name}} <br />
+						{{sc}} <br />
 						</a>
 					  </strong>
 					<small>
@@ -191,18 +214,9 @@
 					  Programmierer:
 					{% endblocktrans %}
 				  </u> 
-				  {% for pro in programmer %}
-					{% if pro.component == sc %}
-					  {% if pro.email in u_programmer.email %}
-						{# TODO Userprofillink einfügen #}
-						<a href="javascript:void(0)"> 
-						  {{ pro.email }}
-						</a>
-					  {% else %}
-						{{ pro.email }}
-					  {% endif %}
-					{% endif %}
-				  {% endfor %} {# pro in... #}
+				  {% for pro in sc.programmer_set.all %}
+					{{ pro.email }}
+				  {% endfor %}{# programmer #}
 				</small>
 				</blockquote>		 
 			  </div>
@@ -219,4 +233,4 @@
 		</div>
 	  </div>  
 	</div>
-{% endif %}  
+	{# {% endif %} #}
