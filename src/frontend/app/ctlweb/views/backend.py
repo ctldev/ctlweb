@@ -63,9 +63,7 @@ def send_user(user, cluster=None, ssh=True, pretend=False):
         ssh_user = c.username
         sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
         ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.ip
-        if domain is None:
-            domain = "" + c.domain
+        domain = c.hostname
         if ssh:
             ssh.connect(hostname=domain, username=ssh_user, port=c.port,
                     key_filename=ssh_file, look_for_keys=False)
@@ -90,9 +88,7 @@ def remove_user(user, cluster=None, ssh=True, pretend=False):
         ssh_user = c.username
         sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
         ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.ip
-        if domain is None:
-            domain = "" + c.domain
+        domain = c.hostname
         if ssh:
             ssh.connect(hostname=domain, username=ssh_user, port=c.port,
                     key_filename=ssh_file, look_for_keys=False)
@@ -116,9 +112,7 @@ def request_modules(ssh=True, pretend=False, request_all=False):
         ssh_user = c.username
         sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
         ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.ip
-        if domain is None:
-            domain = "" + c.domain
+        domain = c.hostname
         date = Components.objects.all().aggregate(Max('date_creation'))
         date = date['date_creation__max']
         # generate secure Token and append to url
