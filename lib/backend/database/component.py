@@ -166,10 +166,11 @@ class Component(Database):
     def _merge(self, opponent):
         from util.build_component import merge_components
         import os
+        import tarfile
         Log.info('About to merge components.')
         merged_file = ""
-        with open(self._component_file, 'r') as one:
-            with open(opponent._component_file, 'r') as two:
+        with tarfile.open(self._component_file, 'r:gz') as one:
+            with tarfile.open(opponent._component_file, 'r:gz') as two:
                 merged_file = merge_components(one, two)
         if not merged_file:
             Log.error('Was unable to merge components')
