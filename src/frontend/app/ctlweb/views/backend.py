@@ -69,17 +69,11 @@ def send_user(user, cluster=None, ssh=True, pretend=False):
         if ssh:
             ssh.connect(hostname=domain, username=ssh_user, port=c.port,
                     key_filename=ssh_file, look_for_keys=False)
-            shell = ssh.invoke_shell(term="vt220")
-            response = ""
-            if pretend:
-                response += _send_message(shell, "s")
-            response += _send_message(shell, "2")
-            response += _send_message(shell, user.username)
             for key in user.userkey_set:
-                response += send_message(shell, key.key)
-            response += _send_message(shell, "q")
-            print response
-            ssh.close
+                shell = ssh.get_transport().open_session()
+                cmd = 'ctl-register add --key %s %s' % (key.key, user.username)
+                if not pretend:
+                    shell.exec_command(cmd)
 
 def remove_user(user, cluster=None, ssh=True, pretend=False):
     if cluster is None:
@@ -102,15 +96,10 @@ def remove_user(user, cluster=None, ssh=True, pretend=False):
         if ssh:
             ssh.connect(hostname=domain, username=ssh_user, port=c.port,
                     key_filename=ssh_file, look_for_keys=False)
-            shell = ssh.invoke_shell(term="vt220")
-            response = ""
-            if pretend:
-                response += _send_message(shell, "s")
-            response += _send_message(shell, "3")
-            response += _send_message(shell, user.username)
-            response += _send_message(shell, "q")
-            print response
-            ssh.close
+            shell = ssh.get_transport().open_session()
+            cmd = 'ctl-register remove %s' % user.username
+            if not pretend:
+                shell.exec_command(cmd)
 
 def request_modules(ssh=True, pretend=False, request_all=False):
     """request all Modules of all Clusters of the Database"""
