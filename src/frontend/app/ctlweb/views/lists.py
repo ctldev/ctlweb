@@ -133,6 +133,8 @@ def new_page(request,
             pn_comp.num_pages, "co_page", s_comp_page, button_range)
     view = request.GET.get('view', '')
 
+    see_ci = v_user.has_perm('ctlweb.can_see_ci')
+    see_description = v_user.has_perm('ctlweb.can_see_description')
     dict_response["user"] = v_user
     dict_response["form"] = form
     dict_response["interfaces"] = paged_interfaces
@@ -142,6 +144,8 @@ def new_page(request,
     dict_response["s_components_page_buttons"] = s_components_page_buttons
     dict_response["post_data"] = request.POST.urlencode()
     dict_response["view"] = view
+    dict_response["see_ci"] = see_ci
+    dict_response["see_description"]= see_description
 
     if "search_query" in request.GET:
         dict_response["searchquery"] = request.GET.get('search_query', None)

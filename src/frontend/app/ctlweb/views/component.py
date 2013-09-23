@@ -25,6 +25,7 @@ def component_detail(request, comp_id):
 #        short_description = descriptionparts[0] + ". "
 #    else:
 #        short_description = comp.description[:255]
+    short_description = True
     if comp.brief_description == comp.description:
         short_description = None
 

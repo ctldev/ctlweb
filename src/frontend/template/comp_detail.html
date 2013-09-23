@@ -64,8 +64,8 @@
         </div>
       </div>
       {% else %}
-      {{ i.name }}
-      {% endif %}
+      {{ i.name }}{% if not forloop.last %}, {% endif %} 
+	  {% endif %}
     {% endfor %}
     </dd>
     <dt>
@@ -77,7 +77,7 @@
     </dt>
     <dd>
       {% for p in component.programmer_set.all %}
-        {{ p.email }} {% if not forloop.last %}, {% endif %}
+        {{ p.email }}{% if not forloop.last %}, {% endif %}
       {% endfor %}
     </dd>
     

@@ -41,12 +41,6 @@ class Components(models.Model):
         if User.has_perm("can_set_active"):
             self.is_active=False
 
-    def save(self, 
-            *args, 
-            **kwargs):
-        self.is_active = False
-        super(Components, self).save(*args, **kwargs)
-
     @property
     def brief_description(self):
         if '.' in self.description:
