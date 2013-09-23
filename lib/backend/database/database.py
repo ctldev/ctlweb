@@ -330,7 +330,7 @@ class Database:
         import re
         attrs = s[1].split(';')
         for attr in sorted(attrs):
-            key, val = attr.split("=")
+            key, val = attr.split("=", 1)
             if re.search('^f_(?P<classname>.+?)_.+', key):
                 class_name = attribute_box['c_referenced_class']
                 exec('from .%s import %s' % (class_name.lower(), class_name))
