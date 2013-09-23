@@ -112,7 +112,7 @@ def hash_file(file, hash_type=None, block_size=512):
                                # fact that the programm crashes.
         file = file.buffer
     while True:
-        data = file.read1(block_size)
+        data = file.read(block_size)
         if not data:
             break
         hash_type.update(data)
