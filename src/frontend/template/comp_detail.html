@@ -15,7 +15,7 @@
     {% if see_description %}  
     {% if short %}
     <blockquote id="description_short">
-      {{ short }} [...]
+      {{ component.brief_description }} [...]
     </blockquote>
     {% endif %}
     <blockquote id="description_long" {% if short %}class="hidden"{% endif %}>
