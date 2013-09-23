@@ -19,68 +19,255 @@ def fqdn():
     return socket.getfqdn()
 
 
-def generate_control(name, host, user, ssh_port,
-                     exe_path, exe_hash, ctl_interfaces,
+def _build_ciline(cis):
+    line = ""
+    for ci in cis:
+        ci_name = ci.name
+        if 'arcname' in dir(ci):
+            ci_name = ci.arcname
+        f = ci_name.replace('\\', '\\\\')
+        f = f.replace(' ', '\\ ')
+        if line == "":
+            line = f
+        else:
+            line += ' ' + f
+    return line
+
+
+def generate_control(name, host, user, ssh, exe, ci,
                      version=None, author=None):
-    """ Generates the config file of an ctl-package
+    """ Generates the config file of an ctl-package.
+
+    :param name: The name of the ctlweb component
+    :param host: The hostname or ip of the ctlweb component.
+    :param user: The accessed username for the ctlweb component.
+    :param ssh: The ssh-port to be used for accessing the ctlweb component.
+    :param exe: The path to the executable of the ctlweb compoenent.
+    :param ci: List of file like objects of the ctl interfaces.
+    :param version: A string with the identifier for the version.
+    :param author: A list of the email addresses of the ctl compoenent developers.
     """
-    from datetime import datetime
-    filename = 'control-%s' % datetime.now().strftime('%s')
-    ci_line = ""
-    for interface in ctl_interfaces:
-        ci = interface.name
-        ci = ci.replace(' ', '  ')
-        ci_line += ' %s' % ci
-    ci_line = ci_line.strip()
-    with open(filename, 'w') as f:
-        f.write('[DEFAULT]\n')
-        f.write('name=%s\n' % name)
-        f.write('host=%s\n' % host)
-        f.write('user=%s\n' % user)
-        f.write('ssh=%s\n' % ssh_port)
-        f.write('exe=%s\n' % exe_path)
-        f.write('exe_hash=%s\n' % exe_hash)
-        f.write('ci=%s\n' % ci_line)
-        if version is not None:
-            f.write('version=%s\n' % version)
-        if author is not None:
-            f.write('author=%s\n' % ' '.join(author))
-    return filename
+    import textwrap
+    with open(exe) as exe_file:
+        exe_hash = hash_file(exe_file)
+    ci = _build_ciline(ci)
+    args = locals()
+
+    control = textwrap.dedent("""\
+                              [DEFAULT]
+                              name={name}
+                              host={host}
+                              user={user}
+                              ssh={ssh}
+                              exe={exe}
+                              exe_hash={exe_hash}
+                              ci={ci}""")
+    if version is not None:
+        control += '\nversion={version}'
+    if author is not None:
+        control += '\nauthor={author}'
+    return control.format(**args)
 
 
 def generate_package(name, control, doc, ci):
     """ Generates ctl-manifest-package
+
+    :param name: The name of the package.
+    :param control: Text for the control file.
+    :param doc: The documentation file.
+    :param ci: A list of ctl interface files.
     """
     import tarfile
+    import tempfile
     from datetime import datetime
     tar_file = '%s_%s.tgz' % (name,
                               datetime.now().strftime('%Y-%m-%d %H.%M.%S'))
+    control_file = tempfile.NamedTemporaryFile()
+    control_file.write(control.encode('utf8'))
+    # If you now think, where does this fuckin arcname comes from, just ignore
+    # it. I created it for all of my filelike objects to fix a problem with the
+    # names file I extracted from a tarfile.. long story short: got frustrated
+    # on the use of io.TextIO and the stuff arround.
+    control_file.arcname = 'control'
+    control_file.seek(0)
+
     with tarfile.open(tar_file, 'w:gz') as package:
-        package.add(control, arcname='control')
-        package.add(doc, arcname='description.txt')
+        package.add(control_file.name, arcname=control_file.arcname)
+        package.add(doc.name, arcname=doc.arcname)
         for interface in ci:
-            package.add(interface.name)
+            package.add(interface.name, arcname=interface.arcname)
     return tar_file
 
 
-def hash_file(file, block_size=512):
-    """ Hashes a file like object with md5. """
+def hash_file(file, hash_type=None, block_size=512):
+    """ Hashes a file like object, default hash function is hashlib.md5. """
     import hashlib
     import base64
-    md5 = hashlib.md5()
-    file = file.name
-    with open(file, 'rb') as f:
-        while True:
-            data = f.read(block_size)
-            if not data:
-                break
-            md5.update(data)
-    return base64.b64encode(md5.digest()).decode('utf8')
+    if hash_type is None:
+        hash_type = hashlib.md5
+    hash_type = hash_type()
+    if 'buffer' in dir(file):  # if File has an underlying buffer switch to
+                               # that. If the filelike object is TextIO based
+                               # but doesn't support buffer, im ok with the
+                               # fact that the programm crashes.
+        file = file.buffer
+    while True:
+        data = file.read1(block_size)
+        if not data:
+            break
+        hash_type.update(data)
+    return base64.b64encode(hash_type.digest()).decode('utf8')
 
 
 def user():
     import getpass
     return getpass.getuser()
+
+
+# The following methods are used for component mergeing only.
+def _merge_configs(first, second):
+    """ This checks if the configs are mergeable and return kwargs for
+    generate_control() if the configs are merable. """
+    import configparser
+    config_one = configparser.ConfigParser()
+    config_one.read_file(first)
+
+    config_two = configparser.ConfigParser()
+    config_two.read_file(second)
+
+    kwargs = {}
+
+    equal_fields = ('name', 'exe', 'version', 'author', 'ssh',
+                    'user', 'host', 'exe_hash', )
+    unequal_fields = ('ci', )
+
+    for field in equal_fields:
+        params = ('DEFAULT', field)
+        if config_one.get(*params,
+                          fallback=None) != config_two.get(*params,
+                                                           fallback=None):
+            return False
+        kwargs[field] = config_one.get(*params, fallback=None)
+    for field in unequal_fields:
+        params = ('DEFAULT', field)
+        if config_one.get(*params,
+                          fallback=True) == config_two.get(*params,
+                                                           fallback=False):
+            return False
+    # cleanup output
+    kwargs.pop('exe_hash', None)
+    return kwargs
+
+
+def _token_unescape(string, i):
+    return None, string[:i - 1] + string[i:]
+
+
+def _token_break(string, i):
+    return string[:i], string[i + 1:]
+
+
+def _lex_analysis(line, token_dict):
+    in_token = False
+    for i in range(len(line)):
+        if in_token:
+            token_dict[i] = line[i]
+            in_token = False
+            continue
+        if ' ' == line[i]:
+            token_dict[i] = '\0'
+        if '\\' == line[i]:
+            in_token = True
+    if in_token:  # conifgparser eliminates tailing spaces, this is fixed here
+        line = line + " "
+        token_dict[len(line) - 1] = " "
+    return line
+
+
+def _split_ciline(ciline):
+    """ Splits the ciline by its cis and returns the clean cis in a tuple. """
+    # All tokens are needed to be escaped
+    token_action = {'\\': _token_unescape,  # text backlash
+                    ' ': _token_unescape,   # text space
+                    '\0': _token_break,     # break
+                    }
+    token = {}  # the position and kind of the token is stored here.
+    ciline = _lex_analysis(ciline, token)
+    variance = 0  # because one token has the size of two, a difference needs
+                  # to be corrected with this variable.
+    cis = []
+    for pos, typ in iter(sorted(token.items())):  # parsing
+        current_token = token[pos]
+        pos = pos - variance  # difference compensation
+        ci, ciline = token_action[current_token](ciline, pos)
+        if ci is not None:
+            cis.append(ci)
+            variance = pos + variance
+        variance += 1
+    else:
+        cis.append(ciline)
+    return tuple(cis)
+
+
+def _filelike_in_tempfile(filelike, blocksize=512):
+    """ expects a filelike object and writes it in a NamedTemporaryFile. The
+    original name of the file is preserved in the attribute arcname."""
+    import tempfile
+    tmp_file = tempfile.NamedTemporaryFile()
+    while True:
+        data = filelike.read(blocksize)
+        if not data:
+            break
+        tmp_file.write(data)
+    tmp_file.seek(0)
+    tmp_file.arcname = filelike.arcname
+    return tmp_file
+
+
+def hash_cis(component, ci_dict):
+    import configparser
+    import io
+    config = io.TextIOWrapper(component.extractfile('control'))
+    parser = configparser.ConfigParser()
+    parser.read_file(config)
+    ciline = parser.get('DEFAULT', 'ci')
+    cis = _split_ciline(ciline)
+    for ci in cis:
+        ci_hash = hash_file(component.extractfile(ci))
+        ci_file = component.extractfile(ci)
+        ci_file.arcname = ci
+        ci_dict[ci_hash] = _filelike_in_tempfile(ci_file)
+
+
+def merge_components(one, two):
+    """ Merges two components to one.
+
+    :param one: open tarfile.
+    :param two: open tarfile.
+    """
+    import io
+    config_one = io.TextIOWrapper(one.extractfile('control'))
+    config_two = io.TextIOWrapper(two.extractfile('control'))
+
+    control_kwargs = _merge_configs(config_one, config_two)
+
+    if control_kwargs is None:
+        return False
+
+    new_cis = {}  # key is the ci hash, value a filelike object with a filename
+                  # in the attribute arcname
+    hash_cis(one, new_cis)
+    hash_cis(two, new_cis)
+    merged_cis = [new_cis[ci] for ci in new_cis]
+
+    control_kwargs['ci'] = merged_cis
+    merged_control = generate_control(**control_kwargs)
+    description = one.extractfile('description.txt')
+    description.arcname = 'description.txt'
+    return generate_package(control_kwargs['name'],
+                            merged_control,
+                            _filelike_in_tempfile(description),
+                            merged_cis)
 
 
 def parse_args():
@@ -105,14 +292,14 @@ def parse_args():
     parser.add_argument('description',
                         type=file,
                         help="A file which contains a description.")
-    parser.add_argument('--pkgversion',
-                        default=None,
-                        help="A version of the ctl component that is served")
     parser.add_argument('--email',
                         default=None,
                         nargs="+",
                         help="Mail addresses on which the authors can be"
                              " contacted")
+    parser.add_argument('--pkgversion',
+                        default=None,
+                        help="A version of the ctl component that is served")
     parser.add_argument('-u', '--user',
                         default=user(),
                         help="The user which shall be accessed."
@@ -132,18 +319,18 @@ def main():
     import os
     args = parse_args()
     abspath_exe = os.path.abspath(args.exe.name)
-    exe_hash = hash_file(args.exe)
     # generating control file
     control = generate_control(args.name, args.hostname, args.user, args.port,
-                               abspath_exe, exe_hash, args.ci,
-                               args.pkgversion, args.email)
+                               abspath_exe, args.ci, args.pkgversion,
+                               args.email)
+    args.description.arcname = 'description.txt'
+    for ci in args.ci:
+        ci.arcname = ci.name
     # generating component
     manifest_package = generate_package(args.name,
                                         control,
-                                        args.description.name,
+                                        args.description,
                                         args.ci)
-    # cleaning up
-    os.remove(control)
 
     # simple check
     if not os.path.isfile(manifest_package):

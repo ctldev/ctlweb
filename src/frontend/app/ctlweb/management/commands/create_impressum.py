@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     """Befehl zur Erstellung eines individuellen Impressums. Es werden auf der
     Kommandozeile einige Daten abgefragt. Dabei sind einige optional und können
-    leer sein, während andere angegeben werden müssen. Diese werden solange 
+    leer sein, während andere angegeben werden müssen. Diese werden solange
     abgefragt bis etwas eingegeben wurde."""
 
     option_list = BaseCommand.option_list + ()
