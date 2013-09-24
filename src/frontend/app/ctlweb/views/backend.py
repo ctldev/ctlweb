@@ -48,11 +48,11 @@ def _gen_sec_token(domain):
     token = hashlib.sha256(secret + domain + hextime).hexdigest()
     return token
 
-def send_user(user, cluster=None, ssh=True, pretend=False):
+def _send_command(command, cluster=None, ssh=True, pretend=False):
     if cluster is None:
         cluster = Cluster.objects.all()
     if not isinstance(cluster, list):
-        cluster = [cluster,]
+        cluster = [cluster, ]
     for c in cluster:
         port = c.port
         if not c.port:
@@ -63,73 +63,35 @@ def send_user(user, cluster=None, ssh=True, pretend=False):
         ssh_user = c.username
         sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
         ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.hostname
-        if ssh:
-            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
-                    key_filename=ssh_file, look_for_keys=False)
-            for key in user.userkey_set:
-                shell = ssh.get_transport().open_session()
-                cmd = 'ctl-register add --key %s %s' % (key.key, user.username)
-                if not pretend:
-                    shell.exec_command(cmd)
+        hostname = c.hostname
+        if ssh:#ssh may not be enabled for testing
+            ssh.connect(hostname=hostname, username=ssh_user, port=port,
+                        key_filename=ssh_file, look_for_keys=False)
+            if not pretend:#for testing purposes do not execute
+                shell.exec_command(command)
+
+def send_user(user, cluster=None, ssh=True, pretend=False):
+    for key in user.userkey_set:
+        cmd = 'ctl-register add --key %s %s' % (key.key, user.username)
+        _send_command(cmd, cluster, ssh, pretend)
 
 def remove_user(user, cluster=None, ssh=True, pretend=False):
-    if cluster is None:
-        cluster = Cluster.objects.all()
-    if not isinstance(cluster, list):
-        cluster = [cluster,]
-    for c in cluster:
-        port = c.port
-        if not c.port:
-            port = 22
-        ssh = paramiko.SSHClient()
-        ssh_file = settings.SSH_KEY_FILE
-        ssh_passwd = settings.SSH_KEY_PASSWORD
-        ssh_user = c.username
-        sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
-        ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.hostname
-        if ssh:
-            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
-                    key_filename=ssh_file, look_for_keys=False)
-            shell = ssh.get_transport().open_session()
-            cmd = 'ctl-register remove %s' % user.username
-            if not pretend:
-                shell.exec_command(cmd)
+    cmd = 'ctl-register remove %s' % user.username
+    _send_command(cmd, cluster, ssh, pretend)
 
 def request_modules(ssh=True, pretend=False, request_all=False):
     """request all Modules of all Clusters of the Database"""
-    ssh = paramiko.SSHClient()
-    cluster = Cluster.objects.all()
-
-    for c in cluster:
-        port = c.port
-        if not c.port:
-            port = 22
-        #paramiko-based commands
-        ssh_file = settings.SSH_KEY_FILE
-        ssh_passwd = settings.SSH_KEY_PASSWORD
-        ssh_user = c.username
-        sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
-        ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.hostname
-        date = Components.objects.all().aggregate(Max('date_creation'))
-        date = date['date_creation__max']
-        # generate secure Token and append to url
-        url_token = _gen_sec_token(domain)
-        url = reverse('component_receive', args=[url_token])
-        # use ssh for testing if enabled, ssh is also used normally
-        if ssh:
-            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
-                    key_filename=ssh_file, look_for_keys=False)
-            shell = ssh.get_transport().open_session()
-            cmd = "ctl-component push"
-            if date and not request_all:
-                cmd += " --timestamp %s" % date.date()
-            cmd += " %s" % url
-            if not pretend:
-                shell.exec_command(cmd)
-            ModuleTokenValidation.create_token(url_token, c)
+    date = Components.objects.all().aggregate(Max('date_creation'))
+    date = date['date_creation__max']
+    # generate secure Token and append to url
+    url_token = _gen_sec_token(domain)
+    url = reverse('component_receive', args=[url_token])
+    cmd = "ctl-component push"
+    if date and not request_all:
+        cmd += " --timestamp %s" % date.date()
+    cmd += " %s" % url
+    _send_command(cmd, cluster, ssh, pretend)
+    ModuleTokenValidation.create_token(url_token, c)
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', )
 
