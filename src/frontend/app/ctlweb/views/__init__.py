@@ -3,6 +3,7 @@ from views import *
 from search import *
 from login import *
 from component import *
+from userkeyconfig import *
 from backend import *
 from django import *
 from django.http import HttpResponse, HttpResponseRedirect, Http404
