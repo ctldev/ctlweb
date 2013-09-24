@@ -52,6 +52,8 @@ def generate_control(name, host, user, ssh, exe, ci,
         exe_hash = hash_file(exe_file)
     ci = _build_ciline(ci)
     args = locals()
+    if author and not isinstance(author, str):  # happens e.g. in case of an merge.
+        args['author'] = ' '.join(author)
 
     control = textwrap.dedent("""\
                               [DEFAULT]
@@ -103,16 +105,19 @@ def hash_file(file, hash_type=None, block_size=512):
     """ Hashes a file like object, default hash function is hashlib.md5. """
     import hashlib
     import base64
+    import io
+    import tarfile
     if hash_type is None:
         hash_type = hashlib.md5
     hash_type = hash_type()
-    if 'buffer' in dir(file):  # if File has an underlying buffer switch to
-                               # that. If the filelike object is TextIO based
-                               # but doesn't support buffer, im ok with the
-                               # fact that the programm crashes.
-        file = file.buffer
+    read = None
+    if isinstance(file, io.BufferedIOBase) or isinstance(file, io.RawIOBase) \
+            or isinstance(file, tarfile.ExFileObject):
+        read = file.read
+    elif isinstance(file, io.TextIOBase):
+        read = file.buffer.read
     while True:
-        data = file.read(block_size)
+        data = read(block_size)
         if not data:
             break
         hash_type.update(data)
@@ -251,8 +256,8 @@ def merge_components(one, two):
 
     control_kwargs = _merge_configs(config_one, config_two)
 
-    if control_kwargs is None:
-        return False
+    if not control_kwargs:
+        raise ValueError("Can't merge components.")
 
     new_cis = {}  # key is the ci hash, value a filelike object with a filename
                   # in the attribute arcname

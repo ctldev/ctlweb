@@ -9,12 +9,7 @@ from database import Component
 
 
 def add(args):
-    comp = Component.add(args.package)
-    try:
-        comp.save()
-    except NoSuchTable:
-        comp.create_table()
-        comp.save()
+    Component.add(args.package)
 
 
 def remove(args):

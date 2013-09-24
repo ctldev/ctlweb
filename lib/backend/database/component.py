@@ -16,11 +16,17 @@ class Component(Database):
         self.c_id = name
         self.c_exe = exe
         self.c_exe_hash = exe_hash
+        self.__filename = False
 
-    @property
-    def _component_file(self):
+    def _component_file_getter(self):
         import os
+        if self.__filename: return self.__filename
         return os.path.join(Database.store, "%s.tgz" % self.c_id)
+
+    def _component_file_setter(self, val):
+        self.__filename = val
+
+    _component_file = property(_component_file_getter, _component_file_setter)
 
     @classmethod
     def create(cls, attr):
@@ -72,11 +78,19 @@ class Component(Database):
         # Create Database entry
         data = Component._unpack(component)
         comp = cls.create(data)
+        comp._component_file = component
         try:
             comp.save()
         except NoSuchTable:
             comp.create_table().save()
+        except ValueError as e:
+            Log.critcal('%s' % e.args[0])
+            return
+        except MergedWarning as e:
+            Log.info('Merged components')
+            return comp
         # Copy package to store
+        comp._component_file = None  # reset the component to default.
         import shutil
         try:
             target_name = comp._component_file
@@ -172,11 +186,9 @@ class Component(Database):
         with tarfile.open(self._component_file, 'r:gz') as one:
             with tarfile.open(opponent._component_file, 'r:gz') as two:
                 merged_file = merge_components(one, two)
-        if not merged_file:
-            Log.error('Was unable to merge components')
-            return
-        os.remove(self._component_file)
-        os.rename(merged_file, self._component_file)
+        os.remove(opponent._component_file)
+        os.rename(merged_file, opponent._component_file)
+        raise MergedWarning('Merged components')
 
     def _update(self, opponent):
         while True:
@@ -191,3 +203,6 @@ class Component(Database):
                 self.c_pk = opponent.c_pk
                 self.save()
                 return
+
+class MergedWarning(Exception):
+    pass
