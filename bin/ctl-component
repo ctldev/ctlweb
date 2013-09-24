@@ -18,7 +18,11 @@ def remove(args):
     except NoSuchTable:
         comp = None
     if comp:
-        comp.remove()
+        comp_log = comp.remove()
+        if comp_log:
+            Log.info('Removed component %s' % comp_log.name)
+        else:
+            Log.critical("Component wasn't deleted and no error was raised.")
     else:
         Log.error('%s was not found in Database' % args.component)
 
@@ -50,15 +54,23 @@ def overview(args):
 
 
 def push(args):
+    from util.log import Log
+    from util.util import push
+    from database.component import ComponentLog
+    Log.fileoutput()
     components = []
     try:
         components = Component.get(args.timestamp)
     except NoSuchTable:
         components = []
-    if components:
-        for c in components:
-            Log.info('Uploading %s to %s' % (c.c_id, args.url))
-            c.upload_to_web(args.url)
+    try:
+        complogs = ComponentLog.get(args.timestamp)
+    except NoSuchTable:
+        complogs = []
+
+    if components or complogs:
+        Log.info('Uploading to %s' % args.url)
+        push(args.url, components, complogs)
     else:
         Log.error('No components to upload')
 

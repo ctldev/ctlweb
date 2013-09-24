@@ -5,6 +5,53 @@ import sqlite3
 from util import Log
 
 
+class ComponentLog(Database):
+    """ Keeps track of deleted components. """
+    def __init__(self, name, exe_hash):
+        super().__init__()
+        self.c_name = name
+        self.c_exe_hash = exe_hash
+        self.c_id = -1
+
+    def save(self):
+        super().save()
+        if not self.c_id == self.c_pk:
+            self.c_id = self.c_pk
+            self.save()
+
+    @classmethod
+    def create(cls, attr):
+        """ attr is expected to be a dict with the following keys:
+            * c_name: The name of the killed component *RIP
+            * c_exe_hash: The dust and the ashes of the component.
+        """
+        cl = cls(attr['c_name'], attr['c_exe_hash'])
+        return cl
+
+    @classmethod
+    def add(cls, name, exe_hash):
+        """ Creates a new Comonent log and saves it. The new component log will
+        be returned.
+        """
+        Log.debug('Component_Log.add(): adding killed component.')
+        data = {'c_name': name,
+                'c_exe_hash': exe_hash}
+        cl = cls.create(data)
+        try:
+            cl.save()
+        except NoSuchTable:
+            cl.create_table().save()
+        return cl
+
+    @property
+    def name(self):
+        return self.c_name
+
+    @property
+    def hash(self):
+        return self.c_exe_hash
+
+
 class Component(Database):
 
     """ Is an component in the CTL-Database
@@ -33,15 +80,18 @@ class Component(Database):
         """ attr is expected to be an dict with the following keys:
             * c_id: Componentname
             * c_exe: Path where the executable can be found
+            * c_exe_hash: Hash of the exe file.
         """
         return cls(attr["c_id"], attr["c_exe"], attr["c_exe_hash"])
 
     def remove(self):
         """ Remove component with given name.
 
-        Returns True if the component successfully removed.
+        Returns ComponentLog if the component successfully removed.
         """
         Log.debug("Component.remove(): removing")
+        name = self.c_id
+        exe_hash = self.c_exe_hash
         super().remove()
         import os
         try:
@@ -49,15 +99,16 @@ class Component(Database):
         except IOError:
             Log.error("Component.remove(): unable to remove component file.")
             return False
-        return True
+        cl = ComponentLog.add(name, exe_hash)
+        return cl
 
     def upload_to_web(self, url):
         """ Upload the component to the given url
 
         """
+        Log.critical('upload_to_web() has been called. This function is deprecated')
         Log.debug("Uploading component to url %s" % url)
         import requests
-        from os import path
         manifest_file = self._component_file
         files = {'manifest': open(manifest_file, "rb")}
         r = requests.post(url, files=files)
