@@ -11,6 +11,8 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 class Components_Inline(admin.StackedInline):
     model = Components_Cluster
     extra = 0
+    max_num = 0
+    can_delete = False
 
 class ClusterAdmin(admin.ModelAdmin):
     """

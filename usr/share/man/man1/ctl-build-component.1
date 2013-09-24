@@ -1,0 +1,77 @@
+.TH ctl-build-component 1  "September 2013" Linux "User Manuals"
+
+.\"**********************************************************************
+
+.SH NAME
+ctl-build-component \- enables easy building of components    
+.SH SYNOPSIS
+.B ctl-build-component
+.RB [\| \-h \|]
+.RB [\| \-\-pkgversion \|
+.IR PKGVERSION \|]
+.RB [\| \-\-email \|
+.IR EMAIL \|
+[EMAIL ...]]
+.RB [\| \-u
+.IR User \|]
+.RB [\| \-\-hostname \|
+.IR HOSTNAME \|]
+.RB [\| \-p
+.IR Port \|]
+.IR NAME \|
+.IR INTERFACE \|
+.IR EXE \|
+.IR DESCRIPTION \| 
+.\".RB [\| \-\-version \|]
+.\" **********************************************************************
+
+.SH DESCRIPTION
+
+.BR ctl-build-component
+is a script that helps the ctl developer with building a ctlweb component. All
+requirements for a valid ctlweb component are checked and will be bound
+together creating a component without any need of a backend script. Easily
+portable due to its only usage of the standard python3 api.
+
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+ Prints a help message with all required/optional arguments and their meanings
+.TP
+.BI  \fB\-\-pkgversion\ \fIPKGVERSION
+Specify the version of the ctl component that is served
+.TP
+.BI  \fB\-\-email\ \fIEMAIL [EMAIL ...]
+Specify mail adress/adresses the author can be contacted with
+.TP
+.BI \-u\ \fIUSER \fR,\ \fB\-\-user\ \fIUSER
+Specify the user which shall be accessed. When not given, defaults to the
+currently logged in username of the OS of the script-user.
+.TP
+.BI \fB\-\-hostname\ \fIHOSTNAME
+Specify a hostname or an IP-adress where the component should be. When not
+given, defaults to the name of the PC.
+.TP
+.BI \-p\ \fIPORT \fR,\ \fB\-\-port\ \fIPORT
+Specify the port to be used for the ssh connection to this component. When not
+given, defaults to port 22 (standard ssh port)
+.\".TP
+.\".BI \-\-version
+.\"Prints the installed version of this command
+
+.\".SH FILES
+
+.\".SH ENVIRONMENT
+
+.\".SH DIAGNOSTICS
+
+.\".SH BUGS
+
+.SH AUTHOR
+Jörn Hameyer <>
+.SH "SEE ALSO"
+.BR ctl (1),
+.BR ctl-component (1),
+.BR ctl-genmanifest (1)
+
+
