@@ -2,9 +2,7 @@
 {% load i18n %}
 {% block title %}
   Component 
-  {% for name in component.components_cluster_set.all.distinct %}
-    {{ name }} {% if not forloop.last %}, {% endif %}
-  {% endfor %}
+    {{ component.names }}
 {% endblock title %}
 {% block content %}
 <div class="transbox">

@@ -5,19 +5,19 @@ from ctlweb.views import send_user, remove_user
 from django.db.models.signals import post_save, post_delete
 from ctlweb.models import Components, Components_Cluster
 
-#@receiver(post_save, sender=User)
-#def resend_user(sender, **kwargs):
-#    """
-#    Sends the saved User to all registered Clusters.
-#    """
-#    send_user(kwargs[u'instance'])
-#
-#@receiver(post_delete, sender=User)
-#def redelete_user(sender, **kwargs):
-#    """
-#    Deletes the User from all registered Clusters.
-#    """
-#    remove_user(kwargs[u'instance'])
+@receiver(post_save, sender=User)
+def resend_user(sender, **kwargs):
+    """
+    Sends the saved User to all registered Clusters.
+    """
+    send_user(kwargs[u'instance'])
+
+@receiver(post_delete, sender=User)
+def redelete_user(sender, **kwargs):
+    """
+    Deletes the User from all registered Clusters.
+    """
+    remove_user(kwargs[u'instance'])
 
 @receiver(post_save, sender=Components_Cluster)
 @receiver(post_delete, sender=Components_Cluster)
