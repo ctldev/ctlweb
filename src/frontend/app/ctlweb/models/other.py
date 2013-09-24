@@ -37,5 +37,5 @@ class ModuleTokenValidation(models.Model):
             except Cluster.DoesNotExist:
                 return False
         if self.cluster == cluster:
-            return (today <= self.date)
+            return (today <= self.expiration_date)
         return False
