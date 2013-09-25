@@ -164,6 +164,7 @@ def receive_modules(request, token):
     dict_response["delete_success"] = delete_success
     dict_response["comp_form"] = comp_form
     dict_response["delete_form"] = delete_form
+    dict_response["debug_mode"] = settings.DEBUG
     context = RequestContext(request, dict_response)
     return render_to_response('receive_components.html', context_instance=context)
 

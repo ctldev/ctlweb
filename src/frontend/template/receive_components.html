@@ -3,7 +3,7 @@
 Receive Components
 {% endblock title %}
 {% block content %}
-<div class="hidden">
+<div {% if not debug_mode %}class="hidden"{% endif%}>
   <form method="post" enctype="multipart/form-data">
 	{{ comp_form.as_p }}
 	{{ delete_form.as_p }}
