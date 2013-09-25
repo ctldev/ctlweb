@@ -16,6 +16,7 @@ urlpatterns = patterns('app.ctlweb.views',
         url(r'^administration/easy/$', 'index', name='administration_easy'),
         url(r'^administration/advanced/$', 'index', name='administration_advanced'),
         url(r'^impressum/$', 'impressum', name='impressum'),
+        url(r'^interface/(?P<int_id>\d+)/$', 'interface', name='interface'), 
 )
 
 urlpatterns += patterns('',
