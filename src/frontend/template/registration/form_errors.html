@@ -1,6 +1,7 @@
+{% load i18n %}
 {% if form.errors or form.non_field_errors %}
   <div class="alert alert-block alert-error fade in">
-    <p><strong>Oops! There were errors processing your form.</strong></p>
+    <p><strong>{% trans "Fehler bei der Verarbeitung Ihrer eingegebenen Daten." %}</strong></p>
     {% if form.non_field_errors %}
       <ul>
         {{ form.non_field_errors|unordered_list }}

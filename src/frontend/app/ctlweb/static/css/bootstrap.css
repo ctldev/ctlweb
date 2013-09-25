@@ -6100,3 +6100,8 @@ a.badge:hover {
 .affix {
   position: fixed;
 }
+
+.wide-modal {
+  width: 60%; 
+  left: 40%;
+}

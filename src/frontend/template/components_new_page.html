@@ -1,4 +1,4 @@
-{% load i18n %}
+ {% load i18n %}
 <br/>
 {% if not form == 1 %}
 <div class="page-header">
@@ -26,6 +26,7 @@
 	{% endif %}
   </blockquote>
 </div>
+{% endif %}
 	<div class="tabbable">
 	  <ul class="nav nav-tabs" id="viewSelection">
 		<li class="active">
@@ -41,7 +42,7 @@
 	  </ul>
 	  <div class="tab-content">
 		<div class="tab-pane active" id="interface">
-{% endif %}
+{# {% endif %} #}
 {# --------------- LEFT CONTENT SIDE --------------------------- #}
 <div class="tabbable tabs-left"> 
   {# Only required for left/right tabs #}
@@ -50,14 +51,13 @@
 			  {% for di in interfaces.object_list %}
 				<li>
 				  {% if di.is_direct %}
-					<a href="#i_{{ di.key }}" data-toogle="tab" 
-					  style="color: #006600" id="i_{{ di.key }}_list">
+					<a href="#i_{{ di.pk }}" data-toogle="tab" 
+					  style="color: #006600" id="i_{{ di.pk }}_list">
 				  {% else %}
-					<a href="#i_{{ di.key }}" data-toggle="tab" 
-					  id="i_{{ di.key }}_list">
+					<a href="#i_{{ di.pk }}" data-toggle="tab" 
+					  id="i_{{ di.pk }}_list">
 				  {% endif %}
-				  <strong>{{ di.name }}</strong><br />
-					  <small>{{ di.description }}</small>
+				  <strong>{{ di.name }}</strong>
 					</a>
 				  </li>
 				{% endfor %} {# di in... #}
@@ -74,14 +74,39 @@
 {# -------------------- RIGHT CONTENT SIDE -------------------- #}
 			<div class="tab-content content">
 			  {% for di in interfaces.object_list %}
-				<div class="tab-pane" id="i_{{ di.key }}">
+				<div class="tab-pane" id="i_{{ di.pk }}">
+				  <center>
+					<h3> {{ di.name }} </h3>
+				  </center>
+				  {% if see_ci %}
+				  <a href="#i_d_{{di.pk}}" role="button" class="btn" data-toggle="modal">{% trans "Details" %}</a>
+				  <div id="i_d_{{di.pk}}" class="modal hode fade wide-modal" tabindex="-1"
+					role="dialog" aria-labelledby="i_d_{{di.pk}}_modal"
+					  aria-hidden="true" style="display: none;">
+						<div class="modal-header">
+						  <button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true"> x </button>
+						  <h3 id="i_d_{{di.pk}}_modal">{{di.name}}</h3>
+						</div>
+						<div class="modal-body">
+						  <pre> {{di.ci}} </pre>
+						</div>
+						<div class="modal-footer">
+						  <button class="btn" data-dismiss="modal"
+							aria-hidden="true">
+							{% trans "Schließen" %}
+						  </button>
+						  <a href="{% url interface di.id %}" class="btn btn-primary">{% trans "Download" %}</a>
+						</div>
+				  </div>
+				  {% endif %}
 				  <center>
 					<b>
 					{% if not di.is_direct %}
 					  {% trans "Gefundene" %}
 					{% endif %}
-					  {% blocktrans with name=di.name %} 
-						Komponenten von {{ name }} 
+					  {% blocktrans %} 
+						Komponenten  
 					  {% endblocktrans %}
 					</b>
 				  </center>
@@ -92,11 +117,12 @@
 					  <blockquote>
 					  <strong>
 						<a href="{% url component c.id %}">
-						{{c.name}} <br />
+						{{ c }} <br />
 						</a>
 					  </strong>
 						<small>
-						  {{ c.brief_description }} <br />
+						  {% if see_description %} {{ c.brief_description }}
+						  <br /> {% endif %}
 						  <u>
 							{% blocktrans count counter=programmer|length %}
 							  Programmierer:
@@ -104,17 +130,8 @@
 							  Programmierer:
 							{% endblocktrans %}
 						  </u> 
-						  {% for pro in programmer %}
-							{% if pro.component == c %}
-							  {% if pro.email in u_programmer.email %}
-							  {# TODO Userprofillink einfügen #}
-								<a href="javascript:void(0)"> 
-								  {{ pro.email }}
-								</a>
-							  {% else %}
-								{{ pro.email }}
-							  {% endif %}
-							{% endif %}
+						  {% for pro in c.programmer_set.all %}
+						  {{ pro.email }}{% if not forloop.last %}, {% endif %}
 							{% endfor %}{# programmer #}
 						  </small>
 						</blockquote>
@@ -136,7 +153,7 @@
 		  <script type="text/javascript">
 			$(function() {
 				{# handle request when clicking on left side #}
-				$('#interfaceList a').click(function(e) {
+        $('#interfaceList>li>a').click(function(e) {
 				{# prevent href, generate new url and get new content #}
 				e.preventDefault();
 				var value = $(this).attr('href').substr(1);
@@ -153,12 +170,6 @@
 				item += "_list";
 			  }
 			  $('#'+item).tab('show');
-			  {# preventing bug: selecting wrong item by mistake #}
-			  $('#interfaceList .pagination a').click(function(e) {
-				var value = "";
-				var url = getModifiedUrlByGet("item", value);
-				window.history.pushState({}, null, url);
-			  });
 
 			  {% if not form == 0 %}
 			  {# interfaceList or componentList, depending on selection and if #}
@@ -185,7 +196,7 @@
 
 			});
 		  </script>
-{% if not form == 0 %}		
+{# {% if not form == 0 %} #}
 		</div>
 		<div class="tab-pane" id="component">
 			{% for sc in paged_components.object_list %}
@@ -194,11 +205,12 @@
 				<blockquote>
 					  <strong>
 						<a href="{% url component sc.id %}">
-						{{sc.name}} <br />
+						{{sc}} <br />
 						</a>
 					  </strong>
 					<small>
-				{{ sc.brief_description }} <br />
+					{% if see_description %} {{ sc.brief_description }} <br />
+					{% endif %}
 				  <u>
 					{% blocktrans count counter=programmer|length %}
 					  Programmierer:
@@ -206,18 +218,9 @@
 					  Programmierer:
 					{% endblocktrans %}
 				  </u> 
-				  {% for pro in programmer %}
-					{% if pro.component == sc %}
-					  {% if pro.email in u_programmer.email %}
-						{# TODO Userprofillink einfügen #}
-						<a href="javascript:void(0)"> 
-						  {{ pro.email }}
-						</a>
-					  {% else %}
-						{{ pro.email }}
-					  {% endif %}
-					{% endif %}
-				  {% endfor %} {# pro in... #}
+				  {% for pro in sc.programmer_set.all %}
+					{{ pro.email }}{% if not forloop.last %}, {% endif %}
+				  {% endfor %}{# programmer #}
 				</small>
 				</blockquote>		 
 			  </div>
@@ -234,4 +237,4 @@
 		</div>
 	  </div>  
 	</div>
-{% endif %}  
+	{# {% endif %} #}

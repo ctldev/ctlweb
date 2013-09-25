@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block title %}
-Home
+{% trans "Home" %}
 {% endblock title %}
 {% block content %}
 
@@ -10,8 +10,9 @@ Home
 	  <p>{% trans "Hier finden Sie DIE Komponenten" %} </p>
     <p>
     <a href="{% url components %}" class="btn btn-primary btn-large">
-    	Los geht's!
+	  {% trans "Los geht's!" %}
     </a>
     </p>
+    
     </div>
 {% endblock content %}

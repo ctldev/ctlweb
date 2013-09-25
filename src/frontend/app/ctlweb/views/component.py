@@ -10,6 +10,7 @@ from ctlweb.models import   Components, \
                             Interfaces, \
                             Programmer
 
+
 def component_detail(request, comp_id):
     """
     Übergibt die Componentdaten ans entsprechende Template weiter
@@ -20,29 +21,76 @@ def component_detail(request, comp_id):
         comp = Components.objects.get(pk=comp_id)
     except Components.DoesNotExist:
         raise Http404
-    homecluster = comp.homecluster.all().order_by('domain')
-    interface = Interfaces.objects.filter(components = comp)
-    emails = Programmer.objects.filter(component = comp)
-    userlist = User.objects.filter(email__in=emails.values_list('email'))
+#    if '.' in comp.description:
+#        descriptionparts = comp.description.split(". ")
+#        short_description = descriptionparts[0] + ". "
+#    else:
+#        short_description = comp.description[:255]
+    short_description = True
+    if comp.brief_description == comp.description:
+        short_description = None
 
     can_change = v_user.has_perm('ctlweb.change_components')
-    see_path = v_user.has_perm('ctlweb.can_see_path')
-    see_description = v_user.has_perm('components.can_see_description')
-    see_code = v_user.has_perm('ctlweb.can_see_code')
+    see_description = v_user.has_perm('ctlweb.can_see_description')
     see_homecluster = v_user.has_perm('ctlweb.can_see_homecluster')
     see_ssh_data = v_user.has_perm('ctlweb.can_see_ssh_data')
+    see_ci = v_user.has_perm('ctlweb.can_see_ci')
     dict_response = dict()
+    dict_response["short"] = short_description
     dict_response["user"] = v_user
     dict_response["component"] = comp
-    dict_response["homecluster"] = homecluster
-    dict_response["interfaces"] = interface
-    dict_response["programmer"] = emails
-    dict_response["users"] = userlist
     dict_response["can_change"] = can_change
-    dict_response["see_path"] = see_path
     dict_response["see_description"] = see_description
-    dict_response["see_code"] = see_code
-    dict_response["see_homecluster"] = see_homecluster
     dict_response["see_ssh_data"] = see_ssh_data
+    dict_response["see_ci"] = see_ci
+    dict_response["see_homecluster"] = see_homecluster
     context = RequestContext(request, dict_response)
     return render_to_response("comp_detail.html", context_instance=context)
+
+
+def interface(request, int_id):
+    
+    v_user = request.user
+    try: 
+        intf = Interfaces.objects.get(pk=int_id)
+    except Interfaces.DoesNotExist:
+        raise Http404
+    
+    see_ci = v_user.has_perm('ctlweb.can_see_ci')
+    dict_response = dict()
+    dict_response["see_ci"] = see_ci
+    dict_response["ci"] = intf.ci
+
+    context = RequestContext(request, dict_response)
+    response = HttpResponse(content_type='text/plain')
+    response = render_to_response("interface.txt", context_instance=context)
+    response['Content-Disposition'] = 'attachment; filename=' + intf.name + '.ci'
+    #print(dict_response["ci"])
+    return response
+
+
+"""def interface(request): 
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename="interface.txt"'
+    text_data = (
+            ('First row', 'Foo', 'Bar', 'Baz'),
+            ('Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"),
+        )
+
+    t = loader.get_template('interface.txt')
+    c = Context({
+        'data': text_data, 
+        })
+    response.write(t.render(c))
+    return response
+"""
+"""
+def interface(request): 
+    return render_to_response("interface.txt",
+        mimetype="text/plain", context_instance=RequestContext(request))
+"""
+
+
+
+
+

@@ -1,9 +1,10 @@
 {% extends "registration/registration_base.html" %}
+{% load i18n %}
 {% block title %}Ausloggen{% endblock %}
 {% block content %}
 <div class ="transbox">
-	Erfolgreich abgemeldet. 
+	{% trans "Erfolgreich abgemeldet." %} 
 
-	Zürück zur <a href="{% url index %}"> Hauptseite </a>. 
+	{% trans "Zurück zur" %}<a href="{% url index %}"> {% trans "Hauptseite" %} </a>. 
 </div>
 {% endblock %}

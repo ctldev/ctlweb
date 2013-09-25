@@ -38,34 +38,36 @@ class UserMethods(User):
         v_user = request.user        
         if request == None :
            super(User, self).save(*args, **kwargs)
-
-        user = User.objects.get(id=self.id)
-        if v_user.id == self.id :
-            # Änderungen der eigenen Informationen
-            if (self.is_active == user.is_active) and \
-                (self.is_staff == user.is_staff) and \
-                (self.is_superuser == user.is_superuser) :
-                super(User, self).save(*args,**kwargs)
-        else : # Änderung von fremden Daten
-            #active-staff-superuser
-            acstsu = User.objects.filter(is_active=True, 
-                                         is_staff=True,
-                                         is_superuser=True)
-            if acstsu.count() > 1 :
-                super(User, self).save(*args, **kwargs)
-            else :
-                if acstsu.filter(id = self.id).count() == 0 :
+        try :
+            user = User.objects.get(id=self.id)
+            if v_user.id == self.id :
+                # Änderungen der eigenen Informationen
+                if (self.is_active == user.is_active) and \
+                    (self.is_staff == user.is_staff) and \
+                    (self.is_superuser == user.is_superuser) :
+                    super(User, self).save(*args,**kwargs)
+            else : # Änderung von fremden Daten
+                #active-staff-superuser
+                acstsu = User.objects.filter(is_active=True, 
+                                             is_staff=True,
+                                             is_superuser=True)
+                if acstsu.count() > 1 :
                     super(User, self).save(*args, **kwargs)
+                else :
+                    if acstsu.filter(id = self.id).count() == 0 :
+                        super(User, self).save(*args, **kwargs)
 
-                #Hinzufügen von Status
-        if not user.is_superuser and self.is_superuser :
-            self.is_active = True
-            self.is_staff = True
-            super(User, self).save(*args, **kwargs)
-        elif not user.is_staff and self.is_staff :
-            self.is_active = True
-            super(User, self).save(*args, **kwargs)
-        elif not user.is_active and self.is_active :
+                    #Hinzufügen von Status
+            if not user.is_superuser and self.is_superuser :
+                self.is_active = True
+                self.is_staff = True
+                super(User, self).save(*args, **kwargs)
+            elif not user.is_staff and self.is_staff :
+                self.is_active = True
+                super(User, self).save(*args, **kwargs)
+            elif not user.is_active and self.is_active :
+                super(User, self).save(*args, **kwargs)
+        except :
             super(User, self).save(*args, **kwargs)
 
     class Meta:

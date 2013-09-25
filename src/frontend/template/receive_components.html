@@ -3,16 +3,16 @@
 Receive Components
 {% endblock title %}
 {% block content %}
-<div class="hidden">
-  <form method="post">
+<div {% if not debug_mode %}class="hidden"{% endif%}>
+  <form method="post" enctype="multipart/form-data">
 	{{ comp_form.as_p }}
-	{{ inter_form.as_p }}
+	{{ delete_form.as_p }}
   </form>
 </div>
 <div id="component_success">
   {{ component_success }}
 </div>
-<div id="interface_success">
-  {{ interface_success }}
+<div id="delete_success">
+  {{ delete_success }}
 </div>
 {% endblock %}

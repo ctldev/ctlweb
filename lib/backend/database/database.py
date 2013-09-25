@@ -196,7 +196,7 @@ class Database:
 
     def _query_values(self):
         attributes = self.get_attributes()
-        values = {'adapter': self,
+        values = {'adapter': self.__conform__(sqlite3.PrepareProtocol),
                   }
         for i in attributes:
             if i == 'c_pk':
@@ -234,14 +234,20 @@ class Database:
         for i in attributes:
             if i == 'c_pk':
                 continue
-            sql += ", " + i
-            sql += " = '" + str(self[i]) + "'"
+            sql += """, 
+                """ + i
+            sql += " = ':" + i + "'"
         values['c_pk'] = self.c_pk
-        sql = "UPDATE " + table + """
-                SET
+        sql = "UPDATE " + table + """ SET
                 date = (strftime('%s', 'now')),
                 c_id = :c_id,
-                adapter = :adapter """ + sql + """
+                adapter = :adapter""" + sql
+        old_object = self.__class__.get_exactly(self.c_pk, 'c_pk')
+        if self.c_id == old_object.c_id:
+            sql += """
+                WHERE c_id = :c_id """
+        else:
+            sql += """
                 WHERE c_pk = :c_pk """
         return sql, values
 
@@ -277,8 +283,10 @@ class Database:
             self.c_pk = cursor.lastrowid
         except sqlite3.IntegrityError:
             sql, values = self._update_query()
-            Log.debug("Database.save(): %s as update query with %s as dict" %
-                      (sql, values))
+            Log.debug("Database.save(): %s is old object" %
+                          self.__class__.get_exactly(self.c_pk, 'c_pk'))
+            Log.debug("Database.save(): %s as update query with %s as dict" % 
+                          (sql, values))
             cursor.execute(sql, values)
             Database.db_connection.commit()
         except sqlite3.OperationalError:
