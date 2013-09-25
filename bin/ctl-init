@@ -2,6 +2,7 @@
 import os
 import argparse
 
+from util.log import Log
 from util.parsing import commit_settings
 from util.parsing import parent_parser
 from database import Component
@@ -17,6 +18,7 @@ def main():
 
     args = parser.parse_args()
     commit_settings(args)
+    Log.fileoutput()
 
     ctl_call = os.getenv('SSH_ORIGINAL_COMMAND')
     if not ctl_call:
@@ -27,7 +29,7 @@ def main():
     try:
         comp = Component.get_exactly(ctl_cmd)
     except (NoSuchTable, InstanceNotFoundError):
-        print('Component not found')
+        Log.warning('Component not found')
         exit(1)
     comp.execute(ctl_call)
 
