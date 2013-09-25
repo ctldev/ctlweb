@@ -12,6 +12,8 @@ class Components_Inline(admin.StackedInline):
     model = Components_Cluster
     readonly_fields = ('name', 'component')
     extra = 0
+    max_num = 0
+    can_delete = False
 
 class ClusterAdmin(admin.ModelAdmin):
     """

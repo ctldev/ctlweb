@@ -2,9 +2,7 @@
 {% load i18n %}
 {% block title %}
   Component 
-  {% for name in component.components_cluster_set.all.distinct %}
-    {{ name }} {% if not forloop.last %}, {% endif %}
-  {% endfor %}
+    {{ component.names }}
 {% endblock title %}
 {% block content %}
 <div class="transbox">
@@ -15,7 +13,7 @@
     {% if see_description %}  
     {% if short %}
     <blockquote id="description_short">
-      {{ short }} [...]
+      {{ component.brief_description }} [...]
     </blockquote>
     {% endif %}
     <blockquote id="description_long" {% if short %}class="hidden"{% endif %}>
@@ -43,7 +41,7 @@
     {% for i in component.interfaces_set.all %}
       {% if see_ci %}
       <a href="#id_ifc_{{ i.id }}" data-toggle="modal">{{ i.name }}</a>{% if not forloop.last %}, {% endif %}
-      <div id="id_ifc_{{ i.id }}" class="modal hode fade" tabindex="-1"
+      <div id="id_ifc_{{ i.id }}" class="modal hode fade wide-modal" tabindex="-1"
           role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-header">
           <button type="button" class="close"
@@ -65,8 +63,8 @@
         </div>
       </div>
       {% else %}
-      {{ i.name }}
-      {% endif %}
+      {{ i.name }}{% if not forloop.last %}, {% endif %} 
+	  {% endif %}
     {% endfor %}
     </dd>
     <dt>
@@ -78,7 +76,7 @@
     </dt>
     <dd>
       {% for p in component.programmer_set.all %}
-        {{ p.email }} {% if not forloop.last %}, {% endif %}
+        {{ p.email }}{% if not forloop.last %}, {% endif %}
       {% endfor %}
     </dd>
     

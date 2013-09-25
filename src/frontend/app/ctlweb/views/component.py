@@ -21,12 +21,13 @@ def component_detail(request, comp_id):
         comp = Components.objects.get(pk=comp_id)
     except Components.DoesNotExist:
         raise Http404
-    if '.' in comp.description:
-        descriptionparts = comp.description.split(". ")
-        short_description = descriptionparts[0] + ". "
-    else:
-        short_description = comp.description[:255]
-    if short_description == comp.description:
+#    if '.' in comp.description:
+#        descriptionparts = comp.description.split(". ")
+#        short_description = descriptionparts[0] + ". "
+#    else:
+#        short_description = comp.description[:255]
+    short_description = True
+    if comp.brief_description == comp.description:
         short_description = None
 
     can_change = v_user.has_perm('ctlweb.change_components')

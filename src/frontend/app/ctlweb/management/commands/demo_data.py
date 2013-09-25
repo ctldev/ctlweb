@@ -39,7 +39,8 @@ class Command(BaseCommand):
         self.i2 = Interfaces(name="Grundlagen", ci_hash="02",
                 ci="Quellcode I2")
         self.i3 = Interfaces(name="Addition", ci_hash="03",
-                ci="Quellcode I3")
+                ci="aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaa" \
+                +"\n alle meine entchen schwimmen auf dem See")
         
         self.i1.save()
         self.i2.save()

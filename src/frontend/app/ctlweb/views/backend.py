@@ -5,7 +5,6 @@ import hashlib
 import time
 import datetime
 import os
-import zipfile
 import tarfile
 import re
 from ConfigParser import SafeConfigParser
@@ -34,7 +33,7 @@ class CTLMissingHostKeyPolicy(paramiko.MissingHostKeyPolicy):
         m = re.match('\[(\S+)\]:\d+$', hostname)
         if m:
             host = m.group(1)
-        q_query = (Q(ip__exact=host)|Q(domain__exact=host))
+        q_query = Q(hostname__exact=host)
         query = Cluster.objects.filter(q_query)
         if query.exists():
             client._host_keys.add(hostname, key.get_name(), key)
@@ -48,11 +47,12 @@ def _gen_sec_token(domain):
     token = hashlib.sha256(secret + domain + hextime).hexdigest()
     return token
 
-def send_user(user, cluster=None, ssh=True, pretend=False):
+def _send_command(command, cluster=None, ssh=True, pretend=False):
     if cluster is None:
         cluster = Cluster.objects.all()
-    if not isinstance(cluster, list):
-        cluster = [cluster,]
+    import collections
+    if not isinstance(cluster, collections.Iterable):
+        cluster = [cluster, ]
     for c in cluster:
         port = c.port
         if not c.port:
@@ -63,90 +63,43 @@ def send_user(user, cluster=None, ssh=True, pretend=False):
         ssh_user = c.username
         sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
         ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.ip
-        if domain is None:
-            domain = "" + c.domain
-        if ssh:
-            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
-                    key_filename=ssh_file, look_for_keys=False)
-            shell = ssh.invoke_shell(term="vt220")
-            response = ""
-            if pretend:
-                response += _send_message(shell, "s")
-            response += _send_message(shell, "2")
-            response += _send_message(shell, user.username)
-            for key in user.userkey_set:
-                response += send_message(shell, key.key)
-            response += _send_message(shell, "q")
-            print response
-            ssh.close
+        hostname = c.hostname
+        if ssh:#ssh may not be enabled for testing
+            ssh.connect(hostname=hostname, username=ssh_user, port=port,
+                        pkey=sshkey, look_for_keys=False)
+            shell = ssh.get_transport().open_session()
+            if not pretend:#for testing purposes do not execute
+                shell.exec_command(command)
+
+def send_user(user, cluster=None, ssh=True, pretend=False):
+    for key in user.userkeys_set.all():
+        cmd = 'ctl-register add --key %s %s' % (key.key, user.username)
+        _send_command(cmd, cluster, ssh, pretend)
 
 def remove_user(user, cluster=None, ssh=True, pretend=False):
+    cmd = 'ctl-register remove %s' % user.username
+    _send_command(cmd, cluster, ssh, pretend)
+
+def request_modules(ssh=True, cluster=None, pretend=False, request_all=False):
+    """request all Modules of all Clusters of the Database"""
     if cluster is None:
         cluster = Cluster.objects.all()
-    if not isinstance(cluster, list):
-        cluster = [cluster,]
+    import collections
+    if not isinstance(cluster, collections.Iterable()):
+        cluster = [cluster, ]
     for c in cluster:
-        port = c.port
-        if not c.port:
-            port = 22
-        ssh = paramiko.SSHClient()
-        ssh_file = settings.SSH_KEY_FILE
-        ssh_passwd = settings.SSH_KEY_PASSWORD
-        ssh_user = c.username
-        sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
-        ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.ip
-        if domain is None:
-            domain = "" + c.domain
-        if ssh:
-            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
-                    key_filename=ssh_file, look_for_keys=False)
-            shell = ssh.invoke_shell(term="vt220")
-            response = ""
-            if pretend:
-                response += _send_message(shell, "s")
-            response += _send_message(shell, "3")
-            response += _send_message(shell, user.username)
-            response += _send_message(shell, "q")
-            print response
-            ssh.close
-
-def request_modules(ssh=True, pretend=False, request_all=False):
-    """request all Modules of all Clusters of the Database"""
-    ssh = paramiko.SSHClient()
-    cluster = Cluster.objects.all()
-
-    for c in cluster:
-        port = c.port
-        if not c.port:
-            port = 22
-        #paramiko-based commands
-        ssh_file = settings.SSH_KEY_FILE
-        ssh_passwd = settings.SSH_KEY_PASSWORD
-        ssh_user = c.username
-        sshkey = paramiko.RSAKey.from_private_key_file(ssh_file, ssh_passwd)
-        ssh.set_missing_host_key_policy(CTLMissingHostKeyPolicy())
-        domain = c.ip
-        if domain is None:
-            domain = "" + c.domain
         date = Components.objects.all().aggregate(Max('date_creation'))
         date = date['date_creation__max']
         # generate secure Token and append to url
+        domain = settings.SITE_DOMAIN
         url_token = _gen_sec_token(domain)
-        url = reverse('component_receive', args=[url_token])
-        # use ssh for testing if enabled, ssh is also used normally
-        if ssh:
-            ssh.connect(hostname=domain, username=ssh_user, port=c.port,
-                    key_filename=ssh_file, look_for_keys=False)
-            shell = ssh.get_transport().open_session()
-            cmd = "ctl-component push"
-            if date and not request_all:
-                cmd += " --timestamp %s" % date.date()
-            cmd += " %s" % url
-            if not pretend:
-                shell.exec_command(cmd)
-            ModuleTokenValidation.create_token(url_token, c)
+        url = domain + reverse('component_receive', args=[url_token])
+        cmd = "ctl-component push"
+        if date and not request_all:
+            cmd += " --timestamp %s" % date.date()
+        cmd += " %s" % url
+        _send_command(cmd, cluster=c, ssh=ssh, pretend=pretend)
+        ModuleTokenValidation.create_token(url_token, c)
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', )
 
@@ -214,20 +167,22 @@ def receive_modules(request, token):
 def _import_manifest(filename, cluster):
     """handle the uploaded module-file, return True on succes, else False"""
     temp_path = '/tmp/'
-    with tarfile.open(fileobj=filename, mode='r:gz') as myzip:
-        control_file = myzip.extractfile("control")
+    with tarfile.open(fileobj=filename, mode='r:gz') as mytar:
+        control_file = mytar.extractfile("control")
         parser = SafeConfigParser()
         parser.readfp(control_file)
 #        if cluster.domain is not None:
 #            if cluster.domain == parser.get("DEFAULT", "host"):
 #                return False
-        doc_file = myzip.extractfile("description.txt")
+        doc_file = mytar.extractfile("description.txt")
         desc = doc_file.read()
-        ci_name = parser.get('DEFAULT', 'ci')
-        ci_file=myzip.extractfile(ci_name)
-        ci = ci_file.read()
-        ci_hash = _hash_file(myzip.extractfile(ci_name, 'rb'))
-        domain = settings.SITE_DOMAIN
+        ci_names = _split_ciline(parser.get('DEFAULT', 'ci'))
+        interfaces = []
+        for ci_name in ci_names:
+            ci_file = mytar.extractfile(ci_name)
+            ci = ci_file.read()
+            ci_hash = _hash_file(mytar.extractfile(ci_name))
+            interfaces.append((ci_name, ci, ci_hash,))
         name = parser.get("DEFAULT", "name")
         exe_hash = parser.get("DEFAULT", "exe_hash")
         path = parser.get('DEFAULT', 'exe')
@@ -246,15 +201,16 @@ def _import_manifest(filename, cluster):
                                           cluster=cluster, name=name)
         comp_cluster.save()
         from os.path import splitext, basename
-        interface_name = splitext(basename(ci_name))[0]
-        interface, created = Interfaces.objects.get_or_create(ci_hash=ci_hash)
-        if created:
-            interface.name = interface_name
-            interface.ci = ci
-        interface.save()
-        inter_comp = Interfaces_Components(interface=interface,
-                component=component)
-        inter_comp.save()
+        for ci_name, ci, ci_hash in interfaces:
+            interface_name = splitext(basename(ci_name))[0]
+            interface, created = Interfaces.objects.get_or_create(ci_hash=ci_hash)
+            if created:
+                interface.name = interface_name
+                interface.ci = ci
+            interface.save()
+            inter_comp = Interfaces_Components(interface=interface,
+                    component=component)
+            inter_comp.save()
         if parser.has_option('DEFAULT', 'author'):
             authors = parser.get('DEFAULT', 'author').split(' ')
             for author in authors:
@@ -269,7 +225,59 @@ def _hash_file(file_object, hashtype=None, block_size=512):
     if not hashtype:
         import hashlib
         hashtype = hashlib.md5()
-    for data in iter(lambda: f.read(block_size)):
+    for data in _iter_read(file_object, block_size):
         hashtype.update(data)
     import base64
     return base64.b64encode(hashtype.digest()).decode('utf8')
+
+def _iter_read(f, block_size):
+    yield f.read(block_size)
+
+def _token_unescape(string, i):
+    return None, string[:i - 1] + string[i:]
+
+
+def _token_break(string, i):
+    return string[:i], string[i + 1:]
+
+
+def _lex_analysis(line, token_dict):
+    in_token = False
+    for i in range(len(line)):
+        if in_token:
+            token_dict[i] = line[i]
+            in_token = False
+            continue
+        if ' ' == line[i]:
+            token_dict[i] = '\0'
+        if '\\' == line[i]:
+            in_token = True
+    if in_token:  # conifgparser eliminates tailing spaces, this is fixed here
+        line = line + " "
+        token_dict[len(line) - 1] = " "
+    return line
+
+
+def _split_ciline(ciline):
+    """ Splits the ciline by its cis and returns the clean cis in a tuple. """
+    # All tokens are needed to be escaped
+    token_action = {'\\': _token_unescape,  # text backlash
+                    ' ': _token_unescape,   # text space
+                    '\0': _token_break,     # break
+                    }
+    token = {}  # the position and kind of the token is stored here.
+    ciline = _lex_analysis(ciline, token)
+    variance = 0  # because one token has the size of two, a difference needs
+                  # to be corrected with this variable.
+    cis = []
+    for pos, typ in iter(sorted(token.items())):  # parsing
+        current_token = token[pos]
+        pos = pos - variance  # difference compensation
+        ci, ciline = token_action[current_token](ciline, pos)
+        if ci is not None:
+            cis.append(ci)
+            variance = pos + variance
+        variance += 1
+    else:
+        cis.append(ciline)
+    return tuple(cis)

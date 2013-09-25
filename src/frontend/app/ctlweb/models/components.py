@@ -12,6 +12,7 @@ class Components(models.Model):
     Stellt die Methoden set_active und set_inactive zur Verfügung.
 
     """
+    names = models.TextField(_("Namen"), blank=True, null=True)
     description = models.TextField(_("Beschreibung"))
     date = models.DateTimeField(_(u"Zuletzt geändert am"), auto_now=True)
     date_creation = models.DateTimeField(_("Erstellungsdatum"),\
@@ -40,17 +41,17 @@ class Components(models.Model):
         if User.has_perm("can_set_active"):
             self.is_active=False
 
-    def save(self, 
-            *args, 
-            **kwargs):
-        self.is_active = False
-        super(Components, self).save(*args, **kwargs)
+    @property
+    def brief_description(self):
+        if '.' in self.description:
+            descriptionparts = self.description.split(". ")
+            short_description = descriptionparts[0] + ". "
+        else:
+            short_description = self.description[:255]
+        return short_description
 
     def __unicode__(self):
-        namelist = self.components_cluster_set.values_list('name',
-                flat=True).distinct().order_by('name')
-        namestring = ', '.join(namelist)
-        return namestring #+ '  -  ' + self.version
+        return self.names
 
 class Components_Cluster(models.Model):
     """
