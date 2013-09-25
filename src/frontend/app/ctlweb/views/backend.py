@@ -33,7 +33,7 @@ class CTLMissingHostKeyPolicy(paramiko.MissingHostKeyPolicy):
         m = re.match('\[(\S+)\]:\d+$', hostname)
         if m:
             host = m.group(1)
-        q_query = (Q(ip__exact=host)|Q(domain__exact=host))
+        q_query = Q(hostname__exact=host)
         query = Cluster.objects.filter(q_query)
         if query.exists():
             client._host_keys.add(hostname, key.get_name(), key)
@@ -50,7 +50,8 @@ def _gen_sec_token(domain):
 def _send_command(command, cluster=None, ssh=True, pretend=False):
     if cluster is None:
         cluster = Cluster.objects.all()
-    if not isinstance(cluster, list):
+    import collections
+    if not isinstance(cluster, collections.Iterable):
         cluster = [cluster, ]
     for c in cluster:
         port = c.port
@@ -65,12 +66,13 @@ def _send_command(command, cluster=None, ssh=True, pretend=False):
         hostname = c.hostname
         if ssh:#ssh may not be enabled for testing
             ssh.connect(hostname=hostname, username=ssh_user, port=port,
-                        key_filename=ssh_file, look_for_keys=False)
+                        pkey=sshkey, look_for_keys=False)
+            shell = ssh.get_transport().open_session()
             if not pretend:#for testing purposes do not execute
                 shell.exec_command(command)
 
 def send_user(user, cluster=None, ssh=True, pretend=False):
-    for key in user.userkey_set:
+    for key in user.userkeys_set.all():
         cmd = 'ctl-register add --key %s %s' % (key.key, user.username)
         _send_command(cmd, cluster, ssh, pretend)
 
@@ -78,19 +80,26 @@ def remove_user(user, cluster=None, ssh=True, pretend=False):
     cmd = 'ctl-register remove %s' % user.username
     _send_command(cmd, cluster, ssh, pretend)
 
-def request_modules(ssh=True, pretend=False, request_all=False):
+def request_modules(ssh=True, cluster=None, pretend=False, request_all=False):
     """request all Modules of all Clusters of the Database"""
-    date = Components.objects.all().aggregate(Max('date_creation'))
-    date = date['date_creation__max']
-    # generate secure Token and append to url
-    url_token = _gen_sec_token(domain)
-    url = reverse('component_receive', args=[url_token])
-    cmd = "ctl-component push"
-    if date and not request_all:
-        cmd += " --timestamp %s" % date.date()
-    cmd += " %s" % url
-    _send_command(cmd, cluster, ssh, pretend)
-    ModuleTokenValidation.create_token(url_token, c)
+    if cluster is None:
+        cluster = Cluster.objects.all()
+    import collections
+    if not isinstance(cluster, collections.Iterable()):
+        cluster = [cluster, ]
+    for c in cluster:
+        date = Components.objects.all().aggregate(Max('date_creation'))
+        date = date['date_creation__max']
+        # generate secure Token and append to url
+        domain = settings.SITE_DOMAIN
+        url_token = _gen_sec_token(domain)
+        url = domain + reverse('component_receive', args=[url_token])
+        cmd = "ctl-component push"
+        if date and not request_all:
+            cmd += " --timestamp %s" % date.date()
+        cmd += " %s" % url
+        _send_command(cmd, cluster=c, ssh=ssh, pretend=pretend)
+        ModuleTokenValidation.create_token(url_token, c)
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', )
 
@@ -172,7 +181,7 @@ def _import_manifest(filename, cluster):
         for ci_name in ci_names:
             ci_file = mytar.extractfile(ci_name)
             ci = ci_file.read()
-            ci_hash = _hash_file(mytar.extractfile(ci_name, 'rb'))
+            ci_hash = _hash_file(mytar.extractfile(ci_name))
             interfaces.append((ci_name, ci, ci_hash,))
         name = parser.get("DEFAULT", "name")
         exe_hash = parser.get("DEFAULT", "exe_hash")
@@ -216,10 +225,13 @@ def _hash_file(file_object, hashtype=None, block_size=512):
     if not hashtype:
         import hashlib
         hashtype = hashlib.md5()
-    for data in iter(lambda: f.read(block_size)):
+    for data in _iter_read(file_object, block_size):
         hashtype.update(data)
     import base64
     return base64.b64encode(hashtype.digest()).decode('utf8')
+
+def _iter_read(f, block_size):
+    yield f.read(block_size)
 
 def _token_unescape(string, i):
     return None, string[:i - 1] + string[i:]
