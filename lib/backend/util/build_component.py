@@ -1,0 +1,1 @@
+../../../bin/ctl-build-component

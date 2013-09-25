@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 import unittest
-import sqlite3
 
 import os
 import sys
 
 lib_path = os.getcwd() + "/../../lib/backend"
-sys.path.append( lib_path )
+sys.path.append(lib_path)
 from database.user import User
 from database.database import Database
 from database.database import NoSuchTable
-from util import Log
+
 
 class UserTest(unittest.TestCase):
     """ Tests for user.py
@@ -28,7 +27,7 @@ class UserTest(unittest.TestCase):
         return conffile
 
     def setUp(self):
-        Database.db_file = None # else the runtime destroys testsing framework
+        Database.db_file = None  # else the runtime destroys testsing framework
         Database(self.gentest_config())
         self.user = User("Douglas")
         self.connection = Database.db_connection
@@ -45,19 +44,20 @@ class UserTest(unittest.TestCase):
                 WHERE name = 'User';""")
         table_exists = False
         result = self.cursor.fetchone()
-        self.assertFalse(result == None,
-                "Table user could not been found")
+        self.assertFalse(result is None,
+                         "Table user could not been found")
         for i in result:
-            if 'User' in i: table_exists = True
+            if 'User' in i:
+                table_exists = True
         self.assertTrue(table_exists)
 
     def test_drop_table(self):
         self.user.create_table()
         self.user.drop_table()
         self.cursor.execute("""SELECT name FROM sqlite_master
-                WHERE name = 'User';""")
-        self.assertTrue(self.cursor.fetchone() == None, 
-                "Database could not been droped")
+                            WHERE name = 'User';""")
+        self.assertTrue(self.cursor.fetchone() is None,
+                        "Database could not been droped")
 
     def test_getitem(self):
         self.user.create_table()
@@ -75,7 +75,7 @@ class UserTest(unittest.TestCase):
         self.assertTrue("c_id" in attrs)
 #        self.assertTrue("c_pubkey" in attrs)
         self.assertFalse("__doc__" in attrs)
-        
+
     def test_save(self):
         with self.assertRaises(NoSuchTable):
             self.user.save()
@@ -94,7 +94,7 @@ class UserTest(unittest.TestCase):
                 WHERE c_id = 'Douglas';""")
         result = self.cursor.fetchone()
         self.assertIsNotNone(result,
-                "Couldn't read data from database")
+                             "Couldn't read data from database")
         result = tuple(result)
         self.assertEqual(result[3], 'Douglas')
 
@@ -106,8 +106,8 @@ class UserTest(unittest.TestCase):
         self.user.remove()
         self.cursor.execute("""SELECT * FROM User
                             WHERE c_id = 'Douglas';""")
-        self.assertTrue(self.cursor.fetchone() == None, 
-                "Removing Entries has failed")
+        self.assertTrue(self.cursor.fetchone() is None,
+                        "Removing Entries has failed")
 
     def test_get(self):
         self.user.create_table()
@@ -125,6 +125,13 @@ class UserTest(unittest.TestCase):
         user = User.get_exactly(self.user.c_id)
         self.assertEqual(user, self.user, "Could not deserialize data")
 
+    def test_override(self):
+        """ This function tests the default override procedure. """
+        self.user.create_table()
+        self.user.save()
+        user2 = User('Douglas')
+        user2.save()
+
     def test_pubkeys(self):
         from collections import Counter
         self.user.create_table()
@@ -133,12 +140,13 @@ class UserTest(unittest.TestCase):
         self.user.add_key('second_pubkey')
         self.user.add_key('third_pubkey')
         self.assertEqual(Counter(['pubkey', 'second_pubkey', 'third_pubkey']),
-                         Counter([i.c_key for i in self.user.get_keys()]), 
+                         Counter([i.c_key for i in self.user.get_keys()]),
                          'did not save keys')
         user = User.get_exactly(self.user.c_id)
         self.assertEqual(Counter(['pubkey', 'second_pubkey', 'third_pubkey']),
-                         Counter([i.c_key for i in user.get_keys()]), 
+                         Counter([i.c_key for i in user.get_keys()]),
                          'did not load keys')
+
 
 class TestAddUser(unittest.TestCase):
     def setUp(self):
@@ -158,5 +166,7 @@ class TestAddUser(unittest.TestCase):
 
     def test_remove(self):
         pass
+
+
 if __name__ == "__main__":
     unittest.main()

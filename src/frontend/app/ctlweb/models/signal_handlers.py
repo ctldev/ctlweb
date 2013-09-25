@@ -36,6 +36,9 @@ def components_renamed(sender, **kwargs):
 
 @receiver(pre_save, sender=Components)
 def components_active(sender, **kwargs):
+    """
+    Set is_active "False"
+    """
         comp = kwargs[u'instance']
         if comp in Components.objects.all():
             comp2 = Components.objects.get(id=comp.id)

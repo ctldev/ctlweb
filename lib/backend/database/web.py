@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import sqlite3
 from .access import Access
+
 
 class Web(Access):
     """ An registerd ctlweb instance
@@ -19,3 +19,11 @@ class Web(Access):
 
     def _keyline(self):
         return 'command="bash -lc ctl-webinit" {0}'
+
+    def save(self):
+        from .database import InstanceAlreadyExists
+        try:
+            super().save()
+        except InstanceAlreadyExists as e:
+            self.c_pk = e.original().c_pk
+            super().save()

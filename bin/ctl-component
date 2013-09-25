@@ -9,12 +9,7 @@ from database import Component
 
 
 def add(args):
-    comp = Component.add(args.package)
-    try:
-        comp.save()
-    except NoSuchTable:
-        comp.create_table()
-        comp.save()
+    Component.add(args.package)
 
 
 def remove(args):
@@ -68,6 +63,19 @@ def push(args):
         Log.error('No components to upload')
 
 
+def merge(args):
+    from util.build_component import merge_components
+    import os
+    import shutil
+    import tarfile
+    with tarfile.open(args.component[0].name, 'r:gz') as first:
+        with tarfile.open(args.component[1].name, 'r:gz') as second:
+            output = merge_components(first, second)
+    with open(output, 'rb') as src:
+        shutil.copyfileobj(src, args.output)
+    os.remove(output)
+
+
 def main():
     parser = argparse.ArgumentParser(description='Manage ctl components.',
                                      parents=[parent_parser])
@@ -119,6 +127,24 @@ def main():
                              help='Get only ctlweb components newer than'
                                   + ' timestamp')
     push_parser.set_defaults(func=push)
+      #######################
+     # ctl-component merge #
+    #######################
+    merge_parser = subparser.add_parser('merge',
+                                        parents=[parent_parser],
+                                        help='Merge two ctlweb components.')
+    merge_parser.add_argument('component',
+                              type=open,
+                              nargs=2,
+                              metavar="CTLWEB-COMPONENT",
+                              help="ctlweb component file to be merged.")
+    default_output = './merged.tgz'
+    merge_parser.add_argument('-o', '--output',
+                              type=argparse.FileType('wb'),
+                              default='%s' % default_output,
+                              help='Output file (default="%s")' %
+                                   default_output)
+    merge_parser.set_defaults(func=merge)
     # Workaround for Python 3.2-3.4 Issue #9694 'optional arguments'
     parser._optionals.title = 'options'
 

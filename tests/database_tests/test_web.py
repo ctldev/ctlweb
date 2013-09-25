@@ -5,9 +5,10 @@ import sys
 import sqlite3
 
 lib_path = os.getcwd() + "/../../lib/backend"
-sys.path.append( lib_path )
+sys.path.append(lib_path)
 from database.web import Web
 from database.database import Database
+
 
 class TestWeb(unittest.TestCase):
 
@@ -24,7 +25,7 @@ class TestWeb(unittest.TestCase):
         return conffile
 
     def setUp(self):
-        Database.db_file = None # else runtime destroys testing framework
+        Database.db_file = None  # else runtime destroys testing framework
         Database(self.gentest_config())
         self.web = Web("url")
         self.web.create_table()
@@ -38,13 +39,14 @@ class TestWeb(unittest.TestCase):
         os.remove(Database.db_file)
 
     def test_create_table(self):
-        self.assertIsNotNone(self.web.db_connection, 
-                "Database isn't correctly initialized")
+        self.assertIsNotNone(self.web.db_connection,
+                             "Database isn't correctly initialized")
         self.cursor.execute("""SELECT name FROM sqlite_master
-                WHERE name = 'Web';""")
+                            WHERE name = 'Web';""")
         table_exists = False
         for i in self.cursor.fetchone():
-            if 'Web' in i: table_exists = True
+            if 'Web' in i:
+                table_exists = True
         self.assertTrue(table_exists)
 
     def test_drop_table(self):
@@ -60,10 +62,10 @@ class TestWeb(unittest.TestCase):
         """ Tests if access to instance objects with names like c_ are
         possible. Errors or Fails need to be fixed in class Database.
         """
-        self.assertEqual(self.web["c_id"], "url" )
+        self.assertEqual(self.web["c_id"], "url")
         try:
             self.web["db_file"]
-            self.assertTrue(false, "Got access to wrong variable")
+            self.assertTrue(False, "Got access to wrong variable")
         except AttributeError:
             pass
 
@@ -73,10 +75,10 @@ class TestWeb(unittest.TestCase):
         """
         attrs = self.web.get_attributes()
         self.assertTrue(attrs, msg="Got no attributes")
-        self.assertTrue("c_id" in attrs , 
-                msg="Caught the following attributes: %s"%attrs)
+        self.assertTrue("c_id" in attrs,
+                        msg="Caught the following attributes: %s" % attrs)
         self.assertFalse("__doc__" in attrs,
-                msg="Caught __doc__ attribute which is wrong")
+                         msg="Caught __doc__ attribute which is wrong")
 
     def test_save(self):
         """ Checks if data can be made persistent in the database
@@ -98,8 +100,8 @@ class TestWeb(unittest.TestCase):
         self.web.remove()
         self.cursor.execute("""SELECT * FROM Web
                             WHERE c_id = 'url';""")
-        self.assertTrue(self.cursor.fetchone() == None, 
-                "Removing Entries has failed")
+        self.assertTrue(self.cursor.fetchone() is None,
+                        "Removing Entries has failed")
 
     def test_get(self):
         self.web.save()
@@ -109,6 +111,22 @@ class TestWeb(unittest.TestCase):
         d = datetime.datetime.now() - datetime.timedelta(minutes=2)
         webs = Web.get(d)
         self.assertEqual(webs[0], self.web, "Unable to get new data")
+
+    def test_override(self):
+        self.web.save()
+        web2 = Web('url')
+        web2.save()
+
+    def test_update(self):
+        from database.database import InstanceNotFoundError
+        self.web.save()
+        self.web.c_id = 'new'
+        self.web.save()
+        web_db = Web.get_exactly('new')
+        self.assertEqual(web_db.c_id, self.web.c_id)
+        self.assertEqual(web_db.c_pk, self.web.c_pk)
+        with self.assertRaises(InstanceNotFoundError):
+            web_db = Web.get_exactly('url')
 
     def test_get_exactly(self):
         self.web.save()
