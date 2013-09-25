@@ -148,9 +148,12 @@ def receive_modules(request, token):
     #handle component-delete-form
     if delete_form.is_valid():
         exe_hash = delete_form.cleaned_data['exe_hash']
-        component = Components.objects.get(exe_hash=exe_hash)
-        comp_cluster = Components_Cluster.objects.get(cluster=cluster,
-                                                      component=component)
+        try:
+            component = Components.objects.get(exe_hash=exe_hash)
+            comp_cluster = Components_Cluster.objects.get(cluster=cluster,
+                                                          component=component)
+        except Components.DoesNotExist:
+            pass # whoops, component is already on holiday
         comp_cluster.delete()
     #handle component-add-form
     if comp_form.is_valid():
