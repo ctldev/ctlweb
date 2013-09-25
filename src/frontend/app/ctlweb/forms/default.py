@@ -16,4 +16,4 @@ class CurrentUserkeyForm(forms.Form):
 
 class UserkeyAddForm(forms.Form):
     new_userkey = forms.CharField(label=_(u'Neuer Userkey'),
-    	widget=forms.Textarea(attrs={'rows':5, 'cols':200}))
+    	widget=forms.Textarea(attrs={'rows':1, 'cols':500}))

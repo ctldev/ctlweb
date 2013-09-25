@@ -85,10 +85,10 @@ def request_modules(ssh=True, cluster=None, pretend=False, request_all=False):
     if cluster is None:
         cluster = Cluster.objects.all()
     import collections
-    if not isinstance(cluster, collections.Iterable()):
+    if not isinstance(cluster, collections.Iterable):
         cluster = [cluster, ]
     for c in cluster:
-        date = Components.objects.all().aggregate(Max('date_creation'))
+        date = Components.objects.filter(components_cluster__cluster=c).aggregate(Max('date_creation'))
         date = date['date_creation__max']
         # generate secure Token and append to url
         domain = settings.SITE_DOMAIN

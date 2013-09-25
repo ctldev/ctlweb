@@ -20,7 +20,7 @@ class TestComponent(unittest.TestCase):
         """
         Database.db_file = "test.db"  # DB File for Testcase without config
         Log.streamoutput()
-        #Log.set_verbosity(5)
+#        Log.set_verbosity(5)
 #       Instance objects
         self.comp = Component("name", "/path/to/exe", 'hash')
         self.connection = Database.db_connection

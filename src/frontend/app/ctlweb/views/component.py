@@ -64,7 +64,7 @@ def interface(request, int_id):
     context = RequestContext(request, dict_response)
     response = HttpResponse(content_type='text/plain')
     response = render_to_response("interface.txt", context_instance=context)
-    response['Content-Disposition'] = 'attachment; filename="interface.txt"'
+    response['Content-Disposition'] = 'attachment; filename="interface.ci"'
     #print(dict_response["ci"])
     return response
 
