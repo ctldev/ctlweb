@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block title %}
-{% trans "Userkeyverwaltung" %}
+{% trans "Userkey-Verwaltung" %}
 {% endblock title %}
 {% block headextra %}
 {{ addform.media }}
 {% endblock headextra %}
 {% block content %}
 <div class='transbox'>
-  <h1>Userkey-Verwaltung</h1>
+  <h1>{% trans "Userkey-Verwaltung" %}</h1>
   <form class="form-horizontal" method="post">
   {% csrf_token %}
   	{{currentform.management_form}}
