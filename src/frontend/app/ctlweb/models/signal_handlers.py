@@ -34,7 +34,7 @@ def components_renamed(sender, **kwargs):
         comp.names = ', '.join(namelist)
         comp.save()
         connections = comp.components_cluster_set.all()
-        if connections == Components_Cluster.objects.none():
+        if list(connections) == []:
             comp.delete()
     except Components.DoesNotExist:
         pass #do nothing, as component has already been deleted

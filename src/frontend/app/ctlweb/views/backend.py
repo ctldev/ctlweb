@@ -152,9 +152,10 @@ def receive_modules(request, token):
             component = Components.objects.get(exe_hash=exe_hash)
             comp_cluster = Components_Cluster.objects.get(cluster=cluster,
                                                           component=component)
+            comp_cluster.delete()
+            delete_success = True
         except Components.DoesNotExist:
             pass # whoops, component is already on holiday
-        comp_cluster.delete()
     #handle component-add-form
     if comp_form.is_valid():
         with request.FILES['manifest'] as manifest:
@@ -218,7 +219,7 @@ def _import_manifest(filename, cluster):
         if parser.has_option('DEFAULT', 'author'):
             authors = parser.get('DEFAULT', 'author').split(' ')
             for author in authors:
-                programmer = Programmer(component, author)
+                programmer = Programmer(component=component, email=author)
                 programmer.save()
         return True
     return False
