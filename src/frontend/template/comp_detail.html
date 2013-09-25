@@ -42,7 +42,7 @@
       {% if see_ci %}
       <a href="#id_ifc_{{ i.id }}" data-toggle="modal">{{ i.name }}</a>{% if not forloop.last %}, {% endif %}
       <div id="id_ifc_{{ i.id }}" class="modal hode fade wide-modal" tabindex="-1"
-          role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
         <div class="modal-header">
           <button type="button" class="close"
               data-dismiss="modal"

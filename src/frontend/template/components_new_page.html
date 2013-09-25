@@ -82,22 +82,22 @@
 				  <a href="#i_d_{{di.pk}}" role="button" class="btn" data-toggle="modal">Details</a>
 				  <div id="i_d_{{di.pk}}" class="modal hode fade wide-modal" tabindex="-1"
 					role="dialog" aria-labelledby="i_d_{{di.pk}}_modal"
-					  aria-hidden="true">
-					<div class="modal-header">
-					  <button type="button" class="close" data-dismiss="modal"
-						aria-hidden="true"> x </button>
-					  <h3 id="i_d_{{di.pk}}_modal">{{di.name}}</h3>
-					</div>
-					<div class="modal-body">
-					  <pre> {{di.ci}} </pre>
-					</div>
-					<div class="modal-footer">
-					  <button class="btn" data-dismiss="modal"
-						aria-hidden="true">
-						{% trans "Schließen" %}
-					  </button>
-					  <a href="{% url interface di.id %}" class="btn btn-primary">Download</a>
-					</div>
+					  aria-hidden="true" style="display: none;">
+						<div class="modal-header">
+						  <button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true"> x </button>
+						  <h3 id="i_d_{{di.pk}}_modal">{{di.name}}</h3>
+						</div>
+						<div class="modal-body">
+						  <pre> {{di.ci}} </pre>
+						</div>
+						<div class="modal-footer">
+						  <button class="btn" data-dismiss="modal"
+							aria-hidden="true">
+							{% trans "Schließen" %}
+						  </button>
+						  <a href="{% url interface di.id %}" class="btn btn-primary">Download</a>
+						</div>
 				  </div>
 				  {% endif %}
 				  <center>
