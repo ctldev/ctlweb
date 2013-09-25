@@ -16,6 +16,8 @@ urlpatterns = patterns('app.ctlweb.views',
         url(r'^administration/easy/$', 'index', name='administration_easy'),
         url(r'^administration/advanced/$', 'index', name='administration_advanced'),
         url(r'^impressum/$', 'impressum', name='impressum'),
+        url(r'^interface/(?P<int_id>\d+)/$', 'interface', name='interface'), 
+        url(r'^userkey/$', 'userkey_main', name='userkey'),
 )
 
 urlpatterns += patterns('',
@@ -23,7 +25,7 @@ urlpatterns += patterns('',
         url(r'^accounts/', include('registration.backends.default.urls')),
         )
 
-#urlpatterns += patterns('django.contrib.auth.views',
+# urlpatterns += patterns('django.contrib.auth.views',
 #        url(r'^login/$', 'login', name='login'),
 #        url(r'^logout/$', 'logout', {'next_page': '/'}, name='logout'),
 #)

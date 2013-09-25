@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}
+{% trans "Userkeyverwaltung" %}
+{% endblock title %}
+{% block headextra %}
+{{ addform.media }}
+{% endblock headextra %}
+{% block content %}
+<div class='transbox'>
+  <h1>Userkeyverwaltung</h1>
+  <form class="form-horizontal" method="post">
+  {% csrf_token %}
+  	{{currentform.management_form}}
+	<table id="formset" class="form">
+	  {% for form in currentform %}
+	    {% if forloop.first %}
+		<thead>
+		  <tr>
+			{% for field in form.visible_fields %}
+			  <th>
+			    {{ field.label|capfirst }}
+			  </th>
+			{% endfor %}
+		  </tr>
+	    </thead>
+		{% endif %}
+		<tr class="{% cycle row1,row2 %}">
+		  {% for field in form.visible_fields %}
+			<td>
+			  {# Include the hidden fields in the form #}
+			  {% if forloop.first %}
+				{% for hidden in form.hidden_fields %}
+				  {{ hidden }}
+				{% endfor%}
+			  {% endif %}
+			  {{ field.errors.as_ul }}
+			  {{ field }}
+			</td>
+		  {% endfor %}
+		</tr>
+	  {% endfor %}
+	</table>
+
+  	
+	</table>
+	{{addform.as_table}}
+	</br>
+	<button class="btn btn-inverse">
+	  {% trans "Änderungen übernehmen" %}
+	</button>
+  </form>
+</div>
+{% endblock %}

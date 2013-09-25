@@ -2,6 +2,7 @@ from .database import Database
 from .pubkey import Pubkey
 from util import Log
 
+
 class Access(Database):
     """ All classes that provide ssh access modification are derived from this
     one.
@@ -25,7 +26,7 @@ class Access(Database):
             * f_Pubkey_pubkey
         """
         Log.debug('Creating object with ssh access'
-                + ' and granting access for public key.')
+                  ' and granting access for public key.')
         return cls.create(attr)
 
     def add_key(self, pubkey):

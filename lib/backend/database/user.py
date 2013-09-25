@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import sqlite3
 from .access import Access
 
 
@@ -20,3 +19,12 @@ class User(Access):
 
     def _keyline(self):
         return 'command="bash -lc ctl-init" {0}'
+
+    def save(self):
+        """ Overrides new users with the same old name. """
+        from .database import InstanceAlreadyExists
+        try:
+            super().save()
+        except InstanceAlreadyExists as e:
+            self.c_pk = e.original().c_pk
+            super().save()

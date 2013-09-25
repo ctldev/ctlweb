@@ -1,0 +1,441 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-09-25 16:14+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: app/ctlweb/admin/actions.py:53
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
+
+#: app/ctlweb/admin/actions.py:65
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr ""
+
+#: app/ctlweb/admin/actions.py:67
+msgid "Are you sure?"
+msgstr ""
+
+#: app/ctlweb/admin/actions.py:89
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
+
+#: app/ctlweb/admin/cluster.py:25
+msgid "Connection"
+msgstr ""
+
+#: app/ctlweb/admin/cluster.py:39 app/ctlweb/admin/interfaces.py:40
+msgid "Anzahl Components"
+msgstr ""
+
+#: app/ctlweb/admin/components.py:13
+msgid "Components aktivieren"
+msgstr ""
+
+#: app/ctlweb/admin/components.py:18
+msgid "Components deaktiveren"
+msgstr ""
+
+#: app/ctlweb/admin/components.py:49
+msgid "Dates"
+msgstr ""
+
+#: app/ctlweb/admin/components.py:50 app/ctlweb/admin/interfaces.py:25
+#: app/ctlweb/models/components.py:22 app/ctlweb/models/interfaces.py:14
+msgid "Hash"
+msgstr ""
+
+#: app/ctlweb/admin/interfaces.py:24
+msgid "Code"
+msgstr ""
+
+#: app/ctlweb/admin/user.py:14
+msgid "Benutzer aktivieren"
+msgstr ""
+
+#: app/ctlweb/admin/user.py:20
+msgid "Benutzer deaktivieren"
+msgstr ""
+
+#: app/ctlweb/admin/user.py:26
+msgid "Benutzer Redakteurrechte geben"
+msgstr ""
+
+#: app/ctlweb/admin/user.py:32
+msgid "Benutzer "
+msgstr ""
+
+#: app/ctlweb/admin/user.py:39
+msgid "Benutzer Adminrechte geben"
+msgstr ""
+
+#: app/ctlweb/admin/user.py:45
+msgid "Benutzer Adminrechte entziehen"
+msgstr ""
+
+#: app/ctlweb/forms/default.py:8 app/ctlweb/models/cluster.py:17
+#: app/ctlweb/models/cluster.py:18
+msgid "Cluster"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:8
+msgid "Alle Kategorien"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:9 app/ctlweb/models/components.py:65
+#: app/ctlweb/models/interfaces.py:13
+msgid "Name"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:10
+msgid "Autor"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:11
+msgid "Schlüsselwort"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:29
+msgid "Komponenten und Interfaces"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:30
+msgid "Komponenten"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:31 template/components_new_page.html:34
+#: template/components_new_page.html:50
+msgid "Interfaces"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:33
+msgid "Suchgebiet"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:36
+msgid "Suchtext"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:38
+msgid "Kategorie"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:47
+msgid "und"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:48
+msgid "und nicht"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:49
+msgid "oder"
+msgstr ""
+
+#: app/ctlweb/forms/search.py:50
+msgid "Bindung"
+msgstr ""
+
+#: app/ctlweb/models/cluster.py:10
+msgid "Host/IP"
+msgstr ""
+
+#: app/ctlweb/models/cluster.py:11
+msgid "Benutzer"
+msgstr ""
+
+#: app/ctlweb/models/cluster.py:12
+msgid "Port"
+msgstr ""
+
+#: app/ctlweb/models/cluster.py:13 app/ctlweb/models/userkeys.py:14
+msgid "Schlüssel"
+msgstr ""
+
+#: app/ctlweb/models/components.py:15
+msgid "Namen"
+msgstr ""
+
+#: app/ctlweb/models/components.py:16
+msgid "Beschreibung"
+msgstr ""
+
+#: app/ctlweb/models/components.py:17
+msgid "Zuletzt geändert am"
+msgstr ""
+
+#: app/ctlweb/models/components.py:18
+msgid "Erstellungsdatum"
+msgstr ""
+
+#: app/ctlweb/models/components.py:20
+msgid "Freigeschaltet"
+msgstr ""
+
+#: app/ctlweb/models/components.py:21
+msgid "Version"
+msgstr ""
+
+#: app/ctlweb/models/components.py:24
+msgid "Ursprungscluster"
+msgstr ""
+
+#: app/ctlweb/models/components.py:29
+msgid "Component"
+msgstr ""
+
+#: app/ctlweb/models/components.py:30 app/ctlweb/models/interfaces.py:16
+#: template/components_new_page.html:39
+msgid "Components"
+msgstr ""
+
+#: app/ctlweb/models/components.py:70
+msgid "Component - Cluster - Verbindung"
+msgstr ""
+
+#: app/ctlweb/models/components.py:71
+msgid "Component - Cluster - Verbindungen"
+msgstr ""
+
+#: app/ctlweb/models/components.py:83 app/ctlweb/models/components.py:85
+#: app/ctlweb/models/components.py:86
+msgid "Programmierer"
+msgstr ""
+
+#: app/ctlweb/models/interfaces.py:12
+msgid "Quellcode"
+msgstr ""
+
+#: app/ctlweb/models/interfaces.py:21
+msgid "Interface"
+msgstr ""
+
+#: app/ctlweb/models/interfaces.py:44
+msgid "Interfaces - Components - Verbindung"
+msgstr ""
+
+#: app/ctlweb/models/interfaces.py:45
+msgid "Interfaces - Components - Verbindungen"
+msgstr ""
+
+#: app/ctlweb/models/other.py:17
+msgid "Token"
+msgstr ""
+
+#: app/ctlweb/models/other.py:19
+msgid "Ablaufdatum"
+msgstr ""
+
+#: app/ctlweb/models/userkeys.py:13 app/ctlweb/models/userkeys.py:76
+#: app/ctlweb/models/userkeys.py:77
+msgid "User"
+msgstr ""
+
+#: app/ctlweb/models/userkeys.py:22 app/ctlweb/models/userkeys.py:23
+msgid "Benutzerschlüssel"
+msgstr ""
+
+#: template/base.html:69 template/components_new_page.html:6
+msgid "Verzeichnis"
+msgstr ""
+
+#: template/base.html:74
+msgid "Administration"
+msgstr ""
+
+#: template/base.html:79
+msgid "Impressum"
+msgstr ""
+
+#: template/base.html:88 template/search.html:4
+msgid "Suche"
+msgstr ""
+
+#: template/base.html:92
+msgid "Erweiterte Suche"
+msgstr ""
+
+#: template/base.html:122
+msgid "Passwort ändern"
+msgstr ""
+
+#: template/base.html:128
+msgid "LogOut"
+msgstr ""
+
+#: template/base.html:145
+msgid "Login"
+msgstr ""
+
+#: template/base.html:152
+msgid "Registrieren"
+msgstr ""
+
+#: template/comp_detail.html:34
+msgid ""
+"\n"
+"      Interface:\n"
+"      "
+msgid_plural ""
+"\n"
+"      Interfaces:\n"
+"      "
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/comp_detail.html:60 template/components_new_page.html:98
+msgid "Schließen"
+msgstr ""
+
+#: template/comp_detail.html:70
+msgid ""
+"\n"
+"      Ersteller:\n"
+"      "
+msgid_plural ""
+"\n"
+"      Ersteller:\n"
+"      "
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/comp_detail.html:83
+msgid "Version:"
+msgstr ""
+
+#: template/comp_detail.html:90
+msgid "Datum:"
+msgstr ""
+
+#: template/comp_detail.html:98
+msgid ""
+"\n"
+"    Cluster:\n"
+"  "
+msgid_plural ""
+"\n"
+"    Cluster:\n"
+"  "
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/comp_detail.html:117
+msgid "CTL-Befehl:"
+msgstr ""
+
+#: template/components_new_page.html:9
+msgid ""
+" \n"
+"\tEine Auflistung aller Interfaces und ihrer zugehörigen Komponenten\n"
+"\t"
+msgstr ""
+
+#: template/components_new_page.html:21
+msgid "Alle direkten und indirekten Ergebnisse für "
+msgstr ""
+
+#: template/components_new_page.html:25
+msgid "die Suche."
+msgstr ""
+
+#: template/components_new_page.html:106
+msgid "Gefundene"
+msgstr ""
+
+#: template/components_new_page.html:108
+msgid ""
+" \n"
+"\t\t\t\t\t\tKomponenten  \n"
+"\t\t\t\t\t  "
+msgstr ""
+
+#: template/components_new_page.html:127
+msgid ""
+"\n"
+"\t\t\t\t\t\t\t  Programmierer:\n"
+"\t\t\t\t\t\t\t"
+msgid_plural ""
+"\n"
+"\t\t\t\t\t\t\t  Programmierer:\n"
+"\t\t\t\t\t\t\t"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/components_new_page.html:215
+msgid ""
+"\n"
+"\t\t\t\t\t  Programmierer:\n"
+"\t\t\t\t\t"
+msgid_plural ""
+"\n"
+"\t\t\t\t\t  Programmierer:\n"
+"\t\t\t\t\t"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/home.html:9
+msgid "Willkommen auf CTLWEB"
+msgstr ""
+
+#: template/home.html:10
+msgid "Hier finden Sie DIE Komponenten"
+msgstr ""
+
+#: template/impressum.html:11
+msgid ""
+"\n"
+"\tCTLWEB-Impressum\n"
+"\t"
+msgstr ""
+
+#: template/search.html:109
+msgid "Suchfeld löschen"
+msgstr ""
+
+#: template/search.html:116
+msgid "Weiteres Suchfeld"
+msgstr ""
+
+#: template/search.html:120
+msgid "Suche starten"
+msgstr ""
+
+#: template/admin/base.html:31
+msgid "Welcome,"
+msgstr ""
+
+#: template/admin/base.html:36
+msgid "Documentation"
+msgstr ""
+
+#: template/admin/base.html:44
+msgid "Change password"
+msgstr ""
+
+#: template/admin/base.html:51
+msgid "Log out"
+msgstr ""
+
+#: template/admin/base.html:59
+msgid "Home"
+msgstr ""
+
+#: template/admin/base_site.html:5
+msgid "CTLWEB admin"
+msgstr ""

@@ -13,8 +13,7 @@ from ctlweb.views.backend import request_modules, _import_manifest
 class BackendTest(TestCase):
     use_ssh = False
     def setUp(self):
-        ip = "127.0.0.1"
-        domain = "localhost"
+        hostname = "localhost"
         port = 22
         path = expanduser("~") + "/.ssh/"
         with open(path+"id_rsa.pub") as f:
@@ -24,13 +23,13 @@ class BackendTest(TestCase):
         sshkey = paramiko.PKey(data=key)
         try:
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(ip, pkey=sshkey, port=port)
+            ssh.connect(hostname, pkey=sshkey, port=port)
             ssh.close()
         except:
            print "No local SSH-Connection allowed, skipping"
            use_ssh = False
 
-        cluster = Cluster.objects.create(ip=ip, domain=domain, port=port, key=key)
+        cluster = Cluster.objects.create(hostname=hostname, port=port, key=key)
 
     @skipIf(use_ssh, "ssh possible")
     @skipIf(True, "")
@@ -43,8 +42,8 @@ class BackendTest(TestCase):
         request_modules(ssh=True, pretend=True)
 
     def testComponentParser(self):
-        ip = "127.0.0.1"
-        cluster = Cluster.objects.get(ip=ip)
+        hostname = "localhost"
+        cluster = Cluster.objects.get(hostname=hostname)
         filename = dirname(dirname(settings.DJANGO_ROOT)) + "/"
         filename += "usr/share/doc/ctlweb/example_package.tgz"
         success = _import_manifest(filename, cluster)

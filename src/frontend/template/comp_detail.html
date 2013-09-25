@@ -1,176 +1,134 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block title %}
-Component {{ component.name }}
+  Component 
+    {{ component.names }}
 {% endblock title %}
 {% block content %}
 <div class="transbox">
-<div class="page-header">
-  <h1>{{ component.name }} 
-  </h1>  
-  <blockquote>
-  {{ component.brief_description  }}
-  </blockquote>
-</div> 
+  <div class="page-header">
+    <h1>
+	    {{ component }}
+    </h1>
+    {% if see_description %}  
+    {% if short %}
+    <blockquote id="description_short">
+      {{ component.brief_description }} [...]
+    </blockquote>
+    {% endif %}
+    <blockquote id="description_long" {% if short %}class="hidden"{% endif %}>
+      {{ component.description }}
+    </blockquote>
+    <script type="text/javascript">
+	    $(function(){
+		    $('#description_short').click(function(e){
+			    $('#description_short').attr('class', 'hidden');
+			    $('#description_long').attr('class', '');
+		    });
+	    });
+    </script>
+    {% endif %}
+  </div> 
   <dl class="dl-horizontal">
-	<dt>
-	  {% blocktrans count counter=interfaces|length %}
-		Interface:
-	  {% plural %}
-		Interfaces:
-	  {% endblocktrans %}
-	</dt>
-	<dd>
-	  {% for i in interfaces %}
-		{{ i.name }}{% if not forloop.last %}, {% endif %}
-	  {% endfor %}
-	</dd>
-
-	<dt>
-	  {% blocktrans count counter=programmer|length %}
-		Ersteller:
-	  {% plural %}
-		Ersteller:
-	  {% endblocktrans %}
-	</dt>
-	<dd> 
-	  {% for p in programmer %}
-		{% if p in users.email %} 
-		  {# url(-Algorithmus) nicht vorhanden #}
-		  <a href="{% url user u.pk %}">
-			{{ p.email }}
-		  </a>{% else %}{{ p.email }}{% endif %}{% if not forloop.last %},
-		  {% endif %}
-		  <br /> 
-	  {% endfor %} 
-	</dd>
-	
-	<dt>
-	  {% trans "Version:" %}
-	</dt>
-	<dd>
-	  {{ component.version }}
-	</dd>
-  	
-  	<dt>
-	  {% trans "Datum:" %}
-	</dt>
-	<dd> 
-	  {{ component.date }} 
-	</dd>
-</dl>
-
-<div class="accordion" id="accordion2">
-  <div class="accordion-group">
-	<div class="accordion-heading">
-	  <a 
-		class="accordion-toggle" 
-		data-toggle="collapse"
-		data-parent="#accordion2" 
-		href="#description"
-	  >
-		{% trans "Beschreibung" %}
-	  </a>
-	</div>
-  <div id="description" class="accordion-body collapse">
-	<div class="accordion-inner">
-	  {{ component.description }}
-	</div>
-  </div>
-  <script type="text/javascript">
-	$(function() {
-		$('.accordion').on('hide', function (e) {
-		  $(this).find('.accordion-toggle').not($(e.target)).removeClass('active');
-		  });
-	});
-  </script>
-</div>
-</div>
-
-{% if see_homecluster %}
-{% blocktrans count counter=homecluster|length %}
-  Cluster:
-{% plural %}
-  Cluster:
-{% endblocktrans %}
-<div class="accordion" id="accordion1">
-  <div class="accordion-group">
-	{% for hc in homecluster %}
-	  <div class="accordion-heading">
-		<a 
-		  class="accordion-toggle" 
-		  data-toggle="collapse"
-		  data-parent="#accordion1" 
-		  href="#{{ hc.id }}"
-		>
-		{{ hc.domain }}
-		</a>
-	  </div>
-	  {% if forloop.first %}
-		<div id="{{ hc.id }}" class="accordion-body collapse in">
-	  {% else %}
-		<div id="{{ hc.id }}" class="accordion-body collapse">
+    <dt>
+      {% blocktrans count counter=component.interfaces_set.all|length %}
+      Interface:
+      {% plural %}
+      Interfaces:
+      {% endblocktrans %}
+    </dt>
+    <dd>
+    {% for i in component.interfaces_set.all %}
+      {% if see_ci %}
+      <a href="#id_ifc_{{ i.id }}" data-toggle="modal">{{ i.name }}</a>{% if not forloop.last %}, {% endif %}
+      <div id="id_ifc_{{ i.id }}" class="modal hode fade wide-modal" tabindex="-1"
+          role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+          <button type="button" class="close"
+              data-dismiss="modal"
+              aria-hidden="true">
+              x
+          </button>
+          <h3 id="myModelLabel">{{i.name}}</h3>
+        </div>
+        <div class="modal-body">
+          <pre>{{i.ci}}</pre>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" data-dismiss="modal"
+              aria-hidden="true">
+            {% trans "Schließen" %}
+          </button>
+          <a href="{% url interface i.id %}" class="btn btn-primary">Download</a>
+        </div>
+      </div>
+      {% else %}
+      {{ i.name }}{% if not forloop.last %}, {% endif %} 
 	  {% endif %}
-		<div class="accordion-inner">
-		  {% for h in hc.components_cluster_set.all %}
-			{% if h.component = component %}
-			    <table>
-				{% if user.is_authenticated %}
-				  <tr>
-				    <td>
-					  {% trans "CTL-Befehl:" %}
-				    </td>
-				    <td>
-					{{ h.ctl }}
-				    </td>
-				  </tr>
-				{% endif %} 
-				{% if see_path %}
-				  <tr>
-					<td> 
-					  {% trans "Pfad:" %} 
-					</td>
-					<td> 
-					  {{ h.path }} 
-					</td>
-				  </tr>
-				{% endif %}
-				{% if see_code %}
-				  <tr>
-					<td> 
-					  {% trans "Code:" %}
-					</td>
-					<td> 
-					  {{ h.code }} 
-					</td>
-				  </tr>
-				{% endif %}
-				{% if see_ssh_data %}
-				  <tr>
+    {% endfor %}
+    </dd>
+    <dt>
+      {% blocktrans count counter=component.programmer_set.all|length %}
+      Ersteller:
+      {% plural %}
+      Ersteller:
+      {% endblocktrans %}
+    </dt>
+    <dd>
+      {% for p in component.programmer_set.all %}
+        {{ p.email }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </dd>
+    
+    <dt>
+      {% trans "Version:" %}
+    </dt>
+    <dd>
+      {{ component.version }}
+    </dd>
+      
+    <dt>
+      {% trans "Datum:" %}
+    </dt>
+    <dd> 
+      {{ component.date }} 
+    </dd>
+  </dl>
+
+  {% if see_homecluster %}
+  {% blocktrans count counter=component.homecluster|length %}
+    Cluster:
+  {% plural %}
+    Cluster:
+  {% endblocktrans %}
+  <div class="accordion" id="accordion1">
+    <div class="accordion-group">
+	  {% for hc in component.components_cluster_set.all %}
+	    <div class="accordion-heading">
+		    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#id_cl_{{ hc.id }}">
+		      {{ hc.cluster.hostname }}
+		    </a>
+	    </div>
+		  <div id="id_cl_{{ hc.id }}" class="accordion-body collapse {% if forloop.first %}in{% endif %}">
+        <div class="accordion-inner">
+			  {% if see_ssh_data %}
+			  <table>
+				<tr>
 					<td>
-					  {% trans "SSH-Benutzer:" %}
+						{% trans "CTL-Befehl:" %}
 					</td>
-					<td>
-					  {{ hc.username }}
+				</tr>
+				<tr>
+					<td> 
+            <pre>{{ hc.cluster.username }}@{{ hc.cluster.hostname }}:{{ hc.name }} -l pipe -c -p {{ hc.cluster.port }}</pre>
 					</td>
-				  </tr>
-				  <tr>
-					<td>
-					  {% trans "SSH-Port:" %}
-					</td>
-					<td>
-					  {{ hc.port|default:22 }}
-					</td>
-				  </tr>
-				{% endif %}
+				</tr>
 			  </table>
-			{% endif %}
-		  {% endfor %}
-		</div>
+			  {% endif %}
+		  </div>
 	  </div>
 	{% endfor %}
   </div>
-</div>
 {% endif %}
 </div>
-{% endblock content %}				
+{% endblock content %}			

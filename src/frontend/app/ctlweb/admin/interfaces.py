@@ -10,6 +10,9 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 class Components_Inline(admin.StackedInline):
     model = Interfaces_Components
     extra = 0
+    readonly_fields=('component',)
+    max_num = 0
+    can_delete = False
 
 class InterfacesAdmin(admin.ModelAdmin):
     """
@@ -18,12 +21,13 @@ class InterfacesAdmin(admin.ModelAdmin):
     """
     fieldsets = (
         (None, {'fields': ('name',)}),
-        (_('Description'), {'fields': ('description',)}),
-        (_('Key'), {'fields': ('key',)}),
+        (_('Code'), {'fields': ('ci',)}),
+        (_('Hash'), {'fields': ('ci_hash',)}),
     )
-    list_display = ['name', 'key', 'counter']
-    search_fields = ('key', 'name', 'description')
-    ordering = ['key']
+    list_display = ['name', 'counter']
+    search_fields = ('name',)
+    ordering = ['name']
+    readonly_fields = ('ci', 'name', 'ci_hash')
     inlines = [Components_Inline,]
     actions = [ delete_selected, ]
 
@@ -34,4 +38,8 @@ class InterfacesAdmin(admin.ModelAdmin):
         return obj.comp_count
     counter.admin_order_field = 'comp_count'
     counter.short_description = _("Anzahl Components")
+
+    def has_add_permission(self, request):
+        return False
+
 admin.site.register(Interfaces, InterfacesAdmin)

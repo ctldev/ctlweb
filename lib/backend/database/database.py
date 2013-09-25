@@ -137,8 +137,8 @@ class Database:
 
     def create_table(self):
         """ Creates a table for the class in which every instance object which
-        starts with 'c_'. For example 'c_id'. This variable can be accessed with
-        self["c_id"]
+        starts with 'c_'. For example 'c_id'. This variable can be accessed
+        with self["c_id"]
 
         returns self
         """
@@ -194,58 +194,89 @@ class Database:
         cursor.execute(sql)
         Database.db_connection.commit()
 
-    def save(self):
-        """ Saves object into database
-        """
-        Log.debug('Saving object to database')
-        cursor = Database.db_connection.cursor()
+    def _query_values(self):
         attributes = self.get_attributes()
-        table = self.__name__
-        # test if object is already in database
-        try:
-            old_object = self.__class__.get_exactly(self.c_id)
-            self.c_pk = old_object.c_pk
-        except InstanceNotFoundError:
-            # just go on, nothing to do
-            pass
-        row_patterns = ""
-        header = ' (date, adapter'
         values = {'adapter': self,
                   }
         for i in attributes:
             if i == 'c_pk':
                 continue
+            values[i] = self[i]
+        return values
+
+    def _insert_query(self):
+        """ """
+        # This function is disgusting, but I'll keep it as long as it works.
+        attributes = self.get_attributes()
+        table = self.__name__
+        row_patterns = ""
+        header = ' (date, adapter'
+        for i in attributes:
+            if i == 'c_pk':
+                continue
             header += ', ' + i
             row_patterns += ", :" + i
-            values[i] = self[i]
         else:
             row_patterns += ")"
             header += ')'
+        sql = "INSERT INTO " + table + header + """
+                VALUES
+                (strftime('%s','now'), :adapter """ + row_patterns
+        return sql, self._query_values()
+
+    def _update_query(self):
+        """ """
+        # This function is disgusting, but I'll keep it as long as it works.
+        attributes = self.get_attributes()
+        values = self._query_values()
+        table = self.__name__
+        sql = ""
+        for i in attributes:
+            if i == 'c_pk':
+                continue
+            sql += ", " + i
+            sql += " = '" + str(self[i]) + "'"
+        values['c_pk'] = self.c_pk
+        sql = "UPDATE " + table + """
+                SET
+                date = (strftime('%s', 'now')),
+                c_id = :c_id,
+                adapter = :adapter """ + sql + """
+                WHERE c_pk = :c_pk """
+        return sql, values
+
+    def save(self):
+        """ Saves object into database.
+
+        On default if an object is about to
+        save while there is aleady an object with the same c_id in the database
+        a InstanceAlreadyExists exception is thrown.
+        To mark possible conflicts as solved the c_pk of both objects needs to
+        be the same. Then a insert or update action is performed.
+        """
+        Log.debug('Saving object to database')
+        cursor = Database.db_connection.cursor()
+        # test if object is already in database
+        try:
+            old_object = self.__class__.get_exactly(self.c_id)
+            if self.c_pk != old_object.c_pk:
+                raise InstanceAlreadyExists('That object already exists in the'
+                                            ' database.',
+                                            old_object)
+        except InstanceNotFoundError:
+            # just go on, nothing to do
+            pass
         try:
             if not self.c_pk == -1:
                 raise sqlite3.IntegrityError()
-            sql = "INSERT INTO " + table + header + """
-                    VALUES
-                    (strftime('%s','now'), :adapter """ + row_patterns
+            sql, values = self._insert_query()
             Log.debug("Database.save(): %s as insert with %s as dict" %
                       (sql, values))
             cursor.execute(sql, values)
             Database.db_connection.commit()
             self.c_pk = cursor.lastrowid
         except sqlite3.IntegrityError:
-            sql = ""
-            for i in attributes:
-                if i == 'c_pk':
-                    continue
-                sql += ", " + i
-                sql += " = '" + str(self[i]) + "'"
-            values['c_pk'] = self.c_pk
-            sql = "UPDATE " + table + """
-                    SET
-                    date = (strftime('%s', 'now')),
-                    c_id = :c_id,
-                    adapter = :adapter """ + sql + """
-                    WHERE c_pk = :c_pk """
+            sql, values = self._update_query()
             Log.debug("Database.save(): %s as update query with %s as dict" %
                       (sql, values))
             cursor.execute(sql, values)
@@ -299,7 +330,7 @@ class Database:
         import re
         attrs = s[1].split(';')
         for attr in sorted(attrs):
-            key, val = attr.split("=")
+            key, val = attr.split("=", 1)
             if re.search('^f_(?P<classname>.+?)_.+', key):
                 class_name = attribute_box['c_referenced_class']
                 exec('from .%s import %s' % (class_name.lower(), class_name))
@@ -341,6 +372,16 @@ class Database:
 
 class InstanceNotFoundError(ValueError):
     pass
+
+
+class InstanceAlreadyExists(ValueError):
+    def __init__(self, msg, original, *args, **kwargs):
+        super(ValueError).__init__(*args, **kwargs)
+        self.message = msg
+        self._orig = original
+
+    def original(self):
+        return self._orig
 
 
 class NoSuchTable(sqlite3.OperationalError):

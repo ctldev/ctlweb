@@ -28,9 +28,6 @@ def lists(request,
                 s_components, form)
     
     v_user = request.user
-    programmer = Programmer.objects.all().order_by('email')
-    emails = Programmer.objects.distinct('email').values_list('email')
-    u_programmer = User.objects.filter(email__in=emails)
     dict_response = dict()
     dict_response["user"] = v_user
     dict_response["form"] = form
@@ -50,9 +47,6 @@ def new_page(request,
     #   1 = Suche
     
     v_user = request.user
-    programmer = Programmer.objects.all().order_by('email')
-    emails = Programmer.objects.distinct('email').values_list('email')
-    u_programmer = User.objects.filter(email__in=emails)
     dict_response = dict()
     if direct_interfaces == None :
         direct_interfaces = Interfaces.objects.none()
@@ -67,10 +61,12 @@ def new_page(request,
     if s_components == None :
         s_components = Components.objects.none()
     else :
-        s_components = s_components.order_by('name')
+        s_components = s_components.order_by('names').distinct()
     s_components = s_components.exclude(is_active=False)
     if form == 0:
         direct_interfaces = Interfaces.objects.all().order_by('name')
+        s_components = \
+                Components.objects.filter(is_active=True).order_by('names')
     interface_page_range = settings.PAGINATION_PAGE_RANGE_INTERFACES
     components_page_range = settings.PAGINATION_PAGE_RANGE_COMPONENTS
     button_range = settings.PAGINATION_BUTTON_RANGE
@@ -104,6 +100,7 @@ def new_page(request,
                 if c not in s_components:
                     components = components.exclude(pk=c.pk)
         components = components.exclude(is_active=False)
+        components = components.order_by('names').distinct()
         pn_comp = Paginator(components, components_page_range)
         if comp_page == "last":
             comp_page = pn_comp.num_pages
@@ -136,6 +133,8 @@ def new_page(request,
             pn_comp.num_pages, "co_page", s_comp_page, button_range)
     view = request.GET.get('view', '')
 
+    see_ci = v_user.has_perm('ctlweb.can_see_ci')
+    see_description = v_user.has_perm('ctlweb.can_see_description')
     dict_response["user"] = v_user
     dict_response["form"] = form
     dict_response["interfaces"] = paged_interfaces
@@ -144,9 +143,9 @@ def new_page(request,
     dict_response["interface_page_buttons"] = interfaces_page_buttons
     dict_response["s_components_page_buttons"] = s_components_page_buttons
     dict_response["post_data"] = request.POST.urlencode()
-    dict_response["programmer"] = programmer
-    dict_response["u_programmer"] = u_programmer
     dict_response["view"] = view
+    dict_response["see_ci"] = see_ci
+    dict_response["see_description"]= see_description
 
     if "search_query" in request.GET:
         dict_response["searchquery"] = request.GET.get('search_query', None)
