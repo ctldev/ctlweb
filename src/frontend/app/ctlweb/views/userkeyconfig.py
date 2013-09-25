@@ -15,12 +15,12 @@ def userkey_main(request):
     """Grundfunktion der Suche. Wenn noch keine Sucheingabe vorhanden ist, wird
     das Suchformular geöffnet. Wenn eine Sucheingabe vorhanden ist, wird diese
     verarbeitet und an die Listenfunktion weitergegeben."""
-    UserkeyFormset = formset_factory(CurrentUserkeyForm)
+    UserkeyFormset = formset_factory(CurrentUserkeyForm, extra=0)
     logged_user = request.user
     if request.method == 'POST':
     	current_keys = Userkeys.objects.all().filter(
             user__username__icontains = logged_user.username)
-        filled_currentform = UserkeyFormset(request.POST, prefix='current')
+        filled_currentform = UserkeyFormset(request.POST, prefix='current',)
         filled_addform = UserkeyAddForm(request.POST, prefix = 'add')
         for form in filled_currentform:
             if form.is_valid():
