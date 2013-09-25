@@ -122,6 +122,8 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
+
+
 try:
     SECRET_KEY = open(SECRET_FILE).read().strip()
 except IOError:

@@ -23,7 +23,6 @@ class Components(models.Model):
     homecluster = models.ManyToManyField(Cluster,\
                                          verbose_name=_("Ursprungscluster"),\
                                          through='Components_Cluster')
-
     class Meta:
         app_label = 'ctlweb'
         verbose_name = _("Component")
