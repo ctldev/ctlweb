@@ -1,10 +1,11 @@
 {% extends "registration/registration_base.html" %}
-{% block title %}{% if account %}Aktivierung komplett{% else %}Aktivierung fehlerhaft{% endif %}{% endblock %}
+{% load i18n %}
+{% block title %}{% if account %}{% trans "Aktivierung komplett" %}{% else %}{% trans "Aktivierung fehlerhaft" %}{% endif %}{% endblock %}
 {% block content %}
 {% if account %}
-Danke {{ account }}, der Account wurde erfolgreich aktiviert! Sie können sich nun mit Ihrem Benutzernamen und Passwort <a href='{% url auth_login %}'>einloggen</a>. 
+{% trans "Danke" %} {{ account }}, {% trans "der Account wurde erfolgreich aktiviert!" %} <a href='{% url auth_login %}'> {% trans "Sie können sich nun mit Ihrem Benutzernamen und Passwort einloggen" %}</a>. 
 {% else %}
-Oops &ndash; es scheint Ihr Aktivierungsschlüssel ist ungültig. Überprüfen Sie Ihren Link.
+{% trans "Oops" %} &ndash; {% trans "es scheint Ihr Aktivierungsschlüssel ist ungültig. Überprüfen Sie Ihren Link." %}
 {% endif %}
 {% endblock %}
 
