@@ -24,6 +24,8 @@ def redelete_user(sender, **kwargs):
 def components_renamed(sender, **kwargs):
     """
     Create a new string for Components.name
+    Also, if a component is deleted on a cluster, check if component is reachable.
+    Exterminate it otherwise.
     """
     try:
         comp = kwargs[u'instance'].component
@@ -31,6 +33,9 @@ def components_renamed(sender, **kwargs):
                 values_list('name', flat=True).distinct().order_by('name')
         comp.names = ', '.join(namelist)
         comp.save()
+        connections = comp.components_cluster_set.all()
+        if connections = Components_Cluster.objects.none():
+            comp.delete()
     except Components.DoesNotExist:
         pass #do nothing, as component has already been deleted
 
