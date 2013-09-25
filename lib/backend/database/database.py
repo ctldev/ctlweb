@@ -88,21 +88,30 @@ class Database:
         # FIXME should use the get_exactly for easy maintenance; skipped due to
         #       motivational problems
         from datetime import datetime
+        import time
         sql = "SELECT c_pk, adapter FROM " + cls.__name__ + """
                 WHERE date >= ?"""
         values = []
         if not time_since:
             Log.debug("Database.get(): Get all objects of %s" % cls.__name__)
             sql = "SELECT c_pk, adapter FROM " + cls.__name__
-        elif isinstance(time_since, datetime):
-            Log.debug("Database.get(): Get %s newer than %s" %
-                      (cls.__name__, time_since))
-            time_since = time_since.strftime("%s")
-            values.append(time_since)
-        else:
+        Log.debug('Database.get(): time_since is %s' % time_since)
+
+        try:
+            if isinstance(time_since, str):
+                time_since = datetime(*(time.strptime(time_since,
+                                                      '%Y-%m-%d')[:3])
+                                      )
+                Log.debug("Database.get(): Get %s newer than %s" %
+                          (cls.__name__, time_since))
+                time_since = time_since.strftime("%s")
+                values.append(time_since)
+        except:
             Log.debug("Wrong dateformat caught in %s.get()" % cls.__name__)
             raise ValueError()
+
         cursor = Database.db_connection.cursor()
+
         try:
             cursor.execute(sql, values)
         except sqlite3.IntegrityError:
@@ -185,14 +194,16 @@ class Database:
     def remove(self):
         """ Removes rows on the basis of the id
         """
-        Log.debug('Removing object from database.')
+        Log.debug('Removing %s object from database.' % self.__name__)
         cursor = Database.db_connection.cursor()
         table = self.__name__
         sql = "DELETE FROM " + table + """
                 WHERE c_id = """ "'%s'" """
                 """ % self["c_id"]
+        Log.debug('Will execute %s to remove %s object.' % (sql, self.__name__))
         cursor.execute(sql)
         Database.db_connection.commit()
+        Log.debug('Removed %s successfully from database.' % self.__name__)
 
     def _query_values(self):
         attributes = self.get_attributes()

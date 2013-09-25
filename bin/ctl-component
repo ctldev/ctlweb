@@ -5,6 +5,7 @@ from util.log import Log
 from util.parsing import commit_settings
 from util.parsing import parent_parser
 from database.database import NoSuchTable
+from database.database import InstanceNotFoundError
 from database import Component
 
 
@@ -17,6 +18,9 @@ def remove(args):
         comp = Component.get_exactly(args.component)
     except NoSuchTable:
         comp = None
+    except InstanceNotFoundError:
+        Log.info('Component with that name was not found.')
+        return
     if comp:
         comp_log = comp.remove()
         if comp_log:
@@ -69,7 +73,6 @@ def push(args):
         complogs = []
 
     if components or complogs:
-        Log.info('Uploading to %s' % args.url)
         push(args.url, components, complogs)
     else:
         Log.error('No components to upload')
@@ -122,6 +125,7 @@ def main():
                                            help='View registered ctlweb'
                                                 + ' users.')
     overview_parser.add_argument('--timestamp', '-t',
+                                 metavar="YYYY-MM-DD",
                                  help='Show only ctlweb components newer than'
                                       + ' timestamp')
     overview_parser.set_defaults(func=overview)
@@ -136,6 +140,7 @@ def main():
                              metavar='URL',
                              help='Upload url')
     push_parser.add_argument('--timestamp', '-t',
+                             metavar="YYYY-MM-DD",
                              help='Get only ctlweb components newer than'
                                   + ' timestamp')
     push_parser.set_defaults(func=push)

@@ -1,16 +1,20 @@
 import logging
 
+
 class Log:
     setHandler = False
     verbose = 1
-    
-    @staticmethod   
+    logfile = None
+    streamhandler = None
+    filehandler = None
+
+    @staticmethod
     def increase_verbosity():
         global verbose
-        if(Log.verbose < 5):    
-            Log.verbose = Log.verbose +  1
-        Log.setHandler = Log.handlerActivation(Log.setHandler) 
-    
+        if(Log.verbose < 5):
+            Log.verbose = Log.verbose + 1
+        Log.setHandler = Log.handlerActivation(Log.setHandler)
+
     @staticmethod
     def set_verbosity(x):
         global verbose
@@ -18,56 +22,56 @@ class Log:
             Log.verbose = x
         else:
             Log.verbose = 5
-        Log.setHandler = Log.handlerActivation(Log.setHandler) 
-    
+        Log.setHandler = Log.handlerActivation(Log.setHandler)
+
     @staticmethod
     def streamoutput():
-        lvl = (60-(10*Log.verbose))
-        root = 0
-        root = logging.getLogger()
-        logging.root.handlers=[] 
-        logging.basicConfig(level = lvl,
-                            format = "%(levelname)s: %(message)s")
+        lvl = (60 - (10 * Log.verbose))
+        logging.root.handlers = []
+        logging.basicConfig(level=lvl,
+                            format="%(levelname)s: %(message)s")
 
         logging.shutdown()
 
     @staticmethod
     def fileoutput():
-        lvl = (60-(10*Log.verbose))
+        lvl = (60 - (10 * Log.verbose))
         fileLogger = 0
-        logging.basicConfig(level = lvl,
-                            filemode = 'a',
-                            format = "%(asctime)s - %(levelname)s: %(message)s)"
+        logging.basicConfig(level=lvl,
+                            filemode='a',
+                            format="%(asctime)s - %(levelname)s: %(message)s)"
                             )
-        fileHandler = logging.FileHandler('ctl.log')
-   
+        if not Log.logfile:
+            Log.warning('Logfile is not set but nessesary.')
+            return
+        fileHandler = logging.FileHandler(Log.logfile)
+
         fileLogger = logging.getLogger()
         fileLogger.addHandler(fileHandler)
         fileLogger.setLevel(lvl)
         logging.shutdown()
 
-    @staticmethod 
+    @staticmethod
     def handlerActivation(setHandler):
         Log.streamoutput()
-        Log.fileoutput()
         return True
-   
-    @staticmethod 
+
+    @staticmethod
     def debug(debugmsg):
         logging.debug(debugmsg)
-   
+
     @staticmethod
     def info(infomsg):
         logging.info(infomsg)
-   
-    @staticmethod 
+
+    @staticmethod
     def warning(warningmsg):
         logging.warning(warningmsg)
-   
-    @staticmethod 
+
+    @staticmethod
     def error(errormsg):
         logging.error(errormsg)
-   
-    @staticmethod 
+
+    @staticmethod
     def critical(criticalmsg):
         logging.critical(criticalmsg)

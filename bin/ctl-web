@@ -101,6 +101,7 @@ def main():
                                            help='View registered ctlweb'
                                                 + ' frontends')
     overview_parser.add_argument('--timestamp', '-t',
+                                 metavar="YYYY-MM-DD",
                                  help='Show only ctlweb frontends newer than'
                                       + ' timestamp')
     overview_parser.set_defaults(func=overview)

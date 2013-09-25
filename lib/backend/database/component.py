@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from .database import Database
 from database.database import NoSuchTable
+from database.database import InstanceNotFoundError
+from database.database import InstanceAlreadyExists
 import sqlite3
 from util import Log
 
@@ -11,12 +13,12 @@ class ComponentLog(Database):
         super().__init__()
         self.c_name = name
         self.c_exe_hash = exe_hash
-        self.c_id = -1
+        self.c_id = exe_hash
 
     def save(self):
         super().save()
-        if not self.c_id == self.c_pk:
-            self.c_id = self.c_pk
+        if not self.c_id == self.c_exe_hash:
+            self.c_id = self.c_exe_hash
             self.save()
 
     @classmethod
@@ -99,7 +101,10 @@ class Component(Database):
         except IOError:
             Log.error("Component.remove(): unable to remove component file.")
             return False
-        cl = ComponentLog.add(name, exe_hash)
+        try:
+            cl = ComponentLog.add(name, exe_hash)
+        except InstanceAlreadyExists as e:
+            cl = e.original()
         return cl
 
     def upload_to_web(self, url):
@@ -135,13 +140,18 @@ class Component(Database):
         except NoSuchTable:
             comp.create_table().save()
         except ValueError as e:
-            Log.critcal('%s' % e.args[0])
+            Log.critical('%s' % e.args[0])
             return
         except MergedWarning as e:
             Log.info('Merged components')
             return comp
         # Copy package to store
         comp._component_file = None  # reset the component to default.
+        try:
+            comp_log = ComponentLog.get_exactly(comp['c_exe_hash'])
+            comp_log.remove()
+        except InstanceNotFoundError:
+            pass
         import shutil
         try:
             target_name = comp._component_file

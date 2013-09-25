@@ -1,4 +1,4 @@
-import Log
+from .log import Log
 
 
 def push(url, components=None, component_logs=None):
@@ -7,18 +7,24 @@ def push(url, components=None, component_logs=None):
     import requests
     Log.debug('push() Uploading to url %s' % url)
 
-    content = {}
+    files = {}
+    data = {}
+    info_data = {'manifest': 'no manifest',
+                 'hash': 'no hash'}
 
     if components:
         comp = components.pop()
         manifest_file = comp._component_file
-        content['manifest'] = open(manifest_file, 'rb')
+        files['manifest'] = open(manifest_file, 'rb')
+        info_data['manifest'] = manifest_file
     if component_logs:
         complog = component_logs.pop()
-        content['exe_hash'] = complog.exe_hash
-    if content:
-        r = requests.post(url, data=content)
+        data['exe_hash'] = complog.hash
+        info_data['hash'] = complog.hash
+    if files or data:
+        Log.info('Uploading {hash} and {manifest}'.format(**info_data))
+        r = requests.post(url, data=data, files=files)
         if r.status_code != requests.codes.ok:
-            Log.critical('Error %s occured while upload' % r.status_code)
+            Log.warning('Error %s occured while upload' % r.status_code)
     if components or component_logs:
         push(url, components, component_logs)
