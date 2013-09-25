@@ -99,6 +99,7 @@ def main():
                                            help='View registered ctlweb users.'
                                            )
     overview_parser.add_argument('--timestamp', '-t',
+                                 metavar="YYYY-MM-DD",
                                  help='Show only ctlweb user newer than'
                                  + ' timestamp')
     overview_parser.set_defaults(func=overview)
