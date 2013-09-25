@@ -1,7 +1,7 @@
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from ctlweb.views import send_user, remove_user
+from ctlweb.views.backend import send_user, remove_user
 from django.db.models.signals import post_save, post_delete
 from ctlweb.models import Components, Components_Cluster
 
@@ -25,11 +25,14 @@ def components_renamed(sender, **kwargs):
     """
     Create a new string for Components.name
     """
-    comp = kwargs[u'instance'].component
-    namelist = comp.components_cluster_set.\
-            values_list('name', flat=True).distinct().order_by('name')
-    comp.names = ', '.join(namelist)
-    comp.save()
+    try:
+        comp = kwargs[u'instance'].component
+        namelist = comp.components_cluster_set.\
+                values_list('name', flat=True).distinct().order_by('name')
+        comp.names = ', '.join(namelist)
+        comp.save()
+    except Components.DoesNotExist:
+        pass #do nothing, as component has already been deleted
 
 @receiver(pre_save, sender=Components)
 def components_active(sender, **kwargs):
