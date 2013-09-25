@@ -1,17 +1,17 @@
-You (or someone pretending to be you) have asked to register an account at 
-{{ site.name }}.  If this wasn't you, please ignore this email
-and your address will be removed from our records.
+{% load i18n %}
+{% trans "Sie wollen einen Account erstellen, auf der Seite" %} 
+{{ site.name }}. {% trans "Sollten Sie dies nicht angefordert haben, ignorieren Sie diese Nachricht. Ihre Email-Adresse wird dann von unserer Datenbank entfernt." %}
 
-To activate this account, please click the following link within the next 
-{{ expiration_days }} days:
+{% trans "Um Ihren Account zu aktivieren, bestätigen Sie den folgenden Link, innerhalb von" %} 
+{{ expiration_days }} {% trans "Tagen:" %}
 
-Test auf Lokalhost:
+Test for Localhost:
 
 http://localhost:8000/accounts/activate/{{ activation_key }}
 
-Später für Webserver:
+Later for web:
 
 http://{{site.domain}}/accounts/activate/{{ activation_key }}
 
-Sincerely,
-{{ site.name }} Management
+{% trans "Sincerely," %}
+{{ site.name }} 

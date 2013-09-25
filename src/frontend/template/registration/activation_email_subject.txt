@@ -1,1 +1,2 @@
-Account registration for {{ site.name }}
+{% load i18n %}
+{% trans "Accountregistrierung für" %} {{ site.name }}

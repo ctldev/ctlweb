@@ -1,5 +1,6 @@
 {% extends "registration/registration_base.html" %}
-{% block title %}Register for an account{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Benutzerregistrierung" %}{% endblock %}
 {% block content %}
   {% include 'registration/form_errors.html' %}
   <form method='post' class="well" action=''>{% csrf_token %}
