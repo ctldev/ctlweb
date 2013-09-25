@@ -43,6 +43,7 @@ def component_detail(request, comp_id):
     dict_response["see_description"] = see_description
     dict_response["see_ssh_data"] = see_ssh_data
     dict_response["see_ci"] = see_ci
+    dict_response["see_homecluster"] = see_homecluster
     context = RequestContext(request, dict_response)
     return render_to_response("comp_detail.html", context_instance=context)
 

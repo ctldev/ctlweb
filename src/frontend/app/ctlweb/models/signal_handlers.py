@@ -39,11 +39,11 @@ def components_active(sender, **kwargs):
     """
     Set is_active "False"
     """
-        comp = kwargs[u'instance']
-        if comp in Components.objects.all():
-            comp2 = Components.objects.get(id=comp.id)
-            if comp2.is_active :
-                comp.is_active = False
-        else :
+    comp = kwargs[u'instance']
+    if comp in Components.objects.all():
+        comp2 = Components.objects.get(id=comp.id)
+        if comp2.is_active :
             comp.is_active = False
+    else :
+        comp.is_active = False
 
