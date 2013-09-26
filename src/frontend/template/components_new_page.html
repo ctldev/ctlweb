@@ -171,7 +171,6 @@
 			  }
 			  $('#'+item).tab('show');
 
-			  {% if not form == 0 %}
 			  {# interfaceList or componentList, depending on selection and if #}
 			  {# searchmode active. Also handling clicks on related tabs #}
 			  $('#viewSelection a').click(function(e) {
@@ -191,9 +190,6 @@
 			  else {
 				$('#viewInterface').tab('show');
 			  }
-
-			  {% endif %}
-
 			});
 		  </script>
 {# {% if not form == 0 %} #}

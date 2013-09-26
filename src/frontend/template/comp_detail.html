@@ -12,21 +12,23 @@
     </h1>
     {% if see_description %}  
     {% if short %}
-    <blockquote id="description_short">
+    <blockquote id="description_short" class="description">
       {{ component.brief_description }} [...]
     </blockquote>
     {% endif %}
-    <blockquote id="description_long" {% if short %}class="hidden"{% endif %}>
-      {{ component.description }}
+    <blockquote id="description_long" class="description{% if short %}hidden{% endif %}">
+      {{ component.description|linebreaksbr }}
     </blockquote>
+    {% if short %}
     <script type="text/javascript">
 	    $(function(){
-		    $('#description_short').click(function(e){
-			    $('#description_short').attr('class', 'hidden');
-			    $('#description_long').attr('class', '');
+		    $('.description').click(function(e){
+			    $('#description_short').toggleClass('hidden');
+			    $('#description_long').toggleClass('hidden');
 		    });
 	    });
     </script>
+    {% endif %}
     {% endif %}
   </div> 
   <dl class="dl-horizontal">
@@ -77,6 +79,8 @@
     <dd>
       {% for p in component.programmer_set.all %}
         {{ p.email }}{% if not forloop.last %}, {% endif %}
+      {% empty %}
+        ---
       {% endfor %}
     </dd>
     
