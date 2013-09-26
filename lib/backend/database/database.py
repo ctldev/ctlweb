@@ -245,7 +245,7 @@ class Database:
         for i in attributes:
             if i == 'c_pk':
                 continue
-            sql += """, 
+            sql += """,
                 """ + i
             sql += " = ':" + i + "'"
         values['c_pk'] = self.c_pk
@@ -296,7 +296,7 @@ class Database:
             sql, values = self._update_query()
             Log.debug("Database.save(): %s is old object" %
                           self.__class__.get_exactly(self.c_pk, 'c_pk'))
-            Log.debug("Database.save(): %s as update query with %s as dict" % 
+            Log.debug("Database.save(): %s as update query with %s as dict" %
                           (sql, values))
             cursor.execute(sql, values)
             Database.db_connection.commit()

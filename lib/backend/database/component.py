@@ -150,7 +150,7 @@ class Component(Database):
         try:
             comp_log = ComponentLog.get_exactly(comp['c_exe_hash'])
             comp_log.remove()
-        except InstanceNotFoundError:
+        except (InstanceNotFoundError, NoSuchTable):
             pass
         import shutil
         try:
