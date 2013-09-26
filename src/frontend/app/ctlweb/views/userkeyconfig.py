@@ -30,6 +30,14 @@ def userkey_main(request):
                 	delete_key.delete()
         if filled_addform.is_valid():
             new_userkey = filled_addform.cleaned_data['new_userkey']
+            split_key = new_userkey.split('\n')
+            new_userkey = ''
+            for part in split_key:
+                new_userkey = new_userkey + part
+            split_key = new_userkey.split('\r')
+            new_userkey = ''
+            for part in split_key:
+                new_userkey = new_userkey + part
             new_userkey_data = Userkeys(user=logged_user, key=new_userkey)
             new_userkey_data.save()
         current_key_list = []
