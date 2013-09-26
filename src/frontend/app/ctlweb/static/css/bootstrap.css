@@ -655,6 +655,7 @@ a:hover {
   display: none;
   float: left;
   min-width: 560px;
+  max-width: 560px;
   padding: 5px 0;
   margin: 2px 0 0;
   list-style: none;
