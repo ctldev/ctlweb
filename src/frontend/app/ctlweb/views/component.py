@@ -1,4 +1,5 @@
 #vim: set fileencoding=utf-8
+
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import RequestContext, Template
 from django.template import Context, loader
@@ -62,10 +63,11 @@ def interface(request, int_id):
     dict_response["ci"] = intf.ci
 
     context = RequestContext(request, dict_response)
-    response = HttpResponse(content_type='text/plain')
     response = render_to_response("interface.txt", context_instance=context)
+    response = HttpResponse(mimetype='text/plain')
     response['Content-Disposition'] = 'attachment; filename=' + intf.name + '.ci'
     #print(dict_response["ci"])
+    
     return response
 
 

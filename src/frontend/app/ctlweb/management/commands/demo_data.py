@@ -116,7 +116,7 @@ class Command(BaseCommand):
                     "mittels Gauß-Algorithmus",
                 version="1.001.0001")
         self.co2 = Components(exe_hash="bar",
-                description="Diese Komponente addiert zwei Matrizen",
+                description="DieseDiese Komponente addiert zwei MatrizenDiese Komponente addiert zwei MatrizenDiese Komponente addiert zwei Matrizen Komponente addiert zwei Matrizen",
                 version="10001a")
         self.co3 = Components(exe_hash="foobar",
                 description="Diese Komponente addiert zwei Zahlen miteinander.",
