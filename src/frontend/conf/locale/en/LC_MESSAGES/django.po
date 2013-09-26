@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-25 16:14+0200\n"
+"POT-Creation-Date: 2013-09-26 09:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,133 +20,141 @@ msgstr ""
 #: app/ctlweb/admin/actions.py:53
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "Successfully deleted %(count)d %(items)s"
 
 #: app/ctlweb/admin/actions.py:65
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Cannot delete %(name)s"
 
 #: app/ctlweb/admin/actions.py:67
 msgid "Are you sure?"
-msgstr ""
+msgstr "Are you sure?"
 
 #: app/ctlweb/admin/actions.py:89
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Delete selected %(verbose_name_plural)s"
 
 #: app/ctlweb/admin/cluster.py:25
 msgid "Connection"
-msgstr ""
+msgstr "Connection"
 
 #: app/ctlweb/admin/cluster.py:39 app/ctlweb/admin/interfaces.py:40
 msgid "Anzahl Components"
-msgstr ""
+msgstr "Count of Components"
 
 #: app/ctlweb/admin/components.py:13
 msgid "Components aktivieren"
-msgstr ""
+msgstr "Activate Components"
 
 #: app/ctlweb/admin/components.py:18
 msgid "Components deaktiveren"
-msgstr ""
+msgstr "Deactivate Components"
 
 #: app/ctlweb/admin/components.py:49
 msgid "Dates"
-msgstr ""
+msgstr "Daten"
 
 #: app/ctlweb/admin/components.py:50 app/ctlweb/admin/interfaces.py:25
 #: app/ctlweb/models/components.py:22 app/ctlweb/models/interfaces.py:14
 msgid "Hash"
-msgstr ""
+msgstr "Hash"
 
 #: app/ctlweb/admin/interfaces.py:24
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
 #: app/ctlweb/admin/user.py:14
 msgid "Benutzer aktivieren"
-msgstr ""
+msgstr "Activate User"
 
 #: app/ctlweb/admin/user.py:20
 msgid "Benutzer deaktivieren"
-msgstr ""
+msgstr "Deactivate User"
 
 #: app/ctlweb/admin/user.py:26
 msgid "Benutzer Redakteurrechte geben"
-msgstr ""
+msgstr "Give User Staff status"
 
 #: app/ctlweb/admin/user.py:32
 msgid "Benutzer "
-msgstr ""
+msgstr "User "
 
 #: app/ctlweb/admin/user.py:39
 msgid "Benutzer Adminrechte geben"
-msgstr ""
+msgstr "Give User Admin rights"
 
 #: app/ctlweb/admin/user.py:45
 msgid "Benutzer Adminrechte entziehen"
-msgstr ""
+msgstr "Revoke User Admin rights"
 
 #: app/ctlweb/forms/default.py:8 app/ctlweb/models/cluster.py:17
 #: app/ctlweb/models/cluster.py:18
 msgid "Cluster"
-msgstr ""
+msgstr "Cluster"
+
+#: app/ctlweb/forms/default.py:14
+msgid "Entfernen?"
+msgstr "Remove?"
+
+#: app/ctlweb/forms/default.py:18
+msgid "Neuer Userkey"
+msgstr "New Userkey"
 
 #: app/ctlweb/forms/search.py:8
 msgid "Alle Kategorien"
-msgstr ""
+msgstr "All categories"
 
-#: app/ctlweb/forms/search.py:9 app/ctlweb/models/components.py:65
+#: app/ctlweb/forms/search.py:9 app/ctlweb/models/components.py:64
 #: app/ctlweb/models/interfaces.py:13
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: app/ctlweb/forms/search.py:10
 msgid "Autor"
-msgstr ""
+msgstr "Author"
 
 #: app/ctlweb/forms/search.py:11
 msgid "Schlüsselwort"
-msgstr ""
+msgstr "Keyword"
 
 #: app/ctlweb/forms/search.py:29
 msgid "Komponenten und Interfaces"
-msgstr ""
+msgstr "Components and Interfaces"
 
 #: app/ctlweb/forms/search.py:30
 msgid "Komponenten"
-msgstr ""
+msgstr "Components"
 
 #: app/ctlweb/forms/search.py:31 template/components_new_page.html:34
 #: template/components_new_page.html:50
 msgid "Interfaces"
-msgstr ""
+msgstr "Interfaces"
 
 #: app/ctlweb/forms/search.py:33
 msgid "Suchgebiet"
-msgstr ""
+msgstr "Search area"
 
 #: app/ctlweb/forms/search.py:36
 msgid "Suchtext"
-msgstr ""
+msgstr "Search text"
 
 #: app/ctlweb/forms/search.py:38
 msgid "Kategorie"
-msgstr ""
+msgstr "Category"
 
 #: app/ctlweb/forms/search.py:47
 msgid "und"
-msgstr ""
+msgstr "and"
 
 #: app/ctlweb/forms/search.py:48
 msgid "und nicht"
-msgstr ""
+msgstr "and not"
 
 #: app/ctlweb/forms/search.py:49
 msgid "oder"
-msgstr ""
+msgstr "or"
 
 #: app/ctlweb/forms/search.py:50
 msgid "Bindung"
@@ -154,138 +162,144 @@ msgstr ""
 
 #: app/ctlweb/models/cluster.py:10
 msgid "Host/IP"
-msgstr ""
+msgstr "Host/IP"
 
 #: app/ctlweb/models/cluster.py:11
 msgid "Benutzer"
-msgstr ""
+msgstr "User"
 
 #: app/ctlweb/models/cluster.py:12
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: app/ctlweb/models/cluster.py:13 app/ctlweb/models/userkeys.py:14
 msgid "Schlüssel"
-msgstr ""
+msgstr "Key"
 
 #: app/ctlweb/models/components.py:15
 msgid "Namen"
-msgstr ""
+msgstr "Name"
 
 #: app/ctlweb/models/components.py:16
 msgid "Beschreibung"
-msgstr ""
+msgstr "Description"
 
 #: app/ctlweb/models/components.py:17
 msgid "Zuletzt geändert am"
-msgstr ""
+msgstr "Last edited on"
 
 #: app/ctlweb/models/components.py:18
 msgid "Erstellungsdatum"
-msgstr ""
+msgstr "Creation date"
 
 #: app/ctlweb/models/components.py:20
 msgid "Freigeschaltet"
-msgstr ""
+msgstr "Unlocked"
 
 #: app/ctlweb/models/components.py:21
 msgid "Version"
-msgstr ""
+msgstr "Version"
 
 #: app/ctlweb/models/components.py:24
 msgid "Ursprungscluster"
-msgstr ""
+msgstr "Root Cluster"
 
-#: app/ctlweb/models/components.py:29
+#: app/ctlweb/models/components.py:28
 msgid "Component"
-msgstr ""
+msgstr "Component"
 
-#: app/ctlweb/models/components.py:30 app/ctlweb/models/interfaces.py:16
+#: app/ctlweb/models/components.py:29 app/ctlweb/models/interfaces.py:16
 #: template/components_new_page.html:39
 msgid "Components"
-msgstr ""
+msgstr "Components"
+
+#: app/ctlweb/models/components.py:69
+msgid "Component - Cluster - Verbindung"
+msgstr "Component - Cluster - Connection"
 
 #: app/ctlweb/models/components.py:70
-msgid "Component - Cluster - Verbindung"
-msgstr ""
-
-#: app/ctlweb/models/components.py:71
 msgid "Component - Cluster - Verbindungen"
-msgstr ""
+msgstr "Component - Cluster - Connections"
 
-#: app/ctlweb/models/components.py:83 app/ctlweb/models/components.py:85
-#: app/ctlweb/models/components.py:86
+#: app/ctlweb/models/components.py:82 app/ctlweb/models/components.py:84
+#: app/ctlweb/models/components.py:85
 msgid "Programmierer"
-msgstr ""
+msgstr "Programmer"
 
 #: app/ctlweb/models/interfaces.py:12
 msgid "Quellcode"
-msgstr ""
+msgstr "Source code"
 
 #: app/ctlweb/models/interfaces.py:21
 msgid "Interface"
-msgstr ""
+msgstr "Interface"
 
 #: app/ctlweb/models/interfaces.py:44
 msgid "Interfaces - Components - Verbindung"
-msgstr ""
+msgstr "Interface - Components - Connection"
 
 #: app/ctlweb/models/interfaces.py:45
 msgid "Interfaces - Components - Verbindungen"
-msgstr ""
+msgstr "Interface - Components - Verbindungen"
 
 #: app/ctlweb/models/other.py:17
 msgid "Token"
-msgstr ""
+msgstr "Token"
 
 #: app/ctlweb/models/other.py:19
 msgid "Ablaufdatum"
-msgstr ""
+msgstr "Expiration date"
 
 #: app/ctlweb/models/userkeys.py:13 app/ctlweb/models/userkeys.py:76
 #: app/ctlweb/models/userkeys.py:77
 msgid "User"
-msgstr ""
+msgstr "User"
 
 #: app/ctlweb/models/userkeys.py:22 app/ctlweb/models/userkeys.py:23
 msgid "Benutzerschlüssel"
-msgstr ""
+msgstr "User Key"
 
 #: template/base.html:69 template/components_new_page.html:6
 msgid "Verzeichnis"
-msgstr ""
+msgstr "Catalogue"
 
-#: template/base.html:74
+#: template/base.html:74 template/admin/base_site.html:18
 msgid "Administration"
-msgstr ""
+msgstr "Administration"
 
 #: template/base.html:79
 msgid "Impressum"
-msgstr ""
+msgstr "Impressum"
 
 #: template/base.html:88 template/search.html:4
 msgid "Suche"
-msgstr ""
+msgstr "Search"
 
 #: template/base.html:92
 msgid "Erweiterte Suche"
-msgstr ""
+msgstr "Advanced Search"
 
-#: template/base.html:122
+#: template/base.html:122 template/registration/password_change_form.html:3
+#: template/registration/password_reset_confirm.html:3
+#: template/registration/password_reset_form.html:3
 msgid "Passwort ändern"
-msgstr ""
+msgstr "Change password"
 
-#: template/base.html:128
+#: template/base.html:127
+msgid "Userkeys verwalten"
+msgstr "Organize User Keys"
+
+#: template/base.html:133
 msgid "LogOut"
-msgstr ""
+msgstr "Logout"
 
-#: template/base.html:145
+#: template/base.html:150
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
-#: template/base.html:152
+#: template/base.html:157
 msgid "Registrieren"
-msgstr ""
+msgstr "Register"
 
 #: template/comp_detail.html:34
 msgid ""
@@ -296,14 +310,24 @@ msgid_plural ""
 "\n"
 "      Interfaces:\n"
 "      "
-msgstr[0] ""
+msgstr[0] "" 
+"\n" 
+"      Interface:\n"
+"      "
 msgstr[1] ""
+"\n"
+"	   Interfaces:\n"
+"      "
 
-#: template/comp_detail.html:60 template/components_new_page.html:98
+#: template/comp_detail.html:60 template/components_new_page.html:97
 msgid "Schließen"
-msgstr ""
+msgstr "Close"
 
-#: template/comp_detail.html:70
+#: template/comp_detail.html:62 template/components_new_page.html:99
+msgid "Download"
+msgstr "Download"
+
+#: template/comp_detail.html:71
 msgid ""
 "\n"
 "      Ersteller:\n"
@@ -313,17 +337,23 @@ msgid_plural ""
 "      Ersteller:\n"
 "      "
 msgstr[0] ""
+"\n"
+"      Creator:\n"
+"      "
 msgstr[1] ""
+"\n"
+"      Creator:\n"
+"      "
 
-#: template/comp_detail.html:83
+#: template/comp_detail.html:84
 msgid "Version:"
-msgstr ""
+msgstr "Version:"
 
-#: template/comp_detail.html:90
+#: template/comp_detail.html:91
 msgid "Datum:"
-msgstr ""
+msgstr "Date:"
 
-#: template/comp_detail.html:98
+#: template/comp_detail.html:99
 msgid ""
 "\n"
 "    Cluster:\n"
@@ -333,11 +363,21 @@ msgid_plural ""
 "    Cluster:\n"
 "  "
 msgstr[0] ""
+"\n"
+"    Cluster:\n"
+"  "
 msgstr[1] ""
+"\n"
+"    Cluster:\n"
+"  "
 
-#: template/comp_detail.html:117
+#: template/comp_detail.html:118
 msgid "CTL-Befehl:"
-msgstr ""
+msgstr "CTL-Command"
+
+#: template/components.html:4
+msgid "Liste"
+msgstr "list"
 
 #: template/components_new_page.html:9
 msgid ""
@@ -345,18 +385,25 @@ msgid ""
 "\tEine Auflistung aller Interfaces und ihrer zugehörigen Komponenten\n"
 "\t"
 msgstr ""
+" \n"
+"\tA list of all Interfaces and their corresponding Components\n"
+"\t"
 
 #: template/components_new_page.html:21
 msgid "Alle direkten und indirekten Ergebnisse für "
-msgstr ""
+msgstr "All direct and indirect results for "
 
 #: template/components_new_page.html:25
 msgid "die Suche."
-msgstr ""
+msgstr "the Search."
+
+#: template/components_new_page.html:82
+msgid "Details"
+msgstr "Details"
 
 #: template/components_new_page.html:106
 msgid "Gefundene"
-msgstr ""
+msgstr "found"
 
 #: template/components_new_page.html:108
 msgid ""
@@ -364,6 +411,9 @@ msgid ""
 "\t\t\t\t\t\tKomponenten  \n"
 "\t\t\t\t\t  "
 msgstr ""
+" \n"
+"\t\t\t\t\t\tComponents  \n"
+"\t\t\t\t\t  "
 
 #: template/components_new_page.html:127
 msgid ""
@@ -375,7 +425,14 @@ msgid_plural ""
 "\t\t\t\t\t\t\t  Programmierer:\n"
 "\t\t\t\t\t\t\t"
 msgstr[0] ""
+"\n"
+"\t\t\t\t\t\t\t  Programmer:\n"
+"\t\t\t\t\t\t\t"
 msgstr[1] ""
+"\n"
+"\t\t\t\t\t\t\t  Programmer:\n"
+"\t\t\t\t\t\t\t"
+
 
 #: template/components_new_page.html:215
 msgid ""
@@ -387,55 +444,221 @@ msgid_plural ""
 "\t\t\t\t\t  Programmierer:\n"
 "\t\t\t\t\t"
 msgstr[0] ""
+"\n"
+"\t\t\t\t\t\t\t  Programmer:\n"
+"\t\t\t\t\t\t\t"
 msgstr[1] ""
+"\n"
+"\t\t\t\t\t\t\t  Programmer:\n"
+"\t\t\t\t\t\t\t"
+
+
+#: template/home.html:4 template/admin/base.html:59
+msgid "Home"
+msgstr "Home"
 
 #: template/home.html:9
 msgid "Willkommen auf CTLWEB"
-msgstr ""
+msgstr "Welcome to CTLWEB"
 
 #: template/home.html:10
 msgid "Hier finden Sie DIE Komponenten"
-msgstr ""
+msgstr "Here are the Components"
+
+#: template/home.html:13
+msgid "Los geht's!"
+msgstr "Let's go!"
 
 #: template/impressum.html:11
 msgid ""
 "\n"
-"\tCTLWEB-Impressum\n"
+"\t  CTLWEB-Impressum\n"
 "\t"
 msgstr ""
+"\n"
+"\t  CTLWEB-Impressum\n"
+"\t"
 
-#: template/search.html:109
+#: template/search.html:87 template/search.html.py:109
 msgid "Suchfeld löschen"
-msgstr ""
+msgstr "Delete searchfield"
 
 #: template/search.html:116
 msgid "Weiteres Suchfeld"
-msgstr ""
+msgstr "Add searchfield"
 
 #: template/search.html:120
 msgid "Suche starten"
-msgstr ""
+msgstr "Start Search"
+
+#: template/userkey.html:4 template/userkey.html.py:11
+msgid "Userkey-Verwaltung"
+msgstr "Userkey-Organization"
+
+#: template/userkey.html:50
+msgid "Änderungen übernehmen"
+msgstr "Save changes"
 
 #: template/admin/base.html:31
 msgid "Welcome,"
-msgstr ""
+msgstr "Welcome,"
 
 #: template/admin/base.html:36
 msgid "Documentation"
-msgstr ""
+msgstr "Documentation"
 
 #: template/admin/base.html:44
 msgid "Change password"
-msgstr ""
+msgstr "Change password"
 
 #: template/admin/base.html:51
 msgid "Log out"
-msgstr ""
-
-#: template/admin/base.html:59
-msgid "Home"
-msgstr ""
+msgstr "Log out"
 
 #: template/admin/base_site.html:5
 msgid "CTLWEB admin"
-msgstr ""
+msgstr "CTLWEB admin"
+
+#: template/registration/activate.html:3
+msgid "Aktivierung komplett"
+msgstr "Activation successful"
+
+#: template/registration/activate.html:3
+msgid "Aktivierung fehlerhaft"
+msgstr "Activation failed"
+
+#: template/registration/activate.html:6
+msgid "Danke"
+msgstr "Thank you"
+
+#: template/registration/activate.html:6
+msgid "der Account wurde erfolgreich aktiviert!"
+msgstr "the Account has been activated successfully"
+
+#: template/registration/activate.html:6
+msgid "Sie können sich nun mit Ihrem Benutzernamen und Passwort einloggen"
+msgstr "You can now login using your Username and password"
+
+#: template/registration/activate.html:8
+msgid "Oops"
+msgstr "Oops"
+
+#: template/registration/activate.html:8
+msgid ""
+"es scheint Ihr Aktivierungsschlüssel ist ungültig. Überprüfen Sie Ihren Link."
+msgstr "It seems that your activationkey is invalid. Please check your link."
+
+#: template/registration/activation_complete.html:6
+msgid "Thanks, activation complete!"
+msgstr "Thanks, activation complete"
+
+#: template/registration/activation_complete.html:7
+msgid "You may now"
+msgstr "You may now"
+
+#: template/registration/activation_complete.html:7
+msgid "login"
+msgstr "login"
+
+#: template/registration/activation_complete.html:7
+msgid "using the username and password you set at registration."
+msgstr "using the username and password you set at registration."
+
+#: template/registration/form_errors.html:4
+msgid "Fehler bei der Verarbeitung Ihrer eingegebenen Daten."
+msgstr "There were errors processing your form"
+
+#: template/registration/logged_out.html:6
+msgid "Erfolgreich abgemeldet."
+msgstr "Logged out successfully"
+
+#: template/registration/logged_out.html:8
+msgid "Zurück zur"
+msgstr "Back to"
+
+#: template/registration/logged_out.html:8
+msgid "Hauptseite"
+msgstr "Home"
+
+#: template/registration/login.html:9
+msgid "Passwort vergessen?"
+msgstr "Forgot password?"
+
+#: template/registration/login.html:9
+msgid "Account erstellen?"
+msgstr "Create account?"
+
+#: template/registration/password_change_done.html:3
+msgid "Passwort geändert"
+msgstr "Password changed"
+
+#: template/registration/password_change_done.html:5
+msgid "Passwort erfolgreich geändert!"
+msgstr "Password successfully changed!"
+
+#: template/registration/password_reset_complete.html:3
+msgid "Passwort erfolgreich geändert"
+msgstr "Password successfully changed"
+
+#: template/registration/password_reset_complete.html:5
+msgid "Ihr Passwort wurde erfolgreich geändert! Sie können sich nun"
+msgstr "Your password has been changed successfully! You may now"
+
+#: template/registration/password_reset_complete.html:5
+msgid "einloggen"
+msgstr "login"
+
+#: template/registration/password_reset_confirm.html:5
+msgid "Geben Sie bitte Ihr neues Passwort ein, um es zu ändern:"
+msgstr "Please provide your new password in order to change it:"
+
+#: template/registration/password_reset_done.html:3
+msgid "Password zurücksetzen"
+msgstr "reset password"
+
+#: template/registration/password_reset_done.html:7
+msgid ""
+"Eine Email wurde an Sie versendet. Bestätigen sie den enthaltenen Link, um "
+"Ihr Passwort zu ändern."
+msgstr "We have sent you an email with a link to reset your password. Please check "
+"your email and click the link to continue."
+
+#: template/registration/password_reset_email.html:2
+msgid "Hallo"
+msgstr "Hello"
+
+#: template/registration/password_reset_email.html:4
+msgid ""
+"Sie haben diese E-Mail erhalten, weil Sie Ihr Passwort ändern möchten, auf "
+"der Seite"
+msgstr "You are receiving this email because you (or someone pretending to be you) "
+"requested that your password be reset on"
+
+#: template/registration/password_reset_email.html:10
+msgid "Ihr Benutzername zur Erinnerung:"
+msgstr "Your Username:"
+
+#: template/registration/password_reset_email.html:13
+msgid "Mit freundlichen Grüßen, "
+msgstr "Wth kind regards, "
+
+#: template/registration/password_reset_form.html:7
+msgid ""
+"Passwort vergessen? Geben Sie einfach Ihre E-Mail Adresse ein und wir "
+"schicken Ihnen Instruktionen zu, wie sie ein neues Passwort erstellen."
+msgstr "Forgot your password?  Enter your email in the form below and we'll send you "
+"instructions for creating a new one."
+
+#: template/registration/registration_complete.html:3
+msgid "Aktivierungsemail versendet"
+msgstr "Activation email sent"
+
+#: template/registration/registration_complete.html:8
+msgid ""
+"Eine Aktivierungsemail wurde an Sie versendet. Bitte bestätigen Sie den "
+"darin enthaltenen Link, um Ihren Account zu aktivieren."
+msgstr "An activation email has been sent. Please check your email and click on the link to activate your account."
+
+#: template/registration/registration_form.html:3
+msgid "Benutzerregistrierung"
+msgstr "User registration"
