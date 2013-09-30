@@ -2,6 +2,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 class Userkeys(models.Model):
     """
@@ -10,8 +11,12 @@ class Userkeys(models.Model):
     bzw. wieder zu aktivieren (set_active).
 
     """
+    def userkey_validator(userkey):
+        if userkey.find('\n') != -1:
+            raise ValidationError(_('The Userkey has more than one line'))
+
     user = models.ForeignKey(User, verbose_name=_("User"))
-    key = models.TextField(_(u"Schlüssel"))
+    key = models.TextField(_(u"Schlüssel"), validators=[userkey_validator])
     class Meta:
         permissions = (
 		    ("can_request_key", "Can request a userkey"),

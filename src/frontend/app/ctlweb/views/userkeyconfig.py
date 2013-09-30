@@ -20,8 +20,10 @@ def userkey_main(request):
     if request.method == 'POST':
     	current_keys = Userkeys.objects.all().filter(
             user__username__icontains = logged_user.username)
+        
         filled_currentform = UserkeyFormset(request.POST, prefix='current',)
         filled_addform = UserkeyAddForm(request.POST, prefix = 'add')
+        adduserkeyform = UserkeyAddForm(prefix = 'add')
         for form in filled_currentform:
             if form.is_valid():
                 old_userkey = form.cleaned_data.get('current_userkey')
@@ -30,22 +32,16 @@ def userkey_main(request):
                 	delete_key.delete()
         if filled_addform.is_valid():
             new_userkey = filled_addform.cleaned_data['new_userkey']
-            split_key = new_userkey.split('\n')
-            new_userkey = ''
-            for part in split_key:
-                new_userkey = new_userkey + part
-            split_key = new_userkey.split('\r')
-            new_userkey = ''
-            for part in split_key:
-                new_userkey = new_userkey + part
             new_userkey_data = Userkeys(user=logged_user, key=new_userkey)
             new_userkey_data.save()
+        else:
+            adduserkeyform = filled_addform
         current_key_list = []
         for key_model in current_keys:
             current_key_list.append({'current_userkey': key_model.key,
                 'deletechoice': False})
+        
         currentuserkeyform=UserkeyFormset(prefix='current', initial=current_key_list)
-        adduserkeyform = UserkeyAddForm(prefix = 'add')
         dict_response = {
             'currentform' : currentuserkeyform,
             'addform' : adduserkeyform,

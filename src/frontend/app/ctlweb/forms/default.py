@@ -10,10 +10,3 @@ class ComponentAddForm(forms.ModelForm):
         model = Components
         exclude = ('date', 'is_active')
 
-class CurrentUserkeyForm(forms.Form):
-	deletechoice = forms.BooleanField(label=_('Entfernen?'))
-	current_userkey = forms.CharField(widget=forms.Textarea(attrs={'rows':5, 'cols':200, 'readonly':True}))
-
-class UserkeyAddForm(forms.Form):
-    new_userkey = forms.CharField(label=_(u'Neuer Userkey'),
-    	widget=forms.Textarea(attrs={'rows':1, 'cols':500}))
